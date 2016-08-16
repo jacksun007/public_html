@@ -1,0 +1,15 @@
+body {
+    padding-top: 60px;  
+}
+
+/* fixes some annoying shifts with having ul in bootstrap */
+@media screen and (min-width: 768px) {
+    body {
+        padding-left: 14px;
+    }
+    
+    ul.nav {
+        padding-left: 7px;
+    }
+}
+
