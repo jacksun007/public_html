@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ECE326 | Programming Languages | Fall 2019</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Kuei (Jack) Sun">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/dashboard.css" rel="stylesheet">
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../assets/js/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+<body data-spy="scroll" data-target=".sidebar"  data-offset="64">
+
+<nav class="navbar navbar-dark navbar-expand-md fixed-top bg-dark shadow">
+  <a class="navbar-brand pr-3" href="ece326.html">ECE326</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarCollapse">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="ece326.html">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="lectures.html">Lecture Notes</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="labs.html">Assignments</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="http://piazza.com/utoronto.ca/fall2019/ece326">Piazza Discussion</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://q.utoronto.ca/">Quercus Website</a>
+      </li>
+    </ul>
+  </div>  
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-md-3 col-lg-2 d-none d-md-block bg-light sidebar">
+      <div class="sidebar-sticky">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="#announcement">
+              Announcements
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#description">
+              Course Description
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#schedule">
+              Course Schedule
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#evaluation">
+              Grading Scheme
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#outline">
+              Course Outline
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">ECE326: Programming Languages, Fall 2019</h1>
+      </div>
+
+      <h4 id="announcement">Announcements</h4>
+      <ul>
+        <li><em>Aug 28, 2019</em>: Course website is up and running!</li>
+      </ul>
+      
+      <h4 id="description">Course Description</h4>
+      <p>
+      General introduction of modern programming languages and paradigms, including imperative programming, object-oriented programming, meta programming, concurrent programming and functional programming. The course will be supplemented by coding assignments using popular programming languages such as C++11, Python, and <a href="https://www.rust-lang.org/">Rust</a>.
+      </p>
+      <p>Note that the 
+        <a href="https://portal.engineering.utoronto.ca/sites/calendars/current/Course_Descriptions.html#ECE326H1">
+      course description on the academic calendar</a> is not up-to-date.
+
+      <dl class="row">
+        <dt class="col-5 col-sm-3">Instructor</dt><dd class="col-7 col-sm-9"><a href="index.html">Kuei (Jack) Sun</a></dd>
+        <dt class="col-5 col-sm-3">Office</dt><dd class="col-7 col-sm-9">PRA372</dd>
+        <dt class="col-5 col-sm-3">Office Hours</dt><dd class="col-7 col-sm-9">available upon request</dd>
+        <dt class="col-5 col-sm-3">TAs</dt><dd class="col-7 col-sm-9">Chloe Geng, Wendy Qiu, Andrew Choi, Szu-Chieh Fang</dd>
+      </dl><!--row-->
+      
+      <p>Course announcements and course discussion will be on the <a href="http://piazza.com/utoronto.ca/fall2019/ece326">Piazza web site</a>. You will need to register with Piazza, and sign up for this course on Piazza through the provided link. You should post any questions about the course on Piazza before sending individual mails to the TAs or the instructor. Please visit the Piazza site regularly for up-to-date information. You may also use private posts on Piazza to provide course feedback to the instructor.</p>
+
+      <p>The <a href="https://q.utoronto.ca/">Quercus website</a> will only be used for course grades and course evaluations.</p>
+      
+      <h4 id="schedule">Course Schedule</h4>
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">Name</th>
+              <th scope="col">Day</th>
+              <th scope="col">Time</th>
+              <th scope="col">Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td scope="row" rowspan="3">Lecture</td>
+              <td scope="row" rowspan="3">LEC0101</td>
+              <td>Tuesday</td>
+              <td>12pm - 1pm</td>
+              <td>BA1190</td>
+            </tr>
+            <tr>
+              <td>Thursday</td>
+              <td>12pm - 1pm</td>
+              <td>BA1190</td>
+            </tr>
+            <tr>
+              <td>Friday</td>
+              <td>12pm - 1pm</td>
+              <td>BA1190</td>
+            </tr>
+            <tr>
+              <td scope="row" rowspan="2">Tutorial^</td>
+              <td>TUT0101</td>
+              <td>Monday</td>
+              <td>10am - 11am</td>
+              <td>WB219</td>
+            </tr>
+            <tr>
+              <td>TUT0102</td>
+              <td>Tuesday</td>
+              <td>2pm - 3pm</td>
+              <td>HA403</td>
+            </tr>
+            <tr>
+              <td scope="row" rowspan="3">Lab*^</td>
+              <td>PRA0101</td>
+              <td>Monday</td>
+              <td>12pm - 3pm</td>
+              <td>GB243</td>
+            </tr>
+            <tr>
+              <td>PRA0102</td>
+              <td>Monday</td>
+              <td>12pm - 3pm</td>
+              <td>GB243</td>
+            </tr>
+            <tr>
+              <td>PRA0103</td>
+              <td>Monday</td>
+              <td>3pm - 6pm</td>
+              <td>GB243</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>*Labs occur once every two weeks. PRA0101 and PRA0103 start on the week of September 9th and PRA0102 starts on the week of September 16th.</p>
+      <p>^There will be <em>no</em> labs or tutorials during Thanksgiving week (week of October 13th). All lab schedules will then be shifted by a week (i.e., PRA0102 on the week of October 20th, PRA0101 and PRA0103 on the week of October 27th, ...etc).</p>
+      
+      <h5>Important Dates</h5>
+      <div class="table-responsive">
+        <table class="table table-borderless table-hover">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">Day</th>
+              <th scope="col">Time</th>
+              <th scope="col">Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td scope="row">Assignment 1</td>
+              <td>Sunday, September 29th</td>
+              <td>11:59pm</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td scope="row">Assignment 2</td>
+              <td>Sunday, October 9th</td>
+              <td>11:59pm</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td scope="row">Midterm</td>
+              <td>Tuesday, October 29th</td>
+              <td>4pm - 5:30pm</td>
+              <td>EX320</td>
+            </tr>
+            <tr>
+              <td scope="row">Assignment 3</td>
+              <td>Sunday, November 10th</td>
+              <td>11:59pm</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td scope="row">Assignment 4</td>
+              <td>Sunday, December 8th</td>
+              <td>11:59pm</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td scope="row">Final Exam</td>
+              <td>TBD</td>
+              <td>TBD</td>
+              <td>TBD</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <h4 id="evaluation">Grading Scheme</h4>
+      <p>There will be 4 major assignments throughout the term, one midterm exam and one final exam. Also, during each tutorial session, you will be asked to complete a simple quiz. The breakdown of the final mark is shown here:</p>
+      
+      <dl class="row">
+        <dt class="offset-1 col-5 col-sm-3">Quizzes</dt><dd class="col">4%*</dd>
+        <dt class="offset-1 col-5 col-sm-3">Assignment 1</dt><dd class="col">5%</dd>
+        <dt class="offset-1 col-5 col-sm-3">Assignment 2</dt><dd class="col">6%</dd>
+        <dt class="offset-1 col-5 col-sm-3">Assignment 3</dt><dd class="col">7%</dd>
+        <dt class="offset-1 col-5 col-sm-3">Assignment 4</dt><dd class="col">8%</dd>
+        <dt class="offset-1 col-5 col-sm-3">Midterm</dt><dd class="col">25%</dd>
+        <dt class="offset-1 col-5 col-sm-3">Final</dt><dd class="col">45%</dd>
+      </dl><!--row-->
+      
+      <p>
+      The midterm and the final exam will be <em>closed book</em> exams. No calculators or cheat sheets are allowed for either exam.
+      </p>
+      
+      <p>
+      *There will be 12 quizzes, but you only need to complete 10 out of the 12 to receive full marks. These quizzes are intended as exercises and thus will only be checked for completion and not for correctness by the TAs. The TAs will provide the answer to each quiz at the end of the tutorial.
+      </p>
+      
+      <p>There will strictly be no extensions for assignments. It is your responsibility to give yourself enough time to properly submit your assignment.</p>
+      
+      <p>For any remarking requests, contact the course instructor directly. You may not submit a remarking request later than two weeks after the assignment or exam is returned.</p>
+      
+      <h5>Policy on Cheating</h5>
+      <p>Plagiarism and cheating will <strong>not</strong> be tolerated under any circumstances. Cheating includes, but is not limited to, generating expected output in an attempt to fool the automated marking script. It is also an offense to allow a copy of your work to be submitted by another person for credit, whether with or without your knowledge. As such, it is your responsibility to protect your work from being copied by others.</p>
+
+      <p>All assignments submitted for credit in this course will be compared pairwise to attempt to identify cases of collusion, copying, and similar offenses. The comparison is performed by a sophisticated program that is capable of detecting similar programs even if considerable effort has been taken to conceal their similarity.</p>
+
+      <p>Any work submitted for credit that is not the work of the person(s) submitting it will be treated as an offense under the Code of Academic Discipline of the University. The Code of Academic Discipline will be rigidly enforced in this course. Penalties can range from grade penalties in the course to suspension from the university. The Dean, as advised by the instructors and the Departmental Chair, determines the penalty for each case.</p>
+
+      <p>For more details, please refer to the <a href="https://www.academicintegrity.utoronto.ca/">Academic Integrity web site</a> at the University.</p>
+      
+      
+      <h4 id="outline">Course Outline</h4>
+      <div class="table-responsive">
+        <table class="table table-borderless table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Week</th>
+              <th scope="col">Topic</th>
+              <th scope="col">Languages</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td scope="row">1</td>
+              <td>Introduction to Programming Languages</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td scope="row">2</td>
+              <td>Imperative Programming</td>
+              <td>C++11, Python</td>
+            </tr>
+            <tr>
+              <td scope="row">3</td>
+              <td>Object-Oriented Programming</td>
+              <td>C++11, Python</td>
+            </tr>
+            <tr>
+              <td scope="row">4</td>
+              <td>Type System</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td scope="row">5</td>
+              <td>Generic Programming</td>
+              <td>C++11, Python, Rust</td>
+            </tr>
+            <tr>
+              <td scope="row">6</td>
+              <td>Metaprogramming (Macro-based)</td>
+              <td>C++11, Rust</td>
+            </tr>
+            <tr>
+              <td scope="row">7</td>
+              <td>Metaprogramming (Template, Reflection)</td>
+              <td>C++11, Python</td>
+            </tr>
+            <tr>
+              <td scope="row">8</td>
+              <td>Concurrent Programming</td>
+              <td>C++11, Rust</td>
+            </tr>
+            <tr>
+              <td scope="row">9</td>
+              <td>Parallel Computing</td>
+              <td>C++11, Rust</td>
+            </tr>
+            <tr>
+              <td scope="row">10</td>
+              <td>Memory Management</td>
+              <td>C++11, Rust</td>
+            </tr>
+            <tr>
+              <td scope="row">11</td>
+              <td>Functional Programming (Closure)</td>
+              <td>Python, Rust</td>
+            </tr>
+            <tr>
+              <td scope="row">12</td>
+              <td>Functional Programming (Coroutine)</td>
+              <td>Python, Rust</td>
+            </tr>
+            <tr>
+              <td scope="row">13</td>
+              <td>Other Programming Paradigms</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td scope="row">14</td>
+              <td>Future of Programming Languages (Time Permitting)</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <p>The suggested textbooks for this course are:</p>
+      <ul>
+        <li>The C++ Programming Language (4th Edition) by Bjarne Stroustrup</li>
+        <li><a href="http://www.math.ru.nl/~bosma/onderwijs/najaar09/thinkpython.pdf">
+          Thinking Python: How to Think Like a Computer Scientist</a></li>
+        <li><a href="https://doc.rust-lang.org/book/">The Rust Programming Language (2018 Edition)</a></li>
+        <li>Concepts of Programming Languages (11th Edition) by Robert W. Sebesta, 2015.</li>
+      </ul>
+      <p>None of the suggested textbooks are mandatory. Midterm and final exam questions will be sourced exclusively from the lecture notes.</p>
+      <hr>
+      <footer class="container text-center">
+        <p>&copy; 2019 Kuei (Jack) Sun, University of Toronto</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    /* nothing for now */
+  });
+</script>
+</body>
+</html>

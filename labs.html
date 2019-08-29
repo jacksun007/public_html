@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Lab Assignments | ECE326 | Programming Languages | Fall 2019</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Kuei (Jack) Sun">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/dashboard.css" rel="stylesheet">
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../assets/js/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+<body data-spy="scroll" data-target=".sidebar"  data-offset="64">
+
+<nav class="navbar navbar-dark navbar-expand-md fixed-top bg-dark shadow">
+  <a class="navbar-brand pr-3" href="ece326.html">ECE326</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarCollapse">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="ece326.html">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="lectures.html">Lecture Notes</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="labs.html">Assignments</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="http://piazza.com/utoronto.ca/fall2019/ece326">Piazza Discussion</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://q.utoronto.ca/">Quercus Website</a>
+      </li>
+    </ul>
+  </div>  
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-md-3 col-lg-2 d-none d-md-block bg-light sidebar">
+      <div class="sidebar-sticky">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="#overview">
+              Assignment Overview
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#guideline">
+              Assignment Guideline
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#information">
+              Lab Information
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Lab Assignments, ECE326</h1>
+      </div>
+
+      <h4 id="overview">Assignment Overview</h4>
+      <div class="table-responsive">
+        <table class="table table-borderless table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Assignment</th>
+              <th scope="col">Name</th>
+              <th scope="col">Start Date</th>
+              <th scope="col">Due Time</th>
+              <th scope="col">Language</th>
+              <th scope="col">Concepts</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td scope="row">1</td>
+              <td>Easy Blackjack Simulator</td>
+              <td>September 9th</td>
+              <td>September 29th, 11:59pm</td>
+              <td>C++11</td>
+              <td>Object-oriented programming</td>
+            </tr>
+            <tr>
+              <td scope="row">2</td>
+              <td>Optimal Strategy Calculator</td>
+              <td>September 16th</td>
+              <td>October 9th, 11:59pm</td>
+              <td>Python</td>
+              <td>Dynamic Programming</td>
+            </tr>
+            <tr>
+              <td scope="row">3</td>
+              <td>Object-Relational Mapping</td>
+              <td>October 7th</td>
+              <td>November 10th, 11:59pm</td>
+              <td>Python</td>
+              <td>Metaprogramming</td>
+            </tr>
+            <tr>
+              <td scope="row">4</td>
+              <td>Concurrent In-Memory Database</td>
+              <td>November 4th</td>
+              <td>Sunday, December 8th, 11:59pm</td>
+              <td>Rust</td>
+              <td>Concurrent Programming</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h4 id="guideline">Assignment Guideline</h4>
+      <p>All assignments will be done in groups of 2 students. You should contact the head TA with the student names, e-mail addresses, and utorids of you and your partner. Please make use of Piazza to facilitate finding a partner. </p>
+      <p>You should be aware that this course will require significant time for each assignment. Many of these assignments require significant preparation that involves reading the specification and the code provided for the assignment. Please read the handouts carefully before starting. This preparation should be done before the lab sessions otherwise you will not be able to make the best use out of the lab TA's time. Preferably, you should have already made some progress so that you can use the lab hours to test your code and, if needed, get help from the lab TAs. Therefore, it is very important to start as early as possible on your assignments and avoid procrastination.
+      </p>
+      <p>It is your responsibility to correctly identify and meet the deadline for each assignment. Assignments will not be accepted after their due dates, without prior arrangement with the course instructor. In general, no deadline extensions will be granted to individuals except in severe circumstances.</p>
+
+      <p>Assignments will be marked by the TAs after they are submitted (they are not marked in the labs). The TAs will send you an email with your lab marks. Note that attending the lab is optional. You can do the assignments at home and submit them remotely. However, it is important that you get your code to work correctly on the lab machines, no matter where you develop it. <strong>A program that does not work correctly on the lab machines, even if it works correctly on your home machine, will be marked as incorrect.</strong> Plan ahead, and give yourself the time to test what you developed at home on the lab machines before the deadline.</p>
+      
+      <p>
+      In general, the TAs will be on duty only during the scheduled lab session. To get help at other times, you should use the forum on the Piazza website. The TAs and the instructors will regularly check the forum and answer your questions. These answers become available to all students. Thus, please check the forum before posting a question to make sure that the question has not been posted and answered earlier. The forum provides functionality for you to receive emails as any messages or their answers are posted. Please enable this functionality if you want to know when your questions have been answered (or when any new questions are posed).
+      </p>
+
+      <p>
+      You are encouraged to use the forum, and to engage in discussions about the assignments with fellow students. Please do not post code publicly on the forum. Doing so will be treated as an academic offense. You can also post messages on Piazza that are only visible to TAs and the instructor.
+      </p>
+      
+      <h4 id="information">Lab Information</h4>
+      <p>
+      All source code must be compiled and submitted on the lab computers. These computers are Linux machines with names that matches <tt>ug*.eecg.utoronto.ca</tt>, e.g., <tt>ug149.eecg.utoronto.ca</tt>. You can tell which machine you are using from the command prompt. For example, if you are using <tt>ug149.eecg.utoronto.ca</tt>, the command prompt will show <tt>ug149</tt>. The range of machines that are accessible is roughly <tt>ug51</tt>-<tt>ug100</tt>, <tt>ug132</tt>-<tt>ug180</tt> and <tt>ug201</tt>-<tt>250</tt>.</p>
+
+      <p>Each group will be assigned a group number for this course. You can find out your group number by typing the <tt>groups</tt> command after logging into the lab machines.</p>
+
+      <p>
+      <tt>$ groups</tt>
+      </p>
+      
+      <p>This command provides information about all the Unix groups to which you belong. One of them should be in the range from <tt>pl-001</tt> to <tt>pl-100</tt>. The 3-digit number after <tt>pl-</tt> is your group number for this course (e.g., with <tt>031</tt>, the group number is <tt>031</tt> and not <tt>31</tt>). If you do not have a group number, please contact the head TA with your and your partner's name, e-mail address, and utorid.
+      </p>
+      
+      <hr>
+      <footer class="container text-center">
+        <p>&copy; 2019 Kuei (Jack) Sun, University of Toronto</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    /* nothing for now */
+  });
+</script>
+</body>
+</html>

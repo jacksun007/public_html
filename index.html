@@ -5,180 +5,182 @@
     <title>Kuei (Jack) Sun | University of Toronto | Home</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="author" content="Kuei (Jack) Sun">
     <link href="css/bootstrap.css" rel="stylesheet">
-    <link href="css/index.css" rel="stylesheet">
-    <link href="css/bootstrap-responsive.css" rel="stylesheet">
-
+    <link href="css/common.css" rel="stylesheet">
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="../assets/js/html5shiv.js"></script>
     <![endif]-->
-
   </head>
 
   <body>
-
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
+    <header>
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
           </button>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li class="active"><a>Home</a></li>
-              <li><a href="biography.html">Biography</a></li>
-              <li><a href="research.html">Research</a></li>
-              <li><a href="teach.html">Teaching</a></li>
-              <li><a href="contact.html">Contact</a></li>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item"><a class="nav-link" href="biography.html">Biography</a></li>
+              <li class="nav-item"><a class="nav-link" href="research.html">Research</a></li>
+              <li class="nav-item"><a class="nav-link" href="teach.html">Teaching</a></li>
+              <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
             </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
+          </div>
+        </div><!-- container -->
+      </nav>
+    </header>
 
-    <div class="container">
-      <div class="row">
-        <div class="span3">
-        <img src="img/Jack2.jpg" class="img-polaroid">
-        </div>
-        <div class="span9">
-        <h1>Kuei (Jack) Sun</h1>
-        <br>
-        <h4>Department of Electrical & Computer Engineering</h4>
-        <h4>University of Toronto</h4>
-        <h4>Email: <a title="" id="email" data-toggle="tooltip" href="#"
-          data-placement="right"
-          data-original-title="Do not copy paste as-is!">&#171;kuei 
-          &middot; sun @ mail &middot; utoronto &middot; ca&#187;</h4>
-        </a>
-        <br>
-        <p>I am a 4th year Ph.D student at the department of Electrical and Computer 
-        Engineering, University of Toronto. My supervisors are 
-        <a href="http://www.eecg.toronto.edu/~ashvin/">Prof. Ashvin Goel</a>
-        and 
-        <a href="http://www.cs.toronto.edu/~demke/">Prof. Angela Demke Brown</a>. The focus of my 
-		research is on simplifying the development of file-system aware applications, 
-		as well as improving the robustness of these applications. The grand vision is to 
-		allow these applications to be written only once and be able to work across 
-		multiple file systems with little to no additional efforts required.</p>
-        </div>
-      </div><!--row-->
-      <hr>
-      <h4>EDUCATION</h4>
-      <ul>
-      <li><strong>Ph.D, Computer Engineering</strong> - University of Toronto, Toronto, Ontario. 2012 - Present</li>
-      <li><strong>M.A.Sc, Computer Engineering</strong> - University of Toronto, Toronto, Ontario. 2010 - 2013</li>
-      <li><strong>B.Eng, Computer Engineering with Software Specialization</strong> - University of Victoria, Victoria, B.C.. 2004 - 2009</li>
-      </ul>     
-      <hr>
-      <h4>PUBLICATIONS</h4>
-  <ul>
-    <li><strong>2018</strong>
-	<ul>
-	  <li><strong>Breaking Apart the VFS for Managing File Systems</strong> [<a href="https://www.usenix.org/system/files/conference/hotstorage18/hotstorage18-paper-sun.pdf">PDF Link</a>]
-      <br><i>Kuei Sun, Matthew Lakier, Angela Demke Brown and Ashvin Goel</i>
-      <br>10th USENIX Workshop on Hot Topics in Storage and File Systems (HotStorage'18),
-          Boston, MA, July 2018.
-    </li>
-    <li><strong>Spiffy: Enabling File-System Aware Storage Applications</strong>
-      [<a href="https://www.usenix.org/system/files/conference/fast18/fast18-sun.pdf">PDF Link</a>]
-      <br><i>Kuei Sun, 
-		  <a href="http://www.cs.toronto.edu/~dfryer/">Daniel Fryer</a>, 
-			  Joseph Chu, Matthew Lakier, Angela Demke Brown and Ashvin Goel</i>
-      <br>16th USENIX conference on File and Storage Technologies (FAST'18),
-      Oakland, CA, February 2018.
-    </li>
-  </ul></li><!--2018-->
-  </ul>    
+    <main role="main">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+          <img src="img/Jack2.jpg" class="img-thumbnail">
+          </div>
+          <div class="col-md-9">
+          <h1>Kuei (Jack) Sun</h1>
+          <br>
+          <h4>Department of Electrical & Computer Engineering</h4>
+          <h4>University of Toronto</h4>
+          <h4>Email: <a title="" id="email" data-toggle="tooltip" href="#"
+            data-placement="right"
+            data-original-title="Do not copy paste as-is!">&#171;kuei 
+            &middot; sun @ mail &middot; utoronto &middot; ca&#187;</h4>
+          </a>
+          <br>
+          <p>I am a 4th year Ph.D student at the department of Electrical and Computer 
+          Engineering, University of Toronto. My supervisors are 
+          <a href="http://www.eecg.toronto.edu/~ashvin/">Prof. Ashvin Goel</a>
+          and 
+          <a href="http://www.cs.toronto.edu/~demke/">Prof. Angela Demke Brown</a>. The focus of my 
+      research is on simplifying the development of file-system aware applications, 
+      as well as improving the robustness of these applications. The grand vision is to 
+      allow these applications to be written only once and be able to work across 
+      multiple file systems with little to no additional efforts required.</p>
+          </div>
+        </div><!--row-->
+        <hr>
+        <h4>EDUCATION</h4>
+        <ul>
+        <li><strong>Ph.D, Computer Engineering</strong> - University of Toronto, Toronto, Ontario. 2012 - Present</li>
+        <li><strong>M.A.Sc, Computer Engineering</strong> - University of Toronto, Toronto, Ontario. 2010 - 2013</li>
+        <li><strong>B.Eng, Computer Engineering with Software Specialization</strong> - University of Victoria, Victoria, B.C.. 2004 - 2009</li>
+        </ul>     
+        <hr>
+        <h4>PUBLICATIONS</h4>
     <ul>
-        <li><strong>2014</strong>
-		<ul>
-            <li><strong>Robust Consistency Checking for Modern Filesystems</strong>
-            [<a href="http://www.eecg.toronto.edu/~ashvin/publications/robust-consistency-checking.pdf">PDF Link</a>]
-            <br><i>Kuei Sun, 
-				<a href="http://www.cs.toronto.edu/~dfryer/">Daniel Fryer</a>, 
-				<a href="http://fs.csl.utoronto.ca/~mike/">Dai Qin</a>, 
-				Angela Demke Brown and Ashvin Goel</i>
-            <br>14th International Conference on Runtime Verification (RV'14),
-            Toronto, ON, September 2014.
-            </li>
-        </ul>
-        <ul>
-            <li><strong>Checking the Integrity of Transactional Mechanisms</strong>
-            [<a href="http://www.eecg.toronto.edu/~ashvin/publications/checking-tx-integrity.pdf">PDF Link</a>]
-            <br><i><a href="http://www.cs.toronto.edu/~dfryer/">Daniel Fryer</a>, 
-				<a href="http://fs.csl.utoronto.ca/~mike/">Dai Qin</a>, 
-				Kuei Sun, Kah Wai Lee, 
-				Angela Demke Brown and Ashvin Goel</i>
-            <br>12th USENIX conference on File and Storage Technologies (FAST'14),
-            Santa Clara, CA, February 2014.
-            </li>
-        </ul>
-        </li><!--2014-->
-    </ul>
+      <li><strong>2018</strong>
+    <ul>
+      <li><strong>Breaking Apart the VFS for Managing File Systems</strong> [<a href="https://www.usenix.org/system/files/conference/hotstorage18/hotstorage18-paper-sun.pdf">PDF Link</a>]
+        <br><i>Kuei Sun, Matthew Lakier, Angela Demke Brown and Ashvin Goel</i>
+        <br>10th USENIX Workshop on Hot Topics in Storage and File Systems (HotStorage'18),
+            Boston, MA, July 2018.
+      </li>
+      <li><strong>Spiffy: Enabling File-System Aware Storage Applications</strong>
+        [<a href="https://www.usenix.org/system/files/conference/fast18/fast18-sun.pdf">PDF Link</a>]
+        <br><i>Kuei Sun, 
+        <a href="http://www.cs.toronto.edu/~dfryer/">Daniel Fryer</a>, 
+          Joseph Chu, Matthew Lakier, Angela Demke Brown and Ashvin Goel</i>
+        <br>16th USENIX conference on File and Storage Technologies (FAST'18),
+        Oakland, CA, February 2018.
+      </li>
+    </ul></li><!--2018-->
+    </ul>    
       <ul>
-        <li><strong>2013</strong>
-        <ul>
-        <li><strong>Annotation for Automation: Rapid Generation of File System Tools</strong>
-        [<a href="http://www.eecg.toronto.edu/~ashvin/publications/annotations-file-systems.pdf">PDF Link</a>]
-        <br>
-        <i>
-			Kuei Sun, 
-			<a href="http://www.cs.toronto.edu/~dfryer/">Daniel Fryer</a>, 
-			Angela Demke Brown, Ashvin Goel
-        </i><br>
-        7th Workshop on Programming Languages and Operating Systems (PLOS 2013), Nemacolin, Pennsylvania, November 2013.
-        <li><strong>Robust Consistency Checking for Modern Filesystems</strong>
-        [<a href="http://www.eecg.toronto.edu/~ashvin/publications/thesis-jack.pdf">PDF Link</a>]<br>
-        <i>
-        Kuei Sun
-        </i><br>
-        M.A.Sc thesis, Dept. of Electrical and Computer Engineering, University of Toronto, Toronto, Ontario, 2013.
-        </li>
-        </ul><!--2013-->
-        </li>
-        <li><strong>2012</strong>
-        <ul>
-          <li><strong>Recon: Verifying File System Consistency at Runtime
-          </strong> [<a href="http://www.eecg.toronto.edu/~ashvin/publications/recon-fs-consistency-runtime.pdf">PDF Link</a>]<br>
-          <i>
-			<a href="http://www.cs.toronto.edu/~dfryer/">Daniel Fryer</a>, 
-			Kuei Sun, Rahat Mahmood, Ting-Hao Cheng, Shaun Benjamin, Ashvin Goel, Angela Demke Brown
-          </i><br>
-          10th USENIX Conference on File and Storage Technologies (FAST'12), San Jose, CA, February 2012 
-          </li>
-        </ul>
-        </li><!--2012-->
-        <li><strong>2011 and earlier</strong>
-        <ul>
-          <li><strong>Using Declarative Invariants for Protecting File-System Integrity
-          </strong> [<a href="http://www.eecg.toronto.edu/~ashvin/publications/declarative-file-system-invariants.pdf">PDF Link</a>]<br>
-          <i>
-          Kuei Sun, 
-		  <a href="http://www.cs.toronto.edu/~dfryer/">Daniel Fryer</a>,
-		  Ashvin Goel, Angela Demke Brown
-          </i><br>
-          6th Workshop on Programming Languages and Operating Systems (PLOS 2011), Cascais, Portugal, October 2011
-          <li><strong>Replicate, Reduce, Recycle: Extending the Lifetime of Flash Memory
-          </strong><br><i>
-          Kuei Sun, Jamie Liu, Ryan Yang, Angela Demke Brown, Ashvin Goel
-          </i><br>
-Poster at 9th USENIX Symposium on Operating System Design and Implementation (OSDI'10), Vancouver, B.C. Canada, October 2010
-          </li>
-          <li>
-          <strong>Inside Vertical-Cavity Surface-Emitting Lasers: Extracting the Refractive Index From Spatial-Spectral Mode Images</strong> [<a href="http://ieeexplore.ieee.org/xpl/login.jsp?tp=&arnumber=4084608&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D4084608">IEEE Link</a>]<br>
-          <i>De Lange, V.; Kuei Sun; Gordon, R.,</i><br>
-          Quantum Electronics, IEEE Journal of , vol.43, no.3, pp.225,229, March 2007 
-          </li>
-        </ul>
-        </li>
+          <li><strong>2014</strong>
+      <ul>
+              <li><strong>Robust Consistency Checking for Modern Filesystems</strong>
+              [<a href="http://www.eecg.toronto.edu/~ashvin/publications/robust-consistency-checking.pdf">PDF Link</a>]
+              <br><i>Kuei Sun, 
+          <a href="http://www.cs.toronto.edu/~dfryer/">Daniel Fryer</a>, 
+          <a href="http://fs.csl.utoronto.ca/~mike/">Dai Qin</a>, 
+          Angela Demke Brown and Ashvin Goel</i>
+              <br>14th International Conference on Runtime Verification (RV'14),
+              Toronto, ON, September 2014.
+              </li>
+          </ul>
+          <ul>
+              <li><strong>Checking the Integrity of Transactional Mechanisms</strong>
+              [<a href="http://www.eecg.toronto.edu/~ashvin/publications/checking-tx-integrity.pdf">PDF Link</a>]
+              <br><i><a href="http://www.cs.toronto.edu/~dfryer/">Daniel Fryer</a>, 
+          <a href="http://fs.csl.utoronto.ca/~mike/">Dai Qin</a>, 
+          Kuei Sun, Kah Wai Lee, 
+          Angela Demke Brown and Ashvin Goel</i>
+              <br>12th USENIX conference on File and Storage Technologies (FAST'14),
+              Santa Clara, CA, February 2014.
+              </li>
+          </ul>
+          </li><!--2014-->
       </ul>
-    </div> <!-- /container -->
-    <script src="js/jquery-2.0.3.min.js"></script>
+        <ul>
+          <li><strong>2013</strong>
+          <ul>
+          <li><strong>Annotation for Automation: Rapid Generation of File System Tools</strong>
+          [<a href="http://www.eecg.toronto.edu/~ashvin/publications/annotations-file-systems.pdf">PDF Link</a>]
+          <br>
+          <i>
+        Kuei Sun, 
+        <a href="http://www.cs.toronto.edu/~dfryer/">Daniel Fryer</a>, 
+        Angela Demke Brown, Ashvin Goel
+          </i><br>
+          7th Workshop on Programming Languages and Operating Systems (PLOS 2013), Nemacolin, Pennsylvania, November 2013.
+          <li><strong>Robust Consistency Checking for Modern Filesystems</strong>
+          [<a href="http://www.eecg.toronto.edu/~ashvin/publications/thesis-jack.pdf">PDF Link</a>]<br>
+          <i>
+          Kuei Sun
+          </i><br>
+          M.A.Sc thesis, Dept. of Electrical and Computer Engineering, University of Toronto, Toronto, Ontario, 2013.
+          </li>
+          </ul><!--2013-->
+          </li>
+          <li><strong>2012</strong>
+          <ul>
+            <li><strong>Recon: Verifying File System Consistency at Runtime
+            </strong> [<a href="http://www.eecg.toronto.edu/~ashvin/publications/recon-fs-consistency-runtime.pdf">PDF Link</a>]<br>
+            <i>
+        <a href="http://www.cs.toronto.edu/~dfryer/">Daniel Fryer</a>, 
+        Kuei Sun, Rahat Mahmood, Ting-Hao Cheng, Shaun Benjamin, Ashvin Goel, Angela Demke Brown
+            </i><br>
+            10th USENIX Conference on File and Storage Technologies (FAST'12), San Jose, CA, February 2012 
+            </li>
+          </ul>
+          </li><!--2012-->
+          <li><strong>2011 and earlier</strong>
+          <ul>
+            <li><strong>Using Declarative Invariants for Protecting File-System Integrity
+            </strong> [<a href="http://www.eecg.toronto.edu/~ashvin/publications/declarative-file-system-invariants.pdf">PDF Link</a>]<br>
+            <i>
+            Kuei Sun, 
+        <a href="http://www.cs.toronto.edu/~dfryer/">Daniel Fryer</a>,
+        Ashvin Goel, Angela Demke Brown
+            </i><br>
+            6th Workshop on Programming Languages and Operating Systems (PLOS 2011), Cascais, Portugal, October 2011
+            <li><strong>Replicate, Reduce, Recycle: Extending the Lifetime of Flash Memory
+            </strong><br><i>
+            Kuei Sun, Jamie Liu, Ryan Yang, Angela Demke Brown, Ashvin Goel
+            </i><br>
+  Poster at 9th USENIX Symposium on Operating System Design and Implementation (OSDI'10), Vancouver, B.C. Canada, October 2010
+            </li>
+            <li>
+            <strong>Inside Vertical-Cavity Surface-Emitting Lasers: Extracting the Refractive Index From Spatial-Spectral Mode Images</strong> [<a href="http://ieeexplore.ieee.org/xpl/login.jsp?tp=&arnumber=4084608&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D4084608">IEEE Link</a>]<br>
+            <i>De Lange, V.; Kuei Sun; Gordon, R.,</i><br>
+            Quantum Electronics, IEEE Journal of , vol.43, no.3, pp.225,229, March 2007 
+            </li>
+          </ul>
+          </li>
+        </ul>
+      </div>
+      <hr>
+      <footer class="container text-center">
+        <p>&copy; 2019 Kuei (Jack) Sun, University of Toronto</p>
+      </footer>
+    </main> <!-- main -->
+    <script src="js/jquery-3.4.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function() {
