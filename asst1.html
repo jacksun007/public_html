@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Assignment 1 | ECE326 | Programming Languages | Fall 2019</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Kuei (Jack) Sun">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/dashboard.css" rel="stylesheet">
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../assets/js/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+<body data-spy="scroll" data-target=".sidebar"  data-offset="64">
+
+<nav class="navbar navbar-dark navbar-expand-md fixed-top bg-dark shadow">
+  <a class="navbar-brand pr-3" href="ece326.html">ECE326</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarCollapse">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="ece326.html">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="lectures.html">Lecture Notes</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="labs.html">Assignments</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="http://piazza.com/utoronto.ca/fall2019/ece326">Piazza Discussion</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://q.utoronto.ca/">Quercus Website</a>
+      </li>
+    </ul>
+  </div>  
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-md-3 col-lg-2 d-none d-md-block bg-light sidebar">
+      <div class="sidebar-sticky">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="#background">
+              Background
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#setup">
+              Setup
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#specification">
+              Solution Requirements
+            </a>
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="#processing">Command Line</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#gameplay">Gameplay</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#manual">Manual Mode</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#automatic">Automatic Mode</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#submission">Code Submission</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Assignment 1: Easy Blackjack</h1>
+      </div>
+      <p><strong>Due Date: September 29th, 11:59pm</strong></p>
+      <p>In this assignment, you will create a program to play the game of Easy Blackjack&trade; in C++11. Your program will allow the user to choose between playing by hand (i.e. manually), or automatically using a strategy table.</p>
+      
+
+      <h4 id="background">Background</h4>
+      <p>TL;DR: Easy Blackjack is the same as normal Blackjack except with both of dealer's cards exposed.</p>
+      <p>The game of Blackjack is played against a dealer. Your objective is to get more points than the dealer without going over 21. The game begins with you placing a bet (e.g. $1), followed by both you (the player) and the dealer being dealt two cards. Unlike regular Blackjack, in Easy Blackjack, both cards held by you and the dealer are dealt face up, meaning that you know exactly how many points you or the dealer has. </p>
+      <p>For cards from 2 to 10, their points are exactly their pip values (e.g., 3 of spades is worth 3 points). All face cards (i.e., J, Q, K) are worth 10 points. Aces may be counted as 1 or 11 points, whichever makes your total larger without going over 21 (e.g., <tt>A2</tt> would give you a total of 13 points, and <tt>A58</tt> would give you a total of 14 points). In all cases, their suits (e.g. spade or heart) are ignored.</p>
+      <p>A starting hand with an ace and a 10-point card is called <em>blackjack</em>. Whoever has this hand wins immediately, or tie if both the player and the dealer has blackjack. If the player has blackjack, the player is paid 3 to 2 (i.e. $1.50 for every $1 bet, and you get your original bet of $1 back). If the dealer has blackjack, the player loses the initial bet only.</p>
+      <p>If neither player or dealer has blackjack, the game continues with the player now able to take one or more actions:</p>
+      <ul>
+        <li><strong>Hit:</strong> a card is added to the player's hand. If the hand's total exceeds 21 (i.e. <em>bust</em>) then the player loses immediately.</li>
+        <li><strong>Stand:</strong> the player chooses to keep his/her hand as is.</li>
+        <li><strong>Double:</strong> the player doubles the bet on the starting hand, and chooses to add exactly one more card to it. Similar to <em>hit</em>, the player loses if the hand busts.</li>
+        <li><strong>Split:</strong> if the player starts with two cards of the same value (e.g., <tt>33</tt> or <tt>KQ</tt>), he/she may "split" the hand into two hands, doubling the bet, and each hand receiving a second card. Split hands do not qualify for blackjack (i.e. receiving <tt>AK</tt> after splitting is only 21 points). You may take more actions on each hand, including doubling or resplitting if possible. However, when splitting aces, no more action is allowed. You may resplit up to a total of 4 hands.</li>
+        <li><strong>Surrender:</strong> the player forfeits the hand and receives half of the bet back. You may not surrender after any other action has been taken.</li>
+      </ul>
+      <p>If the player still has live hands (i.e. has not busted) after taking his/her actions, the dealer will now take action based on predetermined rules:</p>
+      <ul>
+        <li>If the dealer has 18 or more, his/her hand stands.</li>
+        <li>If the dealer has 16 or less, he/she will hit.</li>
+        <li>If the dealer has 17 with an ace that acts as 11 points (also known as <em>soft 17</em>) he/she will hit, otherwise he/she will stand.</li>
+      </ul>
+      <p>If the dealer busts, all of the player's live hands win even money (e.g. $1 bet receives $1 payout). If the dealer does not bust, then each of the player's hand is compared with the dealer's hand, whichever is higher wins.</p>
+      <p>For students who already know Blackjack, the rules for this assignment are summarized as follows:</p>
+      <ul>
+        <li>Dealer hits on soft 17.</li>
+        <li>Player may double on any two cards.</li>
+        <li>Player may not resplit aces, and split aces receive one card only.</li>
+        <li>Player may split up to 4 hands.</li>
+        <li>Player may surrender only on the initial hand.</li>
+        <li>Blackjack pays 3 to 2.</li>
+        <li>Player may only bet exactly $1.</li>
+      </ul>
+      <p>For those unfamiliar, we suggest that you play <a href="https://wizardofodds.com/play/blackjack-v2/">regular Blackjack</a> a few times to understand how the game works.
+      
+      <h4 id="setup">Setup</h4>
+
+      <p>Add the source files for this assignment, available in <tt>easybj.tar</tt>, to your repository, and run <tt>make</tt> in the newly created threads directory.</p>
+      
+      <p><em>Warning,</em> make sure to complete <a href="labs.html#repository">remote repository setup</a> for your group before continuing.</p>
+
+<pre>
+cd ~/ece326
+tar -xf /cad2/ece326f/src/easybj.tar
+git status # should say that "asst1/" directory is untracked
+git add asst1
+git commit -m "Initial code for Assignment 1"
+git tag Asst1-start
+git push
+git push --tags
+cd asst1
+make
+</pre>
+
+      <p>The starter code is organized as follows:</p>
+      <ul>
+        <li><em>main.cpp</em>: contains the <tt>main</tt> function.</li>
+        <li><em>shoe.cpp</em>: contains two subclasses of the <tt>Shoe</tt> base class. <tt>InfiniteShoe</tt> has an infinite supply of cards, generated at random. <tt>FileShoe</tt> reads in a prearranged shoe from a file and deals out the cards in the exact order as entered in the file.</li>
+        <li><em>shoe.h</em>: contains definition of the <tt>Shoe</tt> base class.</li>
+        <li><em>config.cpp</em>: you should modify this file to implement command line parsing.</li>
+        <li><em>config.h</em>: contains definition of the <tt>Config</tt> class.</li>
+        <li><em>player.cpp</em>: you should modify this file to implement manual and automatic mode of playing Easy Blackjack.</li>
+        <li><em>player.h</em>: contains definition of the <tt>Player</tt> base class.</li>
+        <li><em>easybj.cpp</em>: you should modify this file to implement Easy Blackjack logic.</li>
+        <li><em>easybj.h</em>: you should modify this file to define the <tt>Hand</tt> class as well as add member functions/variables to the <tt>Blackjack</tt> class.</li>
+      </ul>
+
+      <h4 id="specification">Solution Requirements</h4>
+      <p>Since this assignment will be graded via an automated marker, you need to print outputs in the exact format described here. You may add additional files if needed, but you may not modify the following files: <tt>main.cpp, shoe.cpp, shoe.h, config.h, player.h</tt>, and <tt>Makefile</tt>. During marking, we will replace these files with the original, which may cause your submission to fail if you modified the aforementioned files. Double check that you did not modify these files prior to submission. Code to fails to compile will receive zero marks.</p>
+      
+      <h4 id="processing">Command Line Parsing</h4>
+      <p>To complete this part of the assignment, you will need to make changes to <em>config.cpp</em>. Let's first fire up the help option "-h" and see what options and arguments the program accepts:</p>
+
+<pre>
+usage: ./asst1 [-h] [-f FILE|-i SEED [-r FILE]] [[-s] -a FILE NUM]
+Options:
+ -h:	Display this message
+ -f:	Use file-based shoe
+ -i:	Use random-based shoe (default)
+ -r:	Record random-based shoe to file
+ -a:	Play automatically using strategy chart
+ -s:	Silent mode
+ FILE:	File name for associated option
+ SEED:	random seed
+ NUM:	number of hands to be played
+</pre>
+      
+      <p>Your program must accept all correct combinations of the options and reject all else. This includes the following restrictions:</p>
+      <ul>
+        <li>Subsequent parsing is ignored as soon as <tt>-h</tt> is found.</li>
+        <li>Only one of <tt>-f</tt> or <tt>-i</tt> is allowed, not both.</li>
+        <li>The <tt>-r</tt> option is only available if <tt>-f</tt> is not chosen.</li>
+        <li>The <tt>-s</tt> option is only available if <tt>-a</tt> is chosen.</li>
+      </ul>
+      
+      <p>Here are the list of possible error messages you should print during command line parsing:</p>
+<pre>
+Error: SEED must be a non-negative integer.
+Error: NUM must be a natural number.
+Error: must specify number of hands when playing automatically.
+Error: silent mode is only available when playing automatically.
+Error: recording is only available for random-based shoe.
+Error: cannot choose both file and random-based shoe.
+./asst1: option requires an argument -- 'f'
+./asst1: option requires an argument -- 'i'
+./asst1: option requires an argument -- 'r'
+./asst1: option requires an argument -- 'a'
+</pre>
+      
+      <p>The suggested solution is to use <a href="https://www.gnu.org/software/libc/manual/html_node/Getopt.html#Getopt">getopt</a> from the standard C library. However, you may choose to do your own parsing as long as the output is identical.</p>
+      
+      <p>At this point, you have not completed either of the playing mode, so the program still won't do much. That's OK. We will work on the core gameplay first, which both modes need.</p>
+      
+      <h4 id="gameplay">Gameplay</h4>
+      
+      <p>This part of the assignment will need to be done along with the manual mode in order to test the program. Alternatively, you may create unit tests to ensure all functionality perform as expected. The files you will modify for this part is <em>easybj.cpp</em> and <em>easybj.h</em>. You may add more files (e.g. <em>hand.cpp</em>) if you prefer to have multiple smaller files than one large file.</p>
+      
+      <p>Before you start, look at how the <tt>Blackjack</tt> class is used in <em>main.cpp</em>. There are four functions which are required by <em>main.cpp</em>.</p>
+      
+      <ol>
+        <li><b>Hand * start()</b>: This function starts a game of Easy Blackjack, and returns the first hand that the player can play. The return value may be <tt>nullptr</tt> if the game ends immediately (i.e. if player and/or dealer has blackjack). The dealer should receive the first 2 cards from the shoe, followed by the player receiving the next 2 cards. Note that this ordering is not the same as in a casino setting, but is done this way to simplify the implementation.</li>
+        <li><b>const Hand * dealer_hand()</b>: This function returns the dealer's hand, or <tt>nullptr</tt> if the game has not started yet.</li>
+        <li><b>Hand * next()</b>: This function may only be called after <tt>start()</tt>, and returns the next hand that the player can play. The return value may be <tt>nullptr</tt> if no more hands are left to be played. Note that if a hand has 21 points, it stands automatically.</li>
+        <li><b>void finish()</b>: This function may only be called after no more hands are left to be played. Its purpose is to allow the dealer to take action(s) and then updates the player's balance based on the outcome of the game. If the player has no live hands (i.e. all his/her hands busted or surrendered), then the dealer <em>will not</em> draw any cards.</li>
+      </ol>  
+      
+      <p>In addition, the constructor for <tt>Blackjack</tt> takes two arguments: a <tt>Player</tt> object, which is the player playing this game, and a <tt>Shoe</tt> object, which is the shoe for which cards are pulled from to be dealt to both player and dealer. You should look at <em>shoe.h</em> to see how to draw cards from a <tt>Shoe</tt> object.</p>
+      
+      <p>The results (net monetary gain/loss) can be calculated as follows. Remember that a player may have multiple hands if he/she splits one or more hands:</p>
+      <ul>
+        <li>The player loses $1 for each bust hand.</li>
+        <li>If the dealer busts, all of the player's live hands (not bust ones) win.</li>
+        <li>For each hand that ties against the dealer's hand, the bet <em>pushes</em> (no net gain or loss).</li>
+        <li>If the player doubled down and wins, he/she wins $2, otherwise he/she loses $2 (except on a tie).</li>
+        <li>If the player wins normally, he/she wins $1, otherwise he/she loses $1 (except on a tie).</li>
+        <li>If the player surrenders, he/she loses $0.5 (i.e. gets half of the money back).</li>
+        <li>If the player wins with blackjack, he/she wins $1.5.</li>
+        <li>If the dealer has blackjack, the player loses $1.</li>
+      </ul>
+      
+      <h5>Summary Output</h5>
+      <p>If silent mode is not turned on, then <tt>main</tt> will try to print the result of the game. The following is a sample output:</p>
+      
+<pre>
+Dealer: 9 T (19)
+Hand 1: J A (21)
+Hand 2: J 5 9 (bust) DOUBLE
+Hand 3: K 9 (19)
+Result: -$1.00
+Current Balance: -$1.00
+</pre>
+
+      <p>From the above, you have enough information to reconstruct the sequence of events.</p>     
+      <ol>
+        <li>The player split his first hand, and resplit his second hand (i.e. Hand 2).</li>
+        <li>For the first hand, the player had 21 and stood automatically (not blackjack since the hand was split).</li>
+        <li>For the second hand, the player doubled down on hard 15 and busted.</li>
+        <li>For the third hand, the player stood on hard 19, which tied with the dealer.</li>
+        <li>In total, the player lost $1. Having played only once, his balance is at -$1.</li>
+      </ol>
+      
+      <p>Now, we detail the output requirement:</p>
+      <ul>
+        <li>Both the player and the dealer's hand will be printed in the same format. For the dealer's hand, it will start with <tt>Dealer:</tt>, for the player, it will start with <tt>Hand N:</tt> where <var>N</var> is the hand number (if splitting occurred).</li>
+        <li>Each card in a hand will be printed by their <em>pip value</em> (and not point value), separated by a single space.</li>
+        <li>Following the list of cards will be the total point value or special text in parentheses. If the hand busted, the text will be "bust". If the hand is blackjack, the text will be "blackjack". Lastly, if the hand is soft, it will say so, followed by the point value (e.g. "soft 16" for A5).</li>
+        <li>Last, if the player doubled down or surrendered a hand, it will say DOUBLE or SURRENDER, respectively.</li>
+        <li>On the next two lines, print the monetary result of the game, followed by the current balance of the player.</li>
+      </ul>
+      
+      <p><tt>main</tt> uses the <code>&lt;&lt;</code> stream insertion operator to print the output. Therefore, you will need to remember from ECE244 on how to overload the operator.</p>
+      
+      <h4 id="manual">Manual Mode</h4>
+      <p>In manual mode, the user of your program will play Easy Blackjack on the terminal using keyboard to enter his/her desired actions. For this, you should make a subclass of <tt>Player</tt> in <tt>player.cpp</tt>. Below is a sample game of Easy Blackjack played in manual mode:</p>
+      
+<pre>
+Dealer: A 4 (soft 15)
+Player: 6 4 (10)
+Stand (S) Hit (H) Double (D) Surrender (R): p
+Stand (S) Hit (H) Double (D) Surrender (R): h
+Dealer: A 4 (soft 15)
+Player: 6 4 8 (18)
+Stand (S) Hit (H): s
+Dealer: A 4 T Q (bust)
+Hand 1: 6 4 8 (18)
+Result: +$1.00
+Current Balance: +$1.00
+Press Any Key to Continue, (Q to Quit): q
+</pre>      
+      
+      <p>Here, the player first chose <em>split</em>. However, since splitting is not allowed, he/she chose to <em>hit</em>, followed by <em>stand</em>. After the game ended, he/she decided to quit.</p>
+      
+      <p>The output requirement is as follows:</p>
+      <ul>
+        <li>For every hand to be played, the dealer's hand is first printed, followed by the player's hand.</li>
+        <li>All possible actions are listed in the exact order shown below:
+          <tt>
+          <ul>
+            <li>Stand (S)</li>
+            <li>Hit (H)</li>
+            <li>Double (D)</li>
+            <li>Split (P)</li>
+            <li>Surrender (R)</li>
+          </ul>
+          </tt>
+        </li>
+        <li>For the player's input, we only care about the first letter, case insensitive match (i.e. "hello" will be interpreted as <em>hit</em>). If the input is invalid, the player is prompted again.</li>
+        <li>At the end of the game, the player is asked to play again.</li>
+      </ul>
+      
+      <h4 id="automatic">Automatic Mode</h4>
+      <p>When playing in automatic mode, the user must specify a strategy table file. Thus, you will need to parse the file. You should make another subclass of <tt>Player</tt> in <tt>player.cpp</tt> to complete this section. Below is a sample strategy table file:</p>
+
+<div class="table-responsive">      
+<pre>
+   4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 AA A2 A3 A4 A5 A6
+4  H  H  H  H  H  H  H  H  H  H  H  Dh Dh H  H  H  H  H  H  H  H  H  H
+5  H  H  H  H  H  H  H  H  H  H  Dh Dh Dh H  H  H  H  H  H  H  H  H  H
+6  H  H  H  H  H  H  H  H  H  H  Dh Dh Dh H  H  H  H  H  H  H  H  H  H
+7  H  H  H  H  H  H  H  H  H  Dh Dh Dh Dh H  H  H  H  H  H  H  H  H  H
+8  H  H  H  H  H  H  H  H  Dh Dh Dh Dh Dh H  H  H  H  H  H  H  H  H  H
+9  Dh Dh Dh H  H  H  H  H  Dh Dh Dh Dh Dh H  H  H  H  H  H  H  H  H  H
+10 Dh Dh Dh Dh Dh Dh H  H  Dh Dh Dh Dh Dh H  H  H  H  H  Dh Dh Dh Dh H
+11 Dh Dh Dh Dh Dh Dh H  H  Dh Dh Dh Dh Dh H  H  H  H  Dh Dh Dh Dh Dh H
+12 S  S  S  H  H  H  H  H  S  S  S  S  S  H  H  H  H  H  H  H  H  H  H
+13 S  S  S  H  H  H  H  H  S  S  S  S  S  H  H  H  H  H  H  H  H  S  H
+14 S  S  S  H  H  H  H  H  S  S  S  S  S  H  H  H  H  H  H  S  S  S  H
+15 S  S  S  H  H  H  H  H  S  S  S  S  S  H  H  H  H  H  S  S  S  S  H
+16 S  S  S  H  H  H  H  S  S  S  S  S  S  H  H  H  H  S  S  S  S  S  H
+17 S  S  S  S  S  S  S  S  S  S  S  S  S  S  H  H  H  S  S  S  S  S  S
+18 S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  H  H  S  S  S  S  S  S
+19 S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  H  S  S  S  S  S  S
+20 S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  S  S
+22 P  P  P  P  H  H  H  H  P  P  P  P  P  P  P  H  H  H  H  H  H  P  P
+33 P  P  P  P  H  H  H  H  P  P  P  P  P  P  P  H  H  H  H  H  H  H  P
+44 H  P  P  H  H  H  H  H  P  P  P  P  P  H  H  H  H  H  H  H  H  H  H
+55 Dh Dh Dh Dh Dh Dh H  H  Dh Dh Dh Dh Dh H  H  H  H  H  Dh Dh Dh Dh H
+66 P  P  P  H  H  H  H  H  P  P  P  P  P  P  H  H  H  H  H  H  H  P  P
+77 P  P  P  P  H  H  H  H  P  P  P  P  P  P  H  H  H  H  H  P  P  P  P
+88 P  P  P  P  P  P  H  S  P  P  P  P  P  P  P  H  H  P  P  P  P  P  P
+99 P  P  P  S  P  P  S  S  P  P  P  P  P  S  P  P  H  S  S  S  P  P  S
+TT S  S  S  S  S  S  S  S  S  P  P  P  P  S  S  S  S  S  S  S  S  S  S
+AA P  P  P  P  P  P  P  P  P  P  P  P  P  H  H  H  H  P  P  P  P  P  H
+A2 H  H  Dh H  H  H  H  H  Dh Dh Dh Dh Dh H  H  H  H  H  H  H  H  H  H
+A3 H  Dh Dh H  H  H  H  H  Dh Dh Dh Dh Dh H  H  H  H  H  H  H  H  H  H
+A4 H  Dh Dh H  H  H  H  H  Dh Dh Dh Dh Dh H  H  H  H  H  H  H  H  H  H
+A5 Dh Dh Dh H  H  H  H  H  Dh Dh Dh Dh Dh H  H  H  H  H  H  H  H  H  H
+A6 Dh Dh Dh H  H  H  H  H  Dh Dh Dh Dh Dh H  H  H  H  H  H  H  H  H  H
+A7 Ds Ds Ds S  S  H  H  S  Ds Ds Ds Ds Ds S  H  H  H  S  S  S  S  S  S
+A8 S  S  S  S  S  S  S  S  Ds Ds Ds Ds Ds S  S  S  H  S  S  S  S  S  S
+A9 S  S  S  S  S  S  S  S  S  Ds Ds Ds Ds S  S  S  S  S  S  S  S  S  S
+</pre>
+</div>    
+
+      <p>The format of the strategy table is as follows:</p>
+      <ul>
+        <li>The first row shows the dealer's starting hand. The last six columns are for soft 12 to soft 17. Note that soft 18 or above is merged with hard 18 or above, since the dealer acts the same under both circumstances.</li>
+        <li>The first column shows the player's starting hand. The first 17 rows are for hard 4 to hard 20. Notice that hard 21 is omitted since the player stands automatically. The next 10 rows are for pairs 22 to AA. Lastly, A2 to A9 are soft 13 to soft 20, respectively.</li>
+        <li>Each cell contains the recommended action given the player and the dealer's hand. Some actions have an alternative, in case the primary action is not allowed. The secondary actions are in lower case, with equivalent meaning.
+          <ul>
+            <li><tt>H</tt>: Hit</li>
+            <li><tt>S</tt>: Stand</li>
+            <li><tt>D</tt>: Double if allowed</li>
+            <li><tt>P</tt>: Split</li>
+            <li><tt>R</tt>: Surrender if allowed</li>
+          </ul>
+        </li>
+        <li>In the case splitting is not allowed (i.e. hand limit reached), look at the equivalent hard value of the hand (e.g. for <tt>77</tt>, look at the row for hard 14).</li>
+      </ul>
+      
+      <p>Your objective for this part of the assignment is to parse the table (mind possible errors in the table format) and play Easy Blackjack using the table automatically. After you are complete, you can alter the strategy table and see what strategy gives better player advantage. The higher the player advantage, the more money you expect to win playing the game (See sample output below, with silent mode turned on).</p>
+      
+<pre>
+$ ./asst1 -s -a strat.txt 2000000
+Hands Played: 2000000
+Final Balance: +$208725.50
+Player Advantage: 10.44%
+</pre>
+      <h4 id="submission">Code Submission</h4>
+      <p>To submit your code with the current commit, use the <tt>Asst1-end</tt> tag. Remember to push the new tag to the remote repository.</p>
+      
+<pre>
+git tag Asst1-end    // Creates tag for current submission for Assignment 1
+git push --tags
+</pre>
+      
+      <hr>
+      <footer class="container text-center">
+        <p>&copy; 2019 Kuei (Jack) Sun, University of Toronto</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    /* nothing for now */
+  });
+</script>
+</body>
+</html>
