@@ -61,6 +61,26 @@
               Lab Information
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#repository">
+              Remote Repository
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#cloning">
+              Cloning Repository
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#update">
+              Working Locally
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#working">
+              Working Together
+            </a>
+          </li>
         </ul>
       </div>
     </nav>
@@ -80,13 +100,13 @@
               <th scope="col">Start Date</th>
               <th scope="col">Due Time</th>
               <th scope="col">Language</th>
-              <th scope="col">Concepts</th>
+              <th scope="col">Concept</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td scope="row">1</td>
-              <td>Easy Blackjack Simulator</td>
+              <td><a href="asst1.html">Easy Blackjack</a></td>
               <td>September 9th</td>
               <td>September 29th, 11:59pm</td>
               <td>C++11</td>
@@ -112,7 +132,7 @@
               <td scope="row">4</td>
               <td>Concurrent In-Memory Database</td>
               <td>November 4th</td>
-              <td>Sunday, December 8th, 11:59pm</td>
+              <td>December 8th, 11:59pm</td>
               <td>Rust</td>
               <td>Concurrent Programming</td>
             </tr>
@@ -120,7 +140,7 @@
         </table>
       </div>
       <h4 id="guideline">Assignment Guideline</h4>
-      <p>All assignments will be done in groups of 2 students. You should contact the head TA with the student names, e-mail addresses, and utorids of you and your partner. Please make use of Piazza to facilitate finding a partner. </p>
+      <p>All assignments will be done in groups of 2 students. You should contact the head TA with the student names, student number, and utorids of you and your partner. Please make use of Piazza to facilitate finding a partner. </p>
       <p>You should be aware that this course will require significant time for each assignment. Many of these assignments require significant preparation that involves reading the specification and the code provided for the assignment. Please read the handouts carefully before starting. This preparation should be done before the lab sessions otherwise you will not be able to make the best use out of the lab TA's time. Preferably, you should have already made some progress so that you can use the lab hours to test your code and, if needed, get help from the lab TAs. Therefore, it is very important to start as early as possible on your assignments and avoid procrastination.
       </p>
       <p>It is your responsibility to correctly identify and meet the deadline for each assignment. Assignments will not be accepted after their due dates, without prior arrangement with the course instructor. In general, no deadline extensions will be granted to individuals except in severe circumstances.</p>
@@ -137,7 +157,13 @@
       
       <h4 id="information">Lab Information</h4>
       <p>
+      We will be using <a href="http://www.ece.utoronto.ca/lab-support/home-directories/">UG Linux machines</a> for grading the labs. Although most or all of this lab should "just work" in many other environments (Cygwin, Solaris, etc.), the course staff will not be able to assist in setting up or debugging problems caused by differences in the environment. If you choose to do development in an unsupported environment, it is your responsibility to leave adequate time to port your solution to the supported environment, test it there, and fix any problems that manifest.
+      </p>
+      
+      <p>
       All source code must be compiled and submitted on the lab computers. These computers are Linux machines with names that matches <tt>ug*.eecg.utoronto.ca</tt>, e.g., <tt>ug149.eecg.utoronto.ca</tt>. You can tell which machine you are using from the command prompt. For example, if you are using <tt>ug149.eecg.utoronto.ca</tt>, the command prompt will show <tt>ug149</tt>. The range of machines that are accessible is roughly <tt>ug51</tt>-<tt>ug100</tt>, <tt>ug132</tt>-<tt>ug180</tt> and <tt>ug201</tt>-<tt>250</tt>.</p>
+      
+      
 
       <p>Each group will be assigned a group number for this course. You can find out your group number by typing the <tt>groups</tt> command after logging into the lab machines.</p>
 
@@ -145,9 +171,278 @@
       <tt>$ groups</tt>
       </p>
       
-      <p>This command provides information about all the Unix groups to which you belong. One of them should be in the range from <tt>pl-001</tt> to <tt>pl-100</tt>. The 3-digit number after <tt>pl-</tt> is your group number for this course (e.g., with <tt>031</tt>, the group number is <tt>031</tt> and not <tt>31</tt>). If you do not have a group number, please contact the head TA with your and your partner's name, e-mail address, and utorid.
+      <p>This command provides information about all the Unix groups to which you belong. One of them should be in the range from <tt>pl-001</tt> to <tt>pl-100</tt>. The 3-digit number after <tt>pl-</tt> is your group number for this course (e.g., with <tt>031</tt>, the group number is <tt>031</tt> and not <tt>31</tt>). If you do not have a group number, please contact the head TA with your and your partner's name, student number, and utorid.
       </p>
       
+      <h5>Basic Setup</h5>
+      <p>On your first log-in, you should change the password on your account for security purposes. You can use the <tt>passwd</tt> command to do so.</p>
+      
+      <p>Start by setting up your personal information for Git, if you have not done it previously. The "--global" option will update the <tt>.gitconfig</tt> file in your home directory.</p>
+
+<pre>
+cd
+git config --global user.name "Your Name"
+git config --global user.email you@example.com
+</pre>
+  
+      <p>Git is a version control software for tracking changes to your source code. You and your partner will use Git to help manage your code base. Git is also used for you to submit your assignment, thus it is important for you to learn to use Git correctly and effectively.</p>
+      
+      <p>Next step, make sure that your home directory is not accessible to others. This way you can ensure that you code will not be available to others accidentally.</p>
+      
+<pre>
+cd
+chmod 700 .  
+</pre>
+
+      <p>At this point, one of the group members should follow the instruction under <a href="#repository">Remote Repository</a>, while the other group member should follow the instruction under <a href="#cloning">Cloning Repository</a> <em>after</em> the remote repository has been created.</p>
+      
+      <h4 id="repository">Remote Repository</h4>
+      <p>You will need to do this step once before starting assignment 1 and <b>only one group member should perform this step.</b></p>
+
+      <p>Create a new ece326 directory and initialize your Git repository in that directory.</pre>
+      
+<pre>
+cd
+mkdir ece326
+cd ece326
+git init
+</pre>      
+
+      <p>The last command should show the following:</p>
+      
+<pre>
+	Initialized empty Git repository in ../ece326/.git/
+</pre>
+
+      <p>At this point, we (i.e., the instructor and the TAs) cannot access this repository because it is local within your home directory (that should no be accessible to others). Instead, you will submit your lab code by creating a clone (copy) of your repository to a remote repository location that is accessible to you and to us.</p>
+
+      <p>
+      You need to run these instructions once to setup your remote repository. After that, you can update the remote repository by following the instructions in the next step.</p>
+
+      <p>
+      Each of you has been assigned a group number for this course. Below, we use XXX to denote your 3-digit group number.
+      The remote repository will be located on the <tt>ug250.eecg.utoronto.ca</tt> machine. Log in this machine.</p>
+
+<pre>
+ssh ug250.eecg.utoronto.ca
+</pre>
+      
+      <p>Now create your repository as follows:</p>
+      
+<pre>
+cd /srv/ece326f/pl-XXX
+mkdir ece326
+chmod 770 ece326
+cd ece326
+git init --bare --shared=group
+</pre>
+
+      <p>Make sure to replace XXX with your 3-digit (not 2-digit) group number. The <tt>chmod</tt> command above ensures that the repository will be accessible to the instructor and the TAs but not to other students. The <tt>git init</tt> command creates an empty Git repository.</p>
+
+      <p>Now, you are done with this machine, so exit out of it. Back on your local machine, you need to tell the local repository about the location of the remote repository.</p>
+
+<pre>
+cd ~/ece326
+git remote add origin ssh://ug250.eecg.toronto.edu/srv/ece326f/pl-XXX/ece326
+</pre>
+
+      <p>
+      The command shown above is run in your local repository. It associates the name origin with the remote repository. You can see that by using the git remote command.
+      </p>
+
+<pre>
+git remote -v
+</pre>
+
+      <p>It will show the following:</p>
+
+<pre>
+    origin  ssh://ug250.eecg.toronto.edu/srv/ece326f/pl-XXX/ece326 (fetch)
+    origin  ssh://ug250.eecg.toronto.edu/srv/ece326f/pl-XXX/ece326 (push)
+</pre>
+
+      <h5>Ignoring Temporary Files</h5>
+      <p>Now you are ready to update your remote repository. Let's try to add a file to the repository and make it available in the remote repository. <tt>.gitignore</tt> is a special file that Git reads to exclude certain files from showing up as candidates to be added to the repository. It is common to place temporary file types (e.g., <tt>.o</tt> files created during compilation, or <tt>.log</tt> files created by the tester) in <tt>.gitignore</tt> so we do not bloat our repository unnecessarily. Create a <tt>.gitignore</tt> file in your ece326 folder:</p>
+      
+<pre>
+cd ~/ece326
+nano .gitignore
+</pre>
+
+      <p>Your terminal should now enter into a text editor. Copy paste the following:</p>
+      
+<pre>
+*.o
+*.pyc
+*.log
+*.mk
+asst1
+</pre>
+
+      <p>The above text means ignore any file that ends with <tt>.o</tt>, <tt>.pyc</tt>, or <tt>.log</tt>. Now save and quit from the editor by pressing <kbd>Ctrl + X</kbd> (Exit) followed by <kbd>Y</kbd> (Yes, Save Changes). Now, type <tt>git status</tt> in the terminal and you should see the following:</p>
+      
+<pre>
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        .gitignore
+
+no changes added to commit (use "git add" and/or "git commit -a")
+</pre>
+
+      <p>Your next step is to stage the file for commit, which means to add a file into the list of files to be committed. You can do that by entering <tt>git add .gitignore</tt>. Now, type <tt>git status</tt> to see what happens:</p>
+      
+<pre>
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+        new file:   .gitignore
+</pre>      
+  
+      <p>The new file we created is ready to be committed, which means the repository will track the file and possibly keep multiple versions of it for your debugging or auditing purposes. To commit the all staged files, type the following:</p>
+      
+<pre>
+git commit -m "added .gitignore"
+</pre>
+
+      <p>The "-m" option allows you to associate a message about what changed to the commit. You should see a message that says 1 file changed, 1 insertion. Now we want to push the changes that we made to the remote repository, you can do so with the following command:</p>
+
+<pre>
+git push origin master
+</pre>
+
+      <p>You should see something that ends with:</p>
+
+<pre>
+To ssh://ug250.eecg.toronto.edu/srv/ece326f/pl-XXX/ece326
+   xxxxxxx..yyyyyyy  master -&gt; master
+</pre>
+      <p>You're done! It is now time for your partner to get a copy of the repository.</p>
+
+      <h4 id="cloning">Cloning Repository</h4>
+      <p>Once the remote repository is set up, your partner (or you, if you accidentally deleted the entire ece326 folder), can make a copy of the repository by <em>cloning</em> it through this command:</p>
+      
+<pre>cd ~
+git clone ssh://ug250.eecg.toronto.edu/srv/ece326f/pl-XXX/ece326
+</pre>
+
+      <p>This will create a local repository in <tt>~/ece326</tt>. Now both you and your partner have a copy of the repository and are connected to the same remote repository.</p>
+
+      <h4 id="update">Working Locally</h4>
+    
+      <p>Once you have made progress on your assignment, you should consider committing your work to the repository so that if you need to rollback to earlier versions of your work, it is saved in the repository. Also, your partner may want to continue where you left off, and thus you will need to commit your changes and make them available to your partner via the remote repository.</p>
+      
+      <p>The first step to committing your changes is to see which files have been changed, or added. You can do so using the <tt>git status</tt> command in the current assignment's folder:</p>
+      
+<pre>
+	Changes not staged for commit:
+	  (use "git add <file>..." to update what will be committed)
+	  (use "git checkout -- <file>..." to discard changes in working directory)
+	
+		modified:   foo.py
+		modified:   bar.py
+	
+	Untracked files:
+	  (use "git add <file>..." to include in what will be committed)
+	
+		baz.py
+	
+	no changes added to commit (use "git add" and/or "git commit -a")
+The command shows the files that you have modified, and some untracked files. The tester.
+</pre>      
+
+      <p>If you only want to add specific files to the commit, you may do so like this:</p>
+      
+<pre>
+git add foo.py baz.py
+</pre>      
+
+      <p>However, if you want to add everything changed or added in this folder, you can do:</p>
+      
+<pre>
+git add .
+</pre>   
+
+      <p>Beware that the above command may add unwanted files as well. To ignore these unwanted files, add their full name or their extensions to the <tt>.gitignore</tt> file as explained earlier under <a href="#repository">Remote Repository</a>.</p>
+      
+      <p>Now, you can commit these changes via the <tt>commit</tt> command.</p>
+      
+<pre>
+git commit -m "Updated foo and added baz"
+</pre>      
+
+      <p>Next, you can update your remote repository by running the <tt>git push</tt>
+command shown below. This command will only push the files that you have
+committed to your local repository, so make sure to commit all the relevant
+files to your local repository that you would like to push to the remote
+repository.</p>
+
+<pre>git push -u origin master --tags
+</pre>
+
+<p>
+When you run the command above, you will see:</p>
+
+<pre>    Branch master set up to track remote branch master from origin.
+</pre>
+
+<p>The "--tags"
+option pushes your local tags to the remote repository. We will be using these
+tags to mark your labs, so don't forget to add the tags option.</p>
+
+<p>If you run <tt>git status</tt>, you should see the following:</p>
+
+<pre>    On branch master
+    Your branch is up-to-date with 'origin/master'.
+    
+    nothing to commit, working directory clean
+</pre>
+
+<p>You need to only run the <tt>push</tt> command with all the options shown
+above once. After that, you can push your commits in the local repository to the
+remote repository by typing the following commands in your local repository:</p>
+
+<pre>    git push
+    git push --tags
+</pre>
+
+<p>When you add a new tag (e.g., Asst1-end) and run the <tt>push</tt> command shown
+above, it will show you:</p>
+
+<pre>    To ssh://ug250.eecg.utoronto.ca/srv/ece326f/pl-XXX/ece326
+     * [new tag]         Asst1-end -&gt; Asst1-end
+</pre>
+
+<p>You may re-submit your code any number of times. For example, you may 
+modify your code and update the end tag in the local repository. To re-submit this updated code, you will need to force an update to the tag on the remote repository by using the "-f" option. Here is the full sequence of operations:</p>
+
+<pre>
+git tag -d Asst1-end // Deletes tag from previous submission for Assignment 1
+git tag Asst1-end    // Creates tag for current submission for Assignment 1
+git push --tags -f   // The "-f" option forces the tag to be pushed to the remote repository, even if the tag exist there
+</pre>
+
+<p>You can update the remote repository at any time as shown above. The instruction for submitting your work will be detailed in the handout for each assignment.</p>
+
+      <h4 id="working">Working Together</h4>
+      
+      <p>After having made progress in an assignment, a group member will have committed meaningful work to their local repository. When the other partner begins to work, he/she will want to continue from these changes. For the partner to get these changes, the commits must be first pushed to the remote repository and then pulled to the partner's local repository.</p>
+
+      <p>The group member who has made the commits (e.g. member1) should push their commits to the remote repository.</p>
+<pre>
+member1@ug123: cd ~/ece326
+member1@ug123: git push origin master
+</pre>
+
+      <p>Finally the other group member (member2) can pull the commits (done by member1) to his/her local repository.</p>
+
+<pre>
+member2@ug123: cd ~/ece326
+member2@ug123: git pull origin master
+</pre>
+
+      <p>If conflicts arise, it means that you and your partner have made individual changes to a file and then committed your changes to the file separately. One of you will need to merge your code before you can continue. To avoid conflict, you and your partner should decide who will modify which files. If you need to modify your partner's files, ask him/her to commit his changes first, pull all of his changes from the remote repository, and make the changes. In the mean time, your partner should not continue working until you have committed and pushed all of your changes to his files.</p>
+
       <hr>
       <footer class="container text-center">
         <p>&copy; 2019 Kuei (Jack) Sun, University of Toronto</p>
