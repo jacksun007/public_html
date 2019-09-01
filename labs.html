@@ -262,7 +262,7 @@ git remote -v
 </pre>
 
       <h5>Ignoring Temporary Files</h5>
-      <p>Now you are ready to update your remote repository. Let's try to add a file to the repository and make it available in the remote repository. <tt>.gitignore</tt> is a special file that Git reads to exclude certain files from showing up as candidates to be added to the repository. It is common to place temporary file types (e.g., <tt>.o</tt> files created during compilation, or <tt>.log</tt> files created by the tester) in <tt>.gitignore</tt> so we do not bloat our repository unnecessarily. Create a <tt>.gitignore</tt> file in your ece326 folder:</p>
+      <p>Now you are ready to update your remote repository. Let's try to commit a file and make it available in the remote repository. <tt>.gitignore</tt> is a special file that Git reads to exclude certain files from showing up as candidates to be added to the repository. It is common to place temporary file types (e.g., <tt>.o</tt> files created during compilation, or <tt>.log</tt> files created by the tester) in <tt>.gitignore</tt> so we do not bloat our repository unnecessarily. Create a <tt>.gitignore</tt> file in your ece326 folder:</p>
       
 <pre>
 cd ~/ece326
@@ -388,7 +388,8 @@ When you run the command above, you will see:</p>
 
 <p>The "--tags"
 option pushes your local tags to the remote repository. We will be using these
-tags to mark your labs, so don't forget to add the tags option.</p>
+tags to mark your labs, so don't forget to add the tags option. At the end of every assignment handout,
+we will specify the assignment submission tag that you need to use to submit your work.</p>
 
 <p>If you run <tt>git status</tt>, you should see the following:</p>
 

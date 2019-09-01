@@ -356,9 +356,12 @@ A9 S  S  S  S  S  S  S  S  S  Ds Ds Ds Ds S  S  S  S  S  S  S  S  S  S
           </ul>
         </li>
         <li>In the case splitting is not allowed (i.e. hand limit reached), look at the equivalent hard value of the hand (e.g. for <tt>77</tt>, look at the row for hard 14).</li>
+        <li>Note that the table is space delimited.</li>
       </ul>
       
-      <p>Your objective for this part of the assignment is to parse the table (mind possible errors in the table format) and play Easy Blackjack using the table automatically. After you are complete, you can alter the strategy table and see what strategy gives better player advantage. The higher the player advantage, the more money you expect to win playing the game (See sample output below, with silent mode turned on).</p>
+      <p>Your objective for this part of the assignment is to parse the table and play Easy Blackjack using the table automatically. If parsing error occurs, then <tt>Player::factory</tt> should return <tt>nullptr</tt> and the program will terminate.</p>
+      
+      <p>After you are complete, you can alter the strategy table and see what strategy gives better player advantage. The higher the player advantage, the more money you expect to win playing the game (See sample output below, with silent mode turned on).</p>
       
 <pre>
 $ ./asst1 -s -a strat.txt 2000000

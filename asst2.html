@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Assignment 2 | ECE326 | Programming Languages | Fall 2019</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Kuei (Jack) Sun">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/dashboard.css" rel="stylesheet">
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../assets/js/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+<body data-spy="scroll" data-target=".sidebar"  data-offset="64">
+
+<nav class="navbar navbar-dark navbar-expand-md fixed-top bg-dark shadow">
+  <a class="navbar-brand pr-3" href="ece326.html">ECE326</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarCollapse">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="ece326.html">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="lectures.html">Lecture Notes</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="labs.html">Assignments</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="http://piazza.com/utoronto.ca/fall2019/ece326">Piazza Discussion</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://q.utoronto.ca/">Quercus Website</a>
+      </li>
+    </ul>
+  </div>  
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-md-3 col-lg-2 d-none d-md-block bg-light sidebar">
+      <div class="sidebar-sticky">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="#background">
+              Background
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#advice">
+              Hints and Advice
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#setup">
+              Setup
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#specification">
+              Solution Requirements
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#submission">Code Submission</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Assignment 2: Optimal Strategy Calculator</h1>
+      </div>
+      <p><strong>Due Date: October 9th, 11:59pm</strong></p>
+      <p>In this assignment, you will calculate the theoretically optimal strategy for Easy Blackjack&trade; using Python.</p>
+      
+
+      <h4 id="background">Background</h4>
+      <p>This assignment is the kind you can expect if you work in <a href="https://en.wikipedia.org/wiki/Actuary">actuarial science</a>: calculating expected return and assessing risk. Since Easy Blackjack is a game of chance, short term result may fluctuate and not be representative of the expected value of playing the game long term. There are two main methods for measuring expected value of a game: 1) by repeating a random experiment <em>many</em> times until the arithmetic mean of the values in the experiments converges to the expected value, and 2) by calculating it mathematically.</p>
+      
+      <p>In assignment 1, you developed a program that can estimate expected value of the game (i.e. player advantage) through repeated trials. In this assignment, you will come up with the optimal strategy table and calculate the player advantage associated with it. Fortunately, you can double check and/or debug your calculation by using your assignment 1 solution and compare the resultant player advantage with the theoretical one that you have calculated.</p>
+      
+      <p>Unlike in a real casino, we will be using an infinite shoe, meaning that the probability of receiving any card on the next draw remains constant and independent (e.g. probability of receiving an ace is always 1/13). This property simplifies our calculation. In the real world, removing a card would reduce the probability that a card of the same value can be drawn. For example, receiving an ace would mean that there is one fewer ace left in the shoe.</p>
+      
+      <h4 id="advice">Hints and Advice</h4>
+      <p>At a high level, we will use divide and conquer to break down the problem into smaller subproblems. For every possible action in Easy Blackjack, there is an associated expected value (EV). For example, the EV for surrendering is always -0.5, because you lose half of your bet when choosing the action. The optimal action, in each situation, is thus the action that yields the highest EV. For example, you have hard 19 versus dealer hard 20, the expected value of each action is as follows:</p>
+      
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Action</th>
+              <th scope="col">EV</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td scope="row">Hit</td>
+              <td>-0.768</td>
+            </tr>
+            <tr>
+              <td scope="row">Double</td>
+              <td>-1.538</td>
+            </tr>
+            <tr>
+              <td scope="row">Stand</td>
+              <td>-1.000</td>
+            </tr>
+            <tr>
+              <td scope="row">Surrender</td>
+              <td>-0.500</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <p>From the above, we can see that surrender is the best option because you lose the least amount of money. Stand, for example, always results in losing the entire bet since the dealer will not hit hard 20 and your hard 19 loses to hard 20.</p>
+      
+      <p>Now, it may become clear what the subproblems are: finding the EV of each action for every combination of player's hand and dealer's hand. Once you calculated all of them, then you can determine the optimal action for every step of the game. We call the result of this set of calculations an "EV Table".</p>
+      
+      <h5>Stand EV</h5>
+      <p>The easiest EV table (besides surrender) to calculate is for standing. Since the player won't take any more cards, the points for his/her hand is fixed. However, the dealer may take more cards. Therefore, the EV of standing is the weighted average of all outcomes after the dealer is done. For example, if you stand on hard 18 against the dealer's hard 16, the following outcomes are possible:</p>
+      
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Dealer</th>
+              <th scope="col">Outcome</th>
+              <th scope="col">Probability</th>
+              <th scope="col">EV</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td scope="row">17</td>
+              <td>+1</td>
+              <td>1/13</td>
+              <td>1/13</td>
+            </tr>
+            <tr>
+              <td scope="row">18</td>
+              <td>0</td>
+              <td>1/13</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <td scope="row">19, 20, 21</td>
+              <td>-1</td>
+              <td>3/13</td>
+              <td>-3/13</td>
+            </tr>
+            <tr>
+              <td scope="row">bust</td>
+              <td>+1</td>
+              <td>8/13</td>
+              <td>8/13</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <p>Here, observe that the dealer can only hit one more card before standing (since his/her points will go up by at least 1, i.e. receiving an ace). The EV of each outcome is the <tt>outcome i</tt> &times; <var>p<sub>i</sub></var>, where the sum of <var>p<sub>i</sub></var> is equal to 1. Finally, the EV standing on hard 18 against dealer's hard 16 is the sum of the EV of all possible outcomes, which is 6/13 or 0.462.</p>
+      
+      <p>Of course, if the dealer has a low starting hand, then it is possible that the dealer will hit multiple times. In this case, you will need recursion and dynamic programming to help you solve the problem more elegantly. Since you should already be familiar with recursion, we will explain dynamic programming and how it works.</p>
+      
+      <h5>Dynamic Programming</h5>
+      <p>Dynamic programming is an optimization technique where the result of a function is cached (saved) so that the cached result is returned on future invocation. This technique will greatly speed up the calculation by avoiding redundant and possibly expensive recomputation. There are some restrictions as to when dynamic programming can be used (i.e. the function must be "pure" -- see lecture note for more thorough explanation). For our purposes, you only need to know that the function may not depend on any mutable non-local variables (constant ones are fine).</p>
+      
+      <p>Continuing from previous example, suppose this time the dealer has hard 15 (the player's hand is not relevant), and we want to calculate the probability distribution <var>F(hard 15)</var> for all possible points that the dealer ends with. We would arrive at the following table:</p>
+      
+       <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Next Card</th>
+              <th scope="col">Dealer</th>
+              <th scope="col">Probability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td scope="row">A</td>
+              <td>16</td>
+              <td>1/13</td>
+            </tr>
+            <tr>
+              <td scope="row">2-6</td>
+              <td>17-21</td>
+              <td>5/13</td>
+            </tr>
+            <tr>
+              <td scope="row">7-K</td>
+              <td>bust</td>
+              <td>7/13</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <p>There is a 1/13 chance that the dealer gets an ace, where he/she would have to keep hitting. However, from previous example, we already calculated <var>F(hard 16)</var>! Therefore, if we have saved the result for <var>F(hard 16)</var>, we can use it immediately and merge the two tables together, where <var>F(hard 15) = 1/13*F(hard 16) + F(hard 15|not ace)</var> for the following final table.</p>
+      
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Dealer</th>
+              <th scope="col">Probability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td scope="row">17</td>
+              <td>1/13 + 1/13 * 1/13</td>
+            </tr>
+            <tr>
+              <td scope="row">...</td>
+              <td>...</td>
+            </tr>
+            <tr>
+              <td scope="row">21</td>
+              <td>1/13 + 1/13 * 1/13</td>
+            </tr>
+            <tr>
+              <td scope="row">bust</td>
+              <td>7/13 + 1/13 * 8/13</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <p>A general suggestion for this assignment is make use of the <tt>assert</tt> function to make sure your assumptions hold. Your program will crash if the assertion fails, which allows you to debug the problem immediately. For example, the sum of the probabilities in all dealer probability tables <em>should be equal to 1</em>. Assuming you are using a Python dictionary to store the table, you can check this using the following snippet of code:</p>
+      
+<pre>
+def isclose(a, b=1., rel_tol=1e-09, abs_tol=0.0):
+    return abs(a-b) &lt;= max(rel_tol * max(abs(a), abs(b)), abs_tol)    
+
+def make_dealer_table(table):    
+   # ...
+   # make sure the probabilities add up to 1
+   assert(isclose(sum(table.values()), 1.0))
+</pre>      
+      
+      <p>Lastly, we would save the result for <var>F(hard 15)</var> so that future calculation that uses it does not require recomputation. There are many opportunities to take advantage of dynamic programming in this assignment. We have showed you one scenario where it can be applied. It is up to you for the remainder of the assignment to identify where else to apply this technique.</p>
+      
+      <p><b>Question:</b> How many dealer probability tables do you need to complete the stand EV table?</p>
+      
+      <h5>Hit EV</h5>
+      <p>Correctly calculating the Hit EV table requires that you first complete the Stand EV table. The reason is that the EV for hitting depends on the optimal action between hitting and standing. Let's suppose you hit on hard 17 against dealer's hard 18. Your possible outcomes are as follows:</p>
+      
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Player</th>
+              <th scope="col">Probability</th>
+              <th scope="col">Outcome</th>
+              <th scope="col">EV</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td scope="row">18-20</td>
+              <td>3/13</td>
+              <td>?</td>
+              <td>?</td>
+            </tr>
+            <tr>
+              <td scope="row">21</td>
+              <td>1/13</td>
+              <td>+1</td>
+              <td>1/13</td>
+            </tr>
+            <tr>
+              <td scope="row">bust</td>
+              <td>9/13</td>
+              <td>-1</td>
+              <td>-9/13</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <p>You may be asking, why is the outcome of achieving 18 to 20 points unknown? It is because the algorithm is unsure whether it is better to hit or stand, for example, on hard 20 against dealer's hard 18. On the surface, it seems obvious that you would stand in this case, but there are many other situations where it may be a close call. Therefore, your algorithm must cast aside all doubt and verify that it is indeed better to stand than to hit, or vice versa.</p>
+      
+      <p>There are always two base cases in the recursion where you would stop hitting: arriving at 21 points or busting. In the above example, hitting on hard 20 results in an EV of 1/13 - 12/13 (only an ace will save you) = -11/13. On the other hand, standing on hard 20 guarantees a win because the dealer does not hit hard 18, so it's EV is +1.000. In this case, it is now clear that you should pick stand and not hit.</p> 
+      
+      <h5>Player Advantage</h5>
+      <p>Once you have calculated the EV of all possible actions for all combinations of hands (note that we intentionally left out hints on calculating the EV table for double and split), you would be able to generate a compact table of the optimal actions and their associated EV. To calculate the player advantage, you need the weighted average of the optimal EV of all possible starting hand combinations (sum of <var>p<sub>i</sub> p<sub>j</sub> EV<sub>ij</sub></var>, where <var>p<sub>i</sub></var> is the probability of the player's starting hand <var>i</var>, and <var>p<sub>j</sub></var> is the probability of the dealer's starting hand <var>j</var>).</p>
+      
+      <h4 id="setup">Setup</h4>
+      <p>There is no starter code for this assignment. You should create a folder named <tt>asst2</tt>, and add <tt>asst2.py</tt> to it. You may add additional files to help you organize your code. When we mark your code, we will run <tt>python asst2.py ...</tt></p>
+      
+<pre>
+cd ~/ece326
+mkdir asst2
+touch asst2/asst2.py
+git status # should say that "asst2/" directory is untracked
+git add asst2
+git commit -m "Initial code for Assignment 2"
+git tag Asst2-start
+git push
+git push --tags
+cd asst2
+</pre>      
+
+      <h4 id="specification">Solution Requirements</h4>
+      <p>To help you with this assignment, we break it up into multiple milestones. The program should take zero or more arguments, with the argument being the name of the table that you wish to print. For example:</p>
+      
+<pre>
+python asst2.py stand optimal
+</pre>
+
+      <p>This will print both the stand EV table and the optimal EV table. Partial marks will be given for completing some of the milestones. The list of all accepted arguments are as follows:</p>
+      
+      <ul>
+        <li><b>stand</b>: print the stand EV table</li>
+        <li><b>hit</b>: print the hit EV table</li>
+        <li><b>double</b>: print the double EV table</li>
+        <li><b>split</b>: print the split EV table</li>
+        <li><b>optimal</b>: print the optimal EV table</li>
+        <li><b>strategy</b>: print the strategy table followed by the theoretical player advantage</li>
+      </ul>
+      
+      <p>If no arguments are given, the program will print the strategy table and the player advantage.</p>
+      <h5>Stand, Hit, Double</h5>
+      <p>For these three tables, do not print the rows for pairs (except for AA). Below is a sample output for the hit EV table (Warning! these values are NOT CORRECT):</p>
+<pre>
+HIT
+     4     5     6     7     8     9     10    11    12    13    14    15    16    17    18    19    20    A2    A3    A4    A5    A6  
+ 4 -.049 -.012 .0111 -.088 -.159 -.240 -.335 -.385 .0989 .1633 .2231 .2785 .3301 .0834 -.099 -.312 -.557 -.256 -.233 -.203 -.163 -.121
+ 5 -.061 -.023 -.001 -.119 -.188 -.266 -.357 -.406 .0889 .1540 .2144 .2705 .3226 .0463 -.130 -.335 -.572 -.282 -.255 -.218 -.177 -.133
+ 6 -.072 -.034 -.013 -.151 -.217 -.292 -.380 -.419 .0795 .1452 .2063 .2630 .3156 .0062 -.161 -.359 -.588 -.304 -.270 -.231 -.190 -.145
+ 7 -.043 -.007 .0291 -.068 -.210 -.285 -.365 -.399 .1024 .1665 .2261 .2813 .3327 .1068 -.195 -.383 -.603 -.275 -.241 -.202 -.161 -.117
+ 8 .0387 .0708 .1149 .0822 -.059 -.210 -.301 -.330 .1686 .2279 .2831 .3343 .3818 .3819 -.036 -.402 -.619 -.181 -.149 -.113 -.075 -.035
+ 9 .1289 .1580 .1960 .1718 .0983 -.052 -.213 -.251 .2439 .2979 .3480 .3946 .4378 .4231 .2477 -.191 -.615 -.073 -.045 -.012 .0220 .0585
+10 .2304 .2562 .2877 .2569 .1979 .1165 -.044 -.146 .3314 .3792 .4235 .4647 .5029 .4643 .3015 .1076 -.351 .0517 .0768 .1050 .1355 .1676 
+11 .2830 .3073 .3336 .2921 .2299 .1582 .0596 -.041 .3792 .4235 .4647 .5029 .5384 .4643 .3015 .1076 -.120 .1214 .1439 .1696 .1976 .2272
+12 -.213 -.193 -.170 -.212 -.271 -.340 -.420 -.465 -.132 -.095 -.061 -.029 .0000 -.068 -.220 -.400 -.612 -.354 -.335 -.312 -.287 -.261
+13 -.274 -.257 -.235 -.269 -.323 -.387 -.462 -.503 -.206 -.175 -.146 -.119 -.094 -.135 -.275 -.442 -.640 -.400 -.382 -.361 -.338 -.315
+14 -.334 -.321 -.300 -.321 -.371 -.430 -.500 -.539 -.281 -.255 -.231 -.209 -.189 -.197 -.327 -.482 -.665 -.443 -.426 -.407 -.388 -.370
+15 -.395 -.385 -.365 -.369 -.416 -.471 -.536 -.572 -.355 -.335 -.317 -.299 -.284 -.254 -.375 -.519 -.689 -.483 -.468 -.453 -.439 -.424
+16 -.456 -.449 -.430 -.414 -.458 -.509 -.569 -.604 -.429 -.415 -.402 -.390 -.378 -.307 -.420 -.553 -.711 -.521 -.510 -.500 -.489 -.479
+17 -.527 -.522 -.508 -.483 -.505 -.553 -.610 -.646 -.511 -.502 -.494 -.486 -.479 -.384 -.461 -.585 -.732 -.570 -.563 -.556 -.550 -.543
+18 -.617 -.615 -.607 -.591 -.591 -.616 -.668 -.704 -.610 -.604 -.600 -.595 -.591 -.538 -.538 -.615 -.751 -.643 -.639 -.635 -.631 -.627
+19 -.726 -.725 -.722 -.715 -.713 -.715 -.744 -.779 -.724 -.721 -.719 -.717 -.715 -.692 -.692 -.692 -.769 -.738 -.737 -.735 -.733 -.732
+20 -.854 -.854 -.853 -.851 -.851 -.850 -.854 -.872 -.854 -.853 -.853 -.852 -.852 -.846 -.846 -.846 -.846 -.857 -.857 -.856 -.856 -.856
+AA .1265 .1564 .1859 .1654 .0951 .0000 -.128 -.205 .2453 .2992 .3492 .3957 .4389 .3832 .1903 -.051 -.358 -.038 -.015 .0107 .0387 .0682
+A2 .1024 .1333 .1616 .1223 .0540 -.037 -.160 -.234 .2253 .2806 .3320 .3797 .4240 .3319 .1450 -.088 -.384 -.074 -.051 -.026 .0008 .0359
+A3 .0800 .1118 .1391 .0795 .0132 -.075 -.193 -.264 .2067 .2634 .3160 .3648 .4102 .2809 .1002 -.125 -.409 -.109 -.087 -.061 -.025 .0125
+A4 .0592 .0919 .1182 .0370 -.027 -.112 -.225 -.293 .1895 .2474 .3011 .3510 .3974 .2303 .0559 -.161 -.435 -.144 -.120 -.085 -.048 -.009
+A5 .0399 .0734 .0988 -.004 -.066 -.148 -.257 -.314 .1735 .2325 .2873 .3382 .3855 .1805 .0123 -.196 -.459 -.176 -.144 -.107 -.069 -.029
+A6 .0593 .0911 .1280 .0538 -.072 -.149 -.249 -.300 .1881 .2461 .3000 .3500 .3964 .2335 -.030 -.231 -.483 -.157 -.124 -.088 -.050 -.011
+A7 .1185 .1476 .1907 .1706 .0396 -.100 -.201 -.249 .2359 .2905 .3411 .3882 .4319 .4643 .0707 -.265 -.506 -.087 -.057 -.024 .0113 .0484
+A8 .1755 .2029 .2397 .2206 .1522 .0078 -.149 -.198 .2837 .3348 .3823 .4264 .4674 .4643 .3015 -.123 -.529 -.017 .0096 .0404 .0734 .1080
+A9 .2304 .2562 .2877 .2569 .1979 .1165 -.044 -.146 .3314 .3792 .4235 .4647 .5029 .4643 .3015 .1076 -.351 .0517 .0768 .1050 .1355 .1676
+</pre>
+
+      <h5>Split</h5>
+      <p>For this EV table, print only the row containing pairs, and print the result for the <b>first</b> split (i.e., from 1 to 2 hands).</p>
+
+      <h5>Strategy Table</h5>
+      <p>For this table, the tester expects the program to complete within a limited amount of time to make sure dynamic programming was implemented correctly. You will lose marks if your code has inefficiencies.</p>
+
+      <h4 id="submission">Code Submission</h4>
+      <p>To submit your code with the current commit, use the <tt>Asst2-end</tt> tag. Remember to push the new tag to the remote repository.</p>
+      
+<pre>
+git tag Asst2-end    // Creates tag for current submission for Assignment 2
+git push --tags
+</pre>
+      
+      <hr>
+      <footer class="container text-center">
+        <p>&copy; 2019 Kuei (Jack) Sun, University of Toronto</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    /* nothing for now */
+  });
+</script>
+</body>
+</html>
