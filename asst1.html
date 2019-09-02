@@ -93,7 +93,7 @@
       <h4 id="background">Background</h4>
       <p>TL;DR: Easy Blackjack is the same as normal Blackjack except with both of dealer's cards exposed.</p>
       <p>The game of Blackjack is played against a dealer. Your objective is to get more points than the dealer without going over 21. The game begins with you placing a bet (e.g. $1), followed by both you (the player) and the dealer being dealt two cards. Unlike regular Blackjack, in Easy Blackjack, both cards held by you and the dealer are dealt face up, meaning that you know exactly how many points you or the dealer has. </p>
-      <p>For cards from 2 to 10, their points are exactly their pip values (e.g., 3 of spades is worth 3 points). All face cards (i.e., J, Q, K) are worth 10 points. Aces may be counted as 1 or 11 points, whichever makes your total larger without going over 21 (e.g., <tt>A2</tt> would give you a total of 13 points, and <tt>A58</tt> would give you a total of 14 points). In all cases, their suits (e.g. spade or heart) are ignored.</p>
+      <p>For cards from 2 to 10, their points are exactly their pip values (e.g., 3 of spades is worth 3 points). All face cards (i.e., J, Q, K) are worth 10 points. Aces may be counted as 1 or 11 points, whichever makes your total larger without going over 21. When your hand has an ace that counts as 11 points, the hand is said to be <em>soft</em>, otherwise it is <em>hard</em>. For example, <tt>A2</tt> would give you a total of 13 points (i.e. soft 13), and <tt>A58</tt> would give you a total of 14 points (i.e. hard 14). In all cases, the suits on the cards (e.g. spade or heart) are ignored.</p>
       <p>A starting hand with an ace and a 10-point card is called <em>blackjack</em>. Whoever has this hand wins immediately, or tie if both the player and the dealer has blackjack. If the player has blackjack, the player is paid 3 to 2 (i.e. $1.50 for every $1 bet, and you get your original bet of $1 back). If the dealer has blackjack, the player loses the initial bet only.</p>
       <p>If neither player or dealer has blackjack, the game continues with the player now able to take one or more actions:</p>
       <ul>
@@ -107,7 +107,7 @@
       <ul>
         <li>If the dealer has 18 or more, his/her hand stands.</li>
         <li>If the dealer has 16 or less, he/she will hit.</li>
-        <li>If the dealer has 17 with an ace that acts as 11 points (also known as <em>soft 17</em>) he/she will hit, otherwise he/she will stand.</li>
+        <li>If the dealer has soft 17 he/she will hit, otherwise he/she will stand on hard 17.</li>
       </ul>
       <p>If the dealer busts, all of the player's live hands win even money (e.g. $1 bet receives $1 payout). If the dealer does not bust, then each of the player's hand is compared with the dealer's hand, whichever is higher wins.</p>
       <p>For students who already know Blackjack, the rules for this assignment are summarized as follows:</p>

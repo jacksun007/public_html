@@ -78,17 +78,19 @@
         <h1 class="h2">Assignment 2: Optimal Strategy Calculator</h1>
       </div>
       <p><strong>Due Date: October 9th, 11:59pm</strong></p>
-      <p>In this assignment, you will calculate the theoretically optimal strategy for Easy Blackjack&trade; using Python.</p>
+      <p>In this assignment, you will calculate the theoretically optimal strategy for Easy Blackjack&trade; in Python 3.</p>
       
 
       <h4 id="background">Background</h4>
-      <p>This assignment is the kind you can expect if you work in <a href="https://en.wikipedia.org/wiki/Actuary">actuarial science</a>: calculating expected return and assessing risk. Since Easy Blackjack is a game of chance, short term result may fluctuate and not be representative of the expected value of playing the game long term. There are two main methods for measuring expected value of a game: 1) by repeating a random experiment <em>many</em> times until the arithmetic mean of the values in the experiments converges to the expected value, and 2) by calculating it mathematically.</p>
+      <p>This assignment is the kind you can expect if you work in <a href="https://en.wikipedia.org/wiki/Actuary">an actuary</a>, e.g. calculating expected return and assessing risk. Since Easy Blackjack is a game of chance, short term result may fluctuate and not be representative of the expected value of playing the game long term. There are two main methods for measuring expected value of a game: 1) by repeating a random experiment <em>many</em> times until the arithmetic mean of the values in the experiments converges to the expected value, and 2) by calculating it mathematically.</p>
       
-      <p>In assignment 1, you developed a program that can estimate expected value of the game (i.e. player advantage) through repeated trials. In this assignment, you will come up with the optimal strategy table and calculate the player advantage associated with it. Fortunately, you can double check and/or debug your calculation by using your assignment 1 solution and compare the resultant player advantage with the theoretical one that you have calculated.</p>
+      <p>In <a href="asst1.html">assignment 1</a>, you developed a program that can estimate expected value of the game (i.e. player advantage) through repeated trials. In this assignment, you will come up with the optimal strategy table and calculate the player advantage associated with it. Fortunately, you can double check and/or debug your calculation by using your assignment 1 solution and compare the resultant player advantage with the theoretical one that you have calculated.</p>
       
       <p>Unlike in a real casino, we will be using an infinite shoe, meaning that the probability of receiving any card on the next draw remains constant and independent (e.g. probability of receiving an ace is always 1/13). This property simplifies our calculation. In the real world, removing a card would reduce the probability that a card of the same value can be drawn. For example, receiving an ace would mean that there is one fewer ace left in the shoe.</p>
       
       <h4 id="advice">Hints and Advice</h4>
+      <p>If you have not done so already, you should go back to <a href="asst1.html">assignment 1</a> and make sure you still have a solid understanding of the rules of Easy Blackjack. In this assignment, the same rules of the game still applies.</a>
+      
       <p>At a high level, we will use divide and conquer to break down the problem into smaller subproblems. For every possible action in Easy Blackjack, there is an associated expected value (EV). For example, the EV for surrendering is always -0.5, because you lose half of your bet when choosing the action. The optimal action, in each situation, is thus the action that yields the highest EV. For example, you have hard 19 versus dealer hard 20, the expected value of each action is as follows:</p>
       
       <div class="table-responsive">
@@ -314,7 +316,7 @@ cd asst2
       <p>To help you with this assignment, we break it up into multiple milestones. The program should take zero or more arguments, with the argument being the name of the table that you wish to print. For example:</p>
       
 <pre>
-python asst2.py stand optimal
+python3 asst2.py stand optimal
 </pre>
 
       <p>This will print both the stand EV table and the optimal EV table. Partial marks will be given for completing some of the milestones. The list of all accepted arguments are as follows:</p>
