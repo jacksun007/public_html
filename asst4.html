@@ -73,14 +73,30 @@
         <h1 class="h2">Assignment 4: Concurrent In-Memory Database</h1>
       </div>
       <p><strong>Due Date: December 8th, 11:59pm</strong></p>
-      <p>In this assignment, you will build EasyDB&tm;, a multithreaded, highly concurrent in-memory database, using the Rust programming language.</p>
+      <p>In this assignment, you will build EasyDB&trade;, a multithreaded, highly concurrent in-memory database, using the Rust programming language.</p>
       
 
       <h4 id="background">Background</h4>
       
-      <h4 id="setup">Setup</h4> 
+      <p>TODO: talk about concurrency and synchronization.</p>
+      
+      <h4 id="setup">Setup</h4>
+      <pre>
+cd ~/ece326
+tar -xf /cad2/ece326f/src/easydb.tar
+git status # should say that "asst4/" directory is untracked
+git add asst4
+git commit -m "Initial code for Assignment 4"
+git tag Asst4-start
+git push
+git push --tags
+cd asst4
+</pre>
+      <p>TODO: The student's starter code should be code that you can copy-paste from Rust book's multi-threaded webserver example.</p>
 
       <h4 id="specification">Solution Requirements</h4>
+
+      <p>Please first familiarize yourself again with the <a href="asst3.html">features of EasyDB</a>. You will need to make sure that your solution can read an EasyDB schema file, and implements the access protocol as described. You are highly suggested to use your ORM software, developed in assignment 3, to test the correctness of your EasyDB server.</p>
 
       <h4 id="submission">Code Submission</h4>
       <p>To submit your code with the current commit, use the <tt>Asst4-end</tt> tag. Remember to push the new tag to the remote repository.</p>

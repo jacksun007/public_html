@@ -90,7 +90,7 @@
         <h1 class="h2">Assignment 3: Object-Relational Mapping</h1>
       </div>
       <p><strong>Due Date: November 10th, 11:59pm</strong></p>
-      <p>In this assignment, you will develop an object relational mapping (ORM) framework for EasyDB&tm; in Python.</p>
+      <p>In this assignment, you will develop an object relational mapping (ORM) framework for EasyDB&trade; in Python.</p>
       
       <h4 id="background">Background</h4>
       
@@ -133,7 +133,7 @@ except ObjectDoesNotExist:
       }
       </p>
       
-      <p>In EasyDB, each column in a table can be one of four types: <tt>integer</tt>, <tt>float</tt>, <tt>string</tt>, or foreign key (i.e. a "pointer" to a record in another table). To specify a foreign key type, use the name of the referenced table. Below is an example of a complete database schema:</p>
+      <p>In EasyDB, each column in a table can be one of four types: <tt>integer</tt>, <tt>float</tt>, <tt>string</tt>, or foreign key (i.e. a "pointer" to a record in another table). To specify a foreign key type, use the name of the referenced table. The names of a table or column must start with a letter, followed by letters (either case) or numbers; underscore is not allowed. Also, the name of a column cannot be id (explained below). Here is an example of a complete database schema:</p>
       
 <pre>
 User {
@@ -150,7 +150,7 @@ Account {
 }
 </pre>      
       
-      <p>In the definitions above, we have two tables: User and Account. For every user, we track his/her names, height, and age. For an account, we store the account type and its balance. But most importantly, an account references the User table. <tt>user</tt> stores the <em>id</em> of a row in the User table. Every row in an easyDB has an automatically generated unique integer id value which allows the row to be unambiguously referenced. In this manner, a user can have zero or more associatd accounts. EasyDB currently disallows cycles in foreign keys. Here are two examples where a cycle occurs:</p>
+      <p>In the definitions above, we have two tables: User and Account. For every user, we track his/her names, height, and age. For an account, we store the account type and its balance. But most importantly, an account references the User table. <tt>user</tt> stores the <em>id</em> of a row in the User table. Every row in EasyDB has an automatically generated unique integer id value which allows the row to be unambiguously referenced. In this manner, a user can have zero or more associatd accounts. EasyDB currently disallows cycles in foreign keys. Here are two examples where a cycle occurs:</p>
 
 <pre>
 # not allowed in EasyDB
@@ -241,6 +241,45 @@ struct row {
 </pre>
 
       <p>In some packets, we need to send a generic value, or a row of values. In these packets, <tt>struct value</tt> and <tt>struct row</tt> would be used. <tt>struct value</tt> contains the column type (<tt>type</tt>), the size of the buffer that is needed to store the value (<tt>size</tt>), and the buffer itself (<tt>buf</tt>). For all column types, size is equal to 8 (i.e. 8 bytes) except for <tt>string</tt>, which stores a cstring in multiples of 4 bytes. Therefore, the size of the buffer for "bad" would be 4 bytes, but 8 bytes for "good" (since the null character needs to be placed in the 5th byte). For <tt>struct row</tt>, <tt>count</tt> specifies how many values are stored.</p>
+
+      <h5>Atomic Update</h5>
+
+<pre>
+struct key {
+    long id;      /* id of the row */
+    long version; /* version of the row */
+};
+</pre>
+
+      <p>EasyDB supports a primitive version of <em>atomic update</em>. In a concurrent environment, atomic update ensures that changes made to a row will not conflict with changes made by others. In EasyDB, updating a piece of data requires retrieving the initial data followed by modifying it in some ways. For example, to withdraw $100 from an account, one needs to first know the current balance, and then deduct $100 from it. However, there is a window of time between two EasyDB commands where it is possible that someone else makes some changes to the same row. For example, the following problem may occur:</p>
+      
+<pre>
+      You            Your Mom     EasyDB
+  GET balance ---------------------->
+                   GET balance ----->
+                       1000    <-----
+     1000     <----------------------
+                  (deposit $500)
+                SET balance 1500 --->
+(withdraw $100)            
+SET balance 900 -------------------->            
+</pre>
+
+      <p>As you can see above, your final balance is supposed to be $1400. However, due to problematic interleaving of the commands, the deposit made by your mother was lost. EasyDB protects from this situation by having a version number associated with every row. When you make an update, you pass the version number of the row that you were modifying to the database. If the version number mismatches with what is in the database, a conflict is detected and <tt>TXN_ABORT</tt> is returned, notifying you that your update was aborted, as seen in the figure below.</p>
+
+<pre>
+      You            Your Mom       EasyDB
+  GET balance ---------------------->
+                   GET balance ----->
+                       1000  <------- v1
+     1000   <------------------------ v1
+                  (deposit $500)
+                SET balance 1500 ---> v2
+(withdraw $100)            
+SET balance 900 --------------------> NO
+   TXN_ABORT  <----------------------           
+</pre>
+      <p>As the programmer, it is likely that you would put an atomic update in a loop so that you can retry if abort occurs.</p>      
       
       <p>We will now describe the format of each EasyDB query.</p>
       
@@ -274,30 +313,38 @@ struct row {
       <div class="table-responsive">
       <table class="packet">
         <tr>
-          <td>struct response</td><td>long id</td>
+          <td>struct response</td><td>struct key</td>
         </tr>
       </table>
       </div>
 
-      <p>Note that <tt>id</tt> only appears if the response code is <tt>OK</tt>.
+      <p>Note that <tt>struct key</tt> only appears if the response code is <tt>OK</tt>.
  
       <h5>Update Command</h5>
  
-      <p>The update command is used to update an existing row in a table. It is similar to insert, with the addition that the id of the row needs to be specified on the request.</p>
+      <p>The update command is used to update an existing row in a table. It is similar to insert, with the addition that <tt>struct key</tt> of the row needs to be specified. If you don't care about atomic update, set <tt>version</tt> of <tt>struct key</tt> to 0.</p>
       
       <div class="table-responsive">
       <table class="packet">
         <tr>
-          <td>struct request</td><td>long id</td><td>struct row</td>
+          <td>struct request</td><td>struct key</td><td>struct row</td>
         </tr>
       </table>
       </div>
 
-      <p>The response for the update command is simple: just <tt>struct response</tt>.</p>
+      <div class="table-responsive">
+      <table class="packet">
+        <tr>
+          <td>struct response</td><td>long version</td>
+        </tr>
+      </table>
+      </div>
+
+      <p>The response for the update command is similar to insert, except only the new version number is returned.</p>
  
       <h5>Drop command</h5>
       
-      <p>The drop command deletes a row in table. Therefore, it needs to specify the id the row to be dropped.</p>
+      <p>The drop command deletes a row in table. Therefore, it needs to specify the id of the row to be dropped. In EasyDB, the drop command performs <em>cascade delete</em>, which means that if a row is referenced by rows in other tables, those rows will also be deleted. For example, if a user has three associated accounts, upon deleting the user, all associated accounts will be deleted as well. This design ensures that there will be no dangling pointers in the database.</p>
       
       <div class="table-responsive">
       <table class="packet">
@@ -311,7 +358,7 @@ struct row {
       
       <h5>Get Command</h5>
       
-      <p>The get command retrieves a row in table, which requires specifying the id of the row.</p>
+      <p>The get command retrieves a row from a table, which requires specifying the id of the row.</p>
       
       <div class="table-responsive">
       <table class="packet">
@@ -321,12 +368,12 @@ struct row {
       </table>
       </div>
       
-      <p>The response packet optionally includes <tt>struct row</tt> if <tt>code</tt> in <tt>struct response</tt> is <tt>OK</tt>.
+      <p>The response packet, on success, will include the row and its associated version number.</p>
       
       <div class="table-responsive">
       <table class="packet">
         <tr>
-          <td>struct request</td><td>struct row</td>
+          <td>struct request</td><td>long version</td><td>struct row</td>
         </tr>
       </table>
       </div>
@@ -363,8 +410,40 @@ enum Operator {
       <p>On success, the response will contain zero or more ids (zero is possible if there were no matches). <tt>BAD_QUERY</tt> is returned if one of the following errors occurred: 1) column type and value type mismatched, or 2) operator for the given type is not supported. In EasyDB, foreign key only supports <tt>OP_EQ</tt> and <tt>OP_NE</tt>. For <tt>string</tt>, <a href="https://en.cppreference.com/w/c/string/byte/strcmp">lexicographical comparison</a> is performed (e.g., "A" is less than "B" and "5" is less than "-2").</p>
       
       <h4 id="setup">Setup</h4> 
+<pre>
+cd ~/ece326
+tar -xf /cad2/ece326f/src/orm.tar
+git status # should say that "asst3/" directory is untracked
+git add asst3
+git commit -m "Initial code for Assignment 3"
+git tag Asst3-start
+git push
+git push --tags
+cd asst3
+</pre>
+      <p>TODO: decide what starter code to give to students</p>
 
       <h4 id="specification">Solution Requirements</h4>
+      
+      <p>In an object-relational mapping software, the programmer would write their database schema in a database-neutral language (i.e., in a way that the underlying database could be swapped out without affecting the program). For our ORM, the programmer will write the schema in Python (inspired by <a href="https://www.djangoproject.com/">Django</a>). Let's first look at an example schema:</p>
+      
+<pre>
+# schema.py
+
+import orm
+
+class User(orm.Table):
+    firstName = orm.String()
+    lastName = orm.String()
+    height = orm.Float()
+    age = orm.Integer()
+    
+class Account(orm.Table):
+    user = orm.Foreign(User)
+    type = orm.String()
+    balance = orm.Float()
+</pre> 
+     
 
       <h4 id="submission">Code Submission</h4>
       <p>To submit your code with the current commit, use the <tt>Asst3-end</tt> tag. Remember to push the new tag to the remote repository.</p>
