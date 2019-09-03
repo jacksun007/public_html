@@ -56,3 +56,18 @@
 .navbar-brand {
   font-size: 1rem;
 }
+
+table.packet, .packet td {
+	border: 1px solid black;
+}
+
+table.packet {
+	margin-bottom: 1rem;
+}
+
+.packet td {
+	font-family: monospace;
+	padding: 6px;
+	font-size: 1.25rem;
+	vertical-align: top;
+}

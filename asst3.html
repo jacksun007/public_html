@@ -52,6 +52,23 @@
             </a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" href="#easydb">
+              EasyDB
+            </a>
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="#schema">
+                Database Schema
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#protocol">
+                Access Protocol
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="#setup">
               Setup
             </a>
@@ -103,9 +120,247 @@ except ObjectDoesNotExist:
       
       <h4 id="easydb">EasyDB</h4>
       
-      <p>EasyDB is a toy relational database that provides minimalistic features for managing records. It supports user-specified tables. Each column in a table can be one of four types: integer, float, string, or foreign key (i.e. a "pointer" to a record in another table). EasyDB provides API for five operations: 1) inserting a new record, 2) updating an existing record, 3) deleting a record, 4) retrieving a record by its id, and 5) filtering a table for records that match user-specified conditions.</p>
+      <p>EasyDB is a toy relational database that provides minimalistic features for managing structured data. In a relational database, data is organized into tables of columns and rows. A column in a database table is a set of data of a primitive type (that is supported by the database). A table is defined with a list of one or more named columns before any data can be inserted. A row is a set of related data that is given meaning through the table it exists in. To insert a row into a table, each value of the row must have the same type as what is defined in the table, in the same order. Also, the number of values in a row must be exactly equal to the number of columns defined in the table. For example, a User table may have the columns: <tt>firstName</tt>, <tt>lastName</tt>, <tt>height</tt> and <tt>age</tt>. A row in a User table may be ("Jay", "Sung", 5.5, 31), which correctly represents a single user in this table. A table, of course, can have many rows, allowing you to store multiple users in a User table. 
       
+      <h4 id="schema">Database Schema</h4>
       
+      <p>There can also be multiple tables in a relational database, allowing tables to reference others. To specify the database schema (i.e. list of table definitions) in EasyDB, use the following syntax:</p>
+      
+      <p><var>table-name</var> {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<var>column-name-1</var> : <var>type | table-specifier</var>;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<var>column-name-2</var> : <var>type | table-specifier</var>;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;...</br>
+      }
+      </p>
+      
+      <p>In EasyDB, each column in a table can be one of four types: <tt>integer</tt>, <tt>float</tt>, <tt>string</tt>, or foreign key (i.e. a "pointer" to a record in another table). To specify a foreign key type, use the name of the referenced table. Below is an example of a complete database schema:</p>
+      
+<pre>
+User {
+  firstName: string;
+  lastName: string;
+  height: float;
+  age: integer;
+}
+
+Account {
+  user: User;
+  type: string;
+  balance: float;
+}
+</pre>      
+      
+      <p>In the definitions above, we have two tables: User and Account. For every user, we track his/her names, height, and age. For an account, we store the account type and its balance. But most importantly, an account references the User table. <tt>user</tt> stores the <em>id</em> of a row in the User table. Every row in an easyDB has an automatically generated unique integer id value which allows the row to be unambiguously referenced. In this manner, a user can have zero or more associatd accounts. EasyDB currently disallows cycles in foreign keys. Here are two examples where a cycle occurs:</p>
+
+<pre>
+# not allowed in EasyDB
+User {
+  firstName: string;
+  lastName: string;
+  father: User;
+  mother: User;
+}
+</pre>
+
+<pre>
+# also not allowed in EasyDB
+User {
+  firstName: string;
+  lastName: string;
+  pet: Animal;
+}
+
+Animal {
+  species: string;
+  owner: User;
+}
+</pre>  
+      
+      <h4 id="protocol">Access Protocol</h4>
+      
+      <p>To access a running EasyDB server, you must know the host name and its port number. Once you are connected, you can make one of five EasyDB queries that is available. Note that EasyDB assumes that the client (the program that is connected to the server) is aware of the current schema and does not provide an API for introspection. EasyDB uses binary format as its mean of communication. Therefore, we describe common structures in the network packets that are used in EasyDB. All structures are defined using C syntax and assumed to be tightly packed (i.e. no padding), with <tt>int</tt> being 32-bit signed integer, and <tt>long</tt> being 64-bit signed integer. All integers are in <a href="https://en.wikipedia.org/wiki/Endianness">network byte order</a>.</p>
+      
+<pre>
+enum Command {
+    INSERT = 1,
+    UPDATE = 2,
+    DROP = 3,
+    GET = 4,    
+    SCAN = 5,
+};
+</pre>
+
+<pre>
+struct request {
+    int command;  /* one of Command */
+    int table;    /* table number */
+};
+</pre>
+
+<pre>
+enum Code {
+    OK = 1,
+    NOT_FOUND = 2, /* id not found */
+    BAD_TABLE = 3, /* table not found */
+    BAD_QUERY = 4, /* error during scan */ 
+    TXN_ABORT = 5, /* update aborted */
+    
+};
+</pre>
+
+<pre>
+struct response {
+    int code;      /* one of Code */
+};
+</pre>
+
+      <p>All EasyDB requests begin with <tt>request</tt>. The <tt>command</tt> field is one of the five commands listed above, and the <tt>table</tt> field is the table number. A table's number is the order in which it appears in the schema, starting at 1 (in earlier example, User's table number would be 1, and Account's would be 2). All responses begin with <tt>response</tt>, which contains a code for success (i.e. OK), or error.</p>
+ 
+<pre>
+enum Column {
+    INTEGER = 1,
+    FLOAT = 2,
+    STRING = 3,
+    FOREIGN = 4,
+};
+</pre>
+
+<pre>
+struct value {
+    int type;     /* one of Column */
+    int size;     /* size of buf */
+    char buf[];   /* data stored within */
+};
+</pre>
+
+<pre>
+struct row {
+    int count;    /* number of elements in values */
+    struct value values[];
+};
+</pre>
+
+      <p>In some packets, we need to send a generic value, or a row of values. In these packets, <tt>struct value</tt> and <tt>struct row</tt> would be used. <tt>struct value</tt> contains the column type (<tt>type</tt>), the size of the buffer that is needed to store the value (<tt>size</tt>), and the buffer itself (<tt>buf</tt>). For all column types, size is equal to 8 (i.e. 8 bytes) except for <tt>string</tt>, which stores a cstring in multiples of 4 bytes. Therefore, the size of the buffer for "bad" would be 4 bytes, but 8 bytes for "good" (since the null character needs to be placed in the 5th byte). For <tt>struct row</tt>, <tt>count</tt> specifies how many values are stored.</p>
+      
+      <p>We will now describe the format of each EasyDB query.</p>
+      
+      <h5>Insert Command</h5>
+      
+      <div class="table-responsive">
+      <table class="packet">
+        <tr>
+          <td>struct request</td><td>struct row</td>
+        </tr>
+      </table>
+      </div>
+      
+      <p>The insert command adds a new row to a database table. Its request packet starts with a <tt>request</tt> structure, followed by a <tt>row</tt> structure, which contains one or more rows. For the User table example, the following is an illustration of the packet that is sent to the server:</p>
+      
+      <div class="table-responsive">
+      <table class="packet">
+        <tr>
+          <td>command: INSERT<br>table: 1</td>
+          <td>count: 4</td>
+          <td>type: string<br>size: 4<br>buf: "Joe"</td>
+          <td>type: string<br>size: 8<br>buf: "Sung"</td>
+          <td>type: float<br>size: 8<br>buf: 5.5</td>
+          <td>type: integer<br>size: 8<br>buf: 31</td>
+        </tr>
+      </table>
+      </div>
+ 
+      <p>Next, the response packet is formatted as shown below:</p>
+ 
+      <div class="table-responsive">
+      <table class="packet">
+        <tr>
+          <td>struct response</td><td>long id</td>
+        </tr>
+      </table>
+      </div>
+
+      <p>Note that <tt>id</tt> only appears if the response code is <tt>OK</tt>.
+ 
+      <h5>Update Command</h5>
+ 
+      <p>The update command is used to update an existing row in a table. It is similar to insert, with the addition that the id of the row needs to be specified on the request.</p>
+      
+      <div class="table-responsive">
+      <table class="packet">
+        <tr>
+          <td>struct request</td><td>long id</td><td>struct row</td>
+        </tr>
+      </table>
+      </div>
+
+      <p>The response for the update command is simple: just <tt>struct response</tt>.</p>
+ 
+      <h5>Drop command</h5>
+      
+      <p>The drop command deletes a row in table. Therefore, it needs to specify the id the row to be dropped.</p>
+      
+      <div class="table-responsive">
+      <table class="packet">
+        <tr>
+          <td>struct request</td><td>long id</td>
+        </tr>
+      </table>
+      </div>
+      
+      <p>The response packet for drop is just <tt>struct response</tt>.</p>
+      
+      <h5>Get Command</h5>
+      
+      <p>The get command retrieves a row in table, which requires specifying the id of the row.</p>
+      
+      <div class="table-responsive">
+      <table class="packet">
+        <tr>
+          <td>struct request</td><td>long id</td>
+        </tr>
+      </table>
+      </div>
+      
+      <p>The response packet optionally includes <tt>struct row</tt> if <tt>code</tt> in <tt>struct response</tt> is <tt>OK</tt>.
+      
+      <div class="table-responsive">
+      <table class="packet">
+        <tr>
+          <td>struct request</td><td>struct row</td>
+        </tr>
+      </table>
+      </div>
+      
+      <h5>Scan Command</h5>
+
+<pre>
+enum Operator {
+    OP_EQ = 1,  /* equal */
+    OP_NE = 2,  /* not equal */
+    OP_LT = 3,  /* less than */
+    OP_GT = 4,  /* greater than */
+};
+</pre>
+      
+      <div class="table-responsive">
+      <table class="packet">
+        <tr>
+          <td>struct request</td><td>int column<br>int operator<br></td><td>struct value</td>
+        </tr>
+      </table>
+      </div>
+      
+      <p>The scan command compares a column of every row in a table against a value and returns the id of all rows that matched. The <tt>column</tt> field is the column number to be matched, based on the order it appears in the table definition, starting with 1. The <tt>operator</tt> field specifies how to compare against the value stored in <tt>struct value</tt>.</p>
+      
+      <div class="table-responsive">
+      <table class="packet">
+        <tr>
+          <td>struct response</td><td>int count<br>long ids[]<br></td>
+        </tr>
+      </table>
+      </div>
+      
+      <p>On success, the response will contain zero or more ids (zero is possible if there were no matches). <tt>BAD_QUERY</tt> is returned if one of the following errors occurred: 1) column type and value type mismatched, or 2) operator for the given type is not supported. In EasyDB, foreign key only supports <tt>OP_EQ</tt> and <tt>OP_NE</tt>. For <tt>string</tt>, <a href="https://en.cppreference.com/w/c/string/byte/strcmp">lexicographical comparison</a> is performed (e.g., "A" is less than "B" and "5" is less than "-2").</p>
       
       <h4 id="setup">Setup</h4> 
 
