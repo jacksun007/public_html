@@ -240,6 +240,10 @@
       <p>A general suggestion for this assignment is make use of the <tt>assert</tt> function to make sure your assumptions hold. Your program will crash if the assertion fails, which allows you to debug the problem immediately. For example, the sum of the probabilities in all dealer probability tables <em>should be equal to 1</em>. Assuming you are using a Python dictionary to store the table, you can check this using the following snippet of code:</p>
       
 <pre>
+# 
+# use math.isclose() for Python 3.5 or later
+# use this for earlier versions of Python
+#
 def isclose(a, b=1., rel_tol=1e-09, abs_tol=0.0):
     return abs(a-b) &lt;= max(rel_tol * max(abs(a), abs(b)), abs_tol)    
 
