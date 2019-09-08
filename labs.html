@@ -224,7 +224,7 @@ git init
 	Initialized empty Git repository in ../ece326/.git/
 </pre>
 
-      <p>At this point, we (i.e., the instructor and the TAs) cannot access this repository because it is local within your home directory (that should no be accessible to others). Instead, you will submit your lab code by creating a clone (copy) of your repository to a remote repository location that is accessible to you and to us.</p>
+      <p>At this point, we (i.e., the instructor and the TAs) cannot access this repository because it is local within your home directory (that should no be accessible to others). Instead, you will submit your assignment code by creating a clone (copy) of your repository to a remote repository location that is accessible to you and to us.</p>
 
       <p>
       You need to run these instructions once to setup your remote repository. After that, you can update the remote repository by following the instructions in the next step.</p>
@@ -398,7 +398,7 @@ When you run the command above, you will see:</p>
 
 <p>The "--tags"
 option pushes your local tags to the remote repository. We will be using these
-tags to mark your labs, so don't forget to add the tags option. At the end of every assignment handout,
+tags to mark your assignments, so don't forget to add the tags option. At the end of every assignment handout,
 we will specify the assignment submission tag that you need to use to submit your work.</p>
 
 <p>If you run <tt>git status</tt>, you should see the following:</p>
@@ -459,7 +459,7 @@ member2@ug123: git pull origin master
       <p>We have provided you a program called <tt>ece326-tester</tt> that allows you to 1) test your code with various test cases, and 2) allows simulating the way we will be marking your code automatically. Please use this program before submitting your code so that you can catch obvious compilation errors, output errors, source code management errors, etc.</p>
 
       <h5>Tester Setup</h5>
-      <p>You will need to setup your path to make it simpler for you to access the tester. To do so, you should check whether you use csh or bash as follows:</p>
+      <p>You will need to setup your path to make it simpler for you to access the tester. To do so, you should check whether you use <tt>csh</tt> or <tt>bash</tt> as follows:</p>
 
       <pre>% echo $0</pre>
 
@@ -486,7 +486,7 @@ member2@ug123: git pull origin master
 % ece326-tester 1
 </pre>
 
-      <p>You will need to be in the directory associated with the assignment (e.g., <tt>asst1</tt> for assignment 1, <tt>asst2</tt> for assignment 2, etc), and specify the assignment number for which the tests should be run. For example, for Lab 2, <tt>lab_nr</tt> is 2. For each test, you will see one or more PASS or FAIL results.</p>
+      <p>You will need to be in the directory associated with the assignment (e.g., <tt>asst1</tt> for assignment 1, <tt>asst2</tt> for assignment 2, etc), and specify the assignment number for which the tests should be run. For example, for assignment 2, <tt>lab_nr</tt> is 2. For each test, you will see one or more PASS or FAIL results.</p>
 
       <p>You can see the output that is expected by the tester by specifying the <tt>-v</tt> (verbose output) option to the tester. Note that the tester looks for regular expressions, not exact matches. Please use <tt>ece326-tester -h</tt> for more details.</p>
 
@@ -530,22 +530,22 @@ FAIL
   # make a brand new directory
   % mkdir marker
   % cd marker
-  % ece326-tester -m assignment_nr
+  % ece326-tester -m lab_nr
 </pre>
 
-      <p>The <tt>-m</tt> option will simulate the marking functionality. It will checkout your code from your remote repository (which you have created as part of submitting your code) using the assignment's end tag (e.g., Asst1-end), build the code, and then run the testing functionality on this code. Note assignment_nr is the lab number (1, 2, etc.).</p>
+      <p>The <tt>-m</tt> option will simulate the marking functionality. It will checkout your code from your remote repository (which you have created as part of submitting your code) using the assignment's end tag (e.g., Asst1-end), build the code, and then run the testing functionality on this code. Note lab_nr is the assignment number (1, 2, etc.).</p>
 
       <p>The output will be stored in three files, shown below, in the <tt>marker</tt> directory where you ran the tester. The XXX shown below is your user number. The last two files are copies of the original outputs of the tester.</p>
       
       <ul>
         <li><tt>marker-XXX.log</tt>: Shows the output of retrieving files from your remote repository, building your code, and running the marker functionality.</li>
-        <li><tt>tester-XXX.log</tt>:	Shows the output of your program when running the ece344 tester.</li>
+        <li><tt>tester-XXX.log</tt>:	Shows the output of your program when running the ece326 tester.</li>
         <li><tt>tester-XXX.out</tt>:	Summarizes the marks for the various tests.</li>
       </ul>
         
-<p>We will run the same marker program to mark your lab. You will receive these files by email when we finish marking your lab. Let us know if you don't receive these files within one week after the lab submission deadline.</p>
+<p>We will run the same marker program to mark your assignment. You will receive these files by email when we finish marking your assignment. Let us know if you don't receive these files within one week after the assignment submission deadline.</p>
 
-<p>We do not use any "hidden" test cases, so there are no surprises. Make sure to run the marker before submitting your code - it will tell you the marks you will get for your submission! If the tester and the marker is giving you different results an assignment, it is possible that you have not tagged the latest version of your code since the marker uses git tags to checkout your code.</p>
+<p>We do not use any "hidden" test cases, so there are no surprises. Make sure to run the marker before submitting your code - it will tell you the marks you will get for your submission! If the tester and the marker is giving you different results for an assignment, it is possible that you have not tagged the latest version of your code since the marker uses git tags to checkout your code.</p>
       
 
       <hr>
