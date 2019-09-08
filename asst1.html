@@ -156,7 +156,7 @@ make
       </ul>
 
       <h4 id="specification">Solution Requirements</h4>
-      <p>Since this assignment will be graded via an automated marker, you need to print outputs in the exact format described here. You may add additional files if needed, but you may not modify the following files: <tt>main.cpp, shoe.cpp, shoe.h, config.h, player.h</tt>, and <tt>Makefile</tt>. During marking, we will replace these files with the original, which may cause your submission to fail if you modified the aforementioned files. Double check that you did not modify these files prior to submission. Code to fails to compile will receive zero marks.</p>
+      <p>Since this assignment will be graded via an automated marker, you need to print outputs in the exact format described here. You may add additional files if needed, but you may not modify the following files: <tt>main.cpp, shoe.cpp, shoe.h, config.h, player.h</tt>, and <tt>Makefile</tt>. During marking, we will replace these files with the original, which may cause your submission to fail if you modified the aforementioned files. Double check that you did not modify these files prior to submission. Code which fails to compile will receive zero marks.</p>
       
       <h4 id="processing">Command Line Parsing</h4>
       <p>To complete this part of the assignment, you will need to make changes to <em>config.cpp</em>. Let's first fire up the help option "-h" and see what options and arguments the program accepts:</p>
@@ -370,7 +370,9 @@ Final Balance: +$208725.50
 Player Advantage: 10.44%
 </pre>
       <h4 id="submission">Code Submission</h4>
-      <p>To submit your code with the current commit, use the <tt>Asst1-end</tt> tag. Remember to push the new tag to the remote repository.</p>
+      <p>Before you submit, we highly suggest you run the tester to verify the correctness of your solution.</p>
+      
+      <p>To submit your code with the current commit, use the <tt>Asst1-end</tt> tag. Remember to push the new tag to the remote repository. <em>Run the marker to verify that your submission is working properly.</em> This may help you detect issues such as having accidentally modified files which are supposed to remain unchanged.</p>
       
 <pre>
 git tag Asst1-end    // Creates tag for current submission for Assignment 1

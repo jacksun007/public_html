@@ -81,6 +81,16 @@
               Working Together
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#testing">
+              Testing Your Code
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#simulate">
+              Simulating Marking
+            </a>
+          </li>
         </ul>
       </div>
     </nav>
@@ -106,7 +116,7 @@
           <tbody>
             <tr>
               <td scope="row">1</td>
-              <td>Easy Blackjack</td>
+              <td><a href="asst1.html">Easy Blackjack</a></td>
               <td>September 9th</td>
               <td>September 29th, 11:59pm</td>
               <td>C++11</td>
@@ -443,6 +453,100 @@ member2@ug123: git pull origin master
 </pre>
 
       <p>If conflicts arise, it means that you and your partner have made individual changes to a file and then committed your changes to the file separately. One of you will need to merge your code before you can continue. To avoid conflict, you and your partner should decide who will modify which files. If you need to modify your partner's files, ask him/her to commit his changes first, pull all of his changes from the remote repository, and make the changes. In the mean time, your partner should not continue working until you have committed and pushed all of your changes to his files.</p>
+
+      <h4 id="testing">Testing Your Code</h4>
+
+      <p>We have provided you a program called <tt>ece326-tester</tt> that allows you to 1) test your code with various test cases, and 2) allows simulating the way we will be marking your code automatically. Please use this program before submitting your code so that you can catch obvious compilation errors, output errors, source code management errors, etc.</p>
+
+      <h5>Tester Setup</h5>
+      <p>You will need to setup your path to make it simpler for you to access the tester. To do so, you should check whether you use csh or bash as follows:</p>
+
+      <pre>% echo $0</pre>
+
+      <p>If the output shows <tt>sh</tt> or <tt>bash</tt>, then you are using <tt>bash</tt>. If the output shows <tt>csh</tt> or <tt>tcsh</tt>, then you are using <tt>csh</tt>.</p>
+      
+      <ol>
+        <li>
+          <p>For csh, add the following to the end of your ~/.cshrc:</p>
+          <pre>set path=( /cad2/ece326f/tester/bin $path)</pre>
+        </li>
+        <li>
+          <p>For bash, add the following to the end of your ~/.bashrc:</p>
+          <pre>export PATH=/cad2/ece326f/tester/bin:$PATH</pre>
+        </li>
+      </ol>
+
+      <p>Then make sure to <em>log out and log back in</em>. Run <tt>echo $PATH</tt> and you should see the new path.</p>
+
+      <h5>Running Tester</h5>
+      <p>Please use the following commands after you have compiled and run your code. For example, for assignment 1, you should write the program described in the assignment 1 handout, and then run the tester.</p>
+
+<pre>
+% cd ~/ece326/asst1
+% ece326-tester 1
+</pre>
+
+      <p>You will need to be in the directory associated with the assignment (e.g., <tt>asst1</tt> for assignment 1, <tt>asst2</tt> for assignment 2, etc), and specify the assignment number for which the tests should be run. For example, for Lab 2, <tt>lab_nr</tt> is 2. For each test, you will see one or more PASS or FAIL results.</p>
+
+      <p>You can see the output that is expected by the tester by specifying the <tt>-v</tt> (verbose output) option to the tester. Note that the tester looks for regular expressions, not exact matches. Please use <tt>ece326-tester -h</tt> for more details.</p>
+
+      <p>The output of the tester will be stored in two files in the directory in which the tester is run:</p>
+
+      <ul>
+        <li><tt>tester.log:</tt>	Shows the output of your program when running the ece326 tester.</li>
+        <li><tt>tester.out:</tt>	Summarizes the marks for the various tests.</li>
+      </ul>	
+
+      <h5>Frequently Asked Questions</h5>
+      
+      <p><em>My output is correct but the tester says my program failed. Why?</em></p>
+      
+      <p>Mostly likely, your output is incorrect in one of two ways:</p>
+      <ol>
+        <li>You have incorrect capitalization (e.g. "Hello World" instead of "Hello world").</li>
+        <li>You added spurious spaces or indentation, (e.g. "Hello " with many spaces following the word is not the same as "Hello" to the tester)</li>
+      </ol>
+
+      <p><em>What does a tester TIMEOUT mean?</em></p>
+      <p>The expected output is not found within the time limit.</p>
+      
+      <p><em>The tester showed this, what does this error mean?</em></p>
+     
+<pre>
+END OF FILE ERROR 
+FAIL
+</pre>
+
+      <p>The end-of-file error suggests that the tester was still looking for input but your program exited. Running the tester with <tt>-v</tt> will show you what input the tester is expecting. Generally, it means that your program has crashed or failed some assertion.</p>
+
+      <h4 id="simulate">Simulating Marking</h4>
+      
+      <p>The tester helps you test your code. However, you need to simulate the marking functionality of the tester to find out whether you have submitted your code correctly. Before you do this step, make sure to submit your code, or else the marking functionality will not work correctly.</p>
+
+      <p>Then, you can simulate the marking functionality by adding the <tt>-m</tt> option to the <tt>ece326-tester</tt> command:</p>
+
+<pre>
+  % cd ~/ece326
+  # make a brand new directory
+  % mkdir marker
+  % cd marker
+  % ece326-tester -m assignment_nr
+</pre>
+
+      <p>The <tt>-m</tt> option will simulate the marking functionality. It will checkout your code from your remote repository (which you have created as part of submitting your code) using the assignment's end tag (e.g., Asst1-end), build the code, and then run the testing functionality on this code. Note assignment_nr is the lab number (1, 2, etc.).</p>
+
+      <p>The output will be stored in three files, shown below, in the <tt>marker</tt> directory where you ran the tester. The XXX shown below is your user number. The last two files are copies of the original outputs of the tester.</p>
+      
+      <ul>
+        <li><tt>marker-XXX.log</tt>: Shows the output of retrieving files from your remote repository, building your code, and running the marker functionality.</li>
+        <li><tt>tester-XXX.log</tt>:	Shows the output of your program when running the ece344 tester.</li>
+        <li><tt>tester-XXX.out</tt>:	Summarizes the marks for the various tests.</li>
+      </ul>
+        
+<p>We will run the same marker program to mark your lab. You will receive these files by email when we finish marking your lab. Let us know if you don't receive these files within one week after the lab submission deadline.</p>
+
+<p>We do not use any "hidden" test cases, so there are no surprises. Make sure to run the marker before submitting your code - it will tell you the marks you will get for your submission! If the tester and the marker is giving you different results an assignment, it is possible that you have not tagged the latest version of your code since the marker uses git tags to checkout your code.</p>
+      
 
       <hr>
       <footer class="container text-center">
