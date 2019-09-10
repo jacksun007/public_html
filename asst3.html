@@ -77,6 +77,18 @@
             <a class="nav-link" href="#specification">
               Solution Requirements
             </a>
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="#client">
+                Database Client
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#orm_schema">
+                Database Model
+                </a>
+              </li>
+            </ul>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#submission">Code Submission</a>
@@ -424,7 +436,48 @@ cd asst3
       <p>TODO: decide what starter code to give to students</p>
 
       <h4 id="specification">Solution Requirements</h4>
+      <p>This assignment has a couple of milestones, each of which can work independently and thus are worth partial marks. You and your partner should take on one of each part of the assignment.</p>
       
+      <h4 id="client">Database Client</h4>
+      <p>In order to communicate with the database server, we need to write a client library that will send requests to an EasyDB server as well as parsing responses received from the server. We will describe the interface here.</p>
+      
+      <h5>Database Schema</h5>
+      <p>As said earlier, the server assumes the client knows the schema, so we must supply the schema to the client to instantiate it. Here is how an ORM developer would use your EasyDB library:</p>
+<pre>
+import easydb
+
+tb = (
+    ("User", (                  # table_name
+        ("firstName", str),     # (column_name, type)
+        ("lastName", str),
+        ("height", float),
+        ("age", int),
+    )),
+    
+    ("Account", (
+        ("user", "User"),       # (column_name, table_reference)
+        ("type", str),
+        ("balance", float),
+    ))
+)
+
+db = easydb.Database(tb)
+</pre>
+      <p>The above code creates a Database object. If there is an issue with the provided schema, then it should throw the following errors:</p>
+      
+      <ul>
+        <li><tt>TypeError</tt>: thrown when either table name or column name is not a string.</li>
+        <li><tt>ValueError</tt>: thrown when type is not one of str, float, int, or a string referencing another table name.<li>
+        <li><tt>easydb.IntegrityError</tt>: thrown when foreign keys causes a cycle. You must define this error by inheriting from Python's built-in <tt>Exception</tt> base class.<li>
+      </ul>
+      
+      <p>Next, we connect to the server via the <tt>connect</tt> member function.</p>
+<pre>
+db.connect("127.0.0.1", 8080)
+</pre>
+      <p><tt>connect</tt> takes two arguments, the host name and the port number. You should use Python's <a href="https://docs.python.org/3.5/library/socket.html">socket</a> library to implement this function. The function should throw whatever error <tt>socket.connect</tt> throws.</p>
+      
+      <h4 id="orm_schema">Defining Schema</h4>
       <p>In an object-relational mapping software, the programmer would write their database schema in a database-neutral language (i.e., in a way that the underlying database could be swapped out without affecting the program). For our ORM, the programmer will write the schema in Python (inspired by <a href="https://www.djangoproject.com/">Django</a>). Let's first look at an example schema:</p>
       
 <pre>
