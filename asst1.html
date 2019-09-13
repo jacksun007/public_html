@@ -197,9 +197,19 @@ Error: cannot choose both file and random-based shoe.
 ./asst1: option requires an argument -- 'a'
 </pre>
       
-      <p>The suggested solution is to use <a href="https://www.gnu.org/software/libc/manual/html_node/Getopt.html#Getopt">getopt</a> from the standard C library. However, you may choose to do your own parsing as long as the output is identical.</p>
+      <p>The suggested solution is to use <a href="https://www.gnu.org/software/libc/manual/html_node/Getopt.html#Getopt">getopt</a> from the standard C library. However, you may choose to do your own parsing as long as the output is identical. Note that for <tt>getopt</tt>, options that require an argument will treat the next token as argument, even if it is actually another option. for example: </p>
+
+<pre>
+./asst1 -f -i
+</pre>      
       
-      <p>At this point, you have not completed either of the playing mode, so the program still won't do much. That's OK. We will work on the core gameplay first, which both modes need.</p>
+      <p>In this case, <tt>getopt</tt> thinks the file name for file-based shoe is <tt>-i</tt>, and therefore you will get this error (which is printed as part of the starter code):</p>
+
+<pre>
+Error: cannot instantiate Shoe. (bad file?)
+</pre>      
+      
+      <p>After command line parsing is done, you have not completed either of the playing mode, so the program still won't do much. That's OK. We will work on the core gameplay first, which both modes need.</p>
       
       <h4 id="gameplay">Gameplay</h4>
       
