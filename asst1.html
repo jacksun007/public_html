@@ -224,6 +224,8 @@ Error: cannot instantiate Shoe. (bad file?)
         <li><b>void finish()</b>: This function may only be called after no more hands are left to be played. Its purpose is to allow the dealer to take action(s) and then updates the player's balance based on the outcome of the game. If the player has no live hands (i.e. all his/her hands busted or surrendered), then the dealer <em>will not</em> draw any cards.</li>
       </ol>  
       
+      <p>When the player splits, the current hand (first hand) will be played out while the new hand (second hand) will be added to the end of a queue. If the current hand is split again, the new hand (third hand) will again be placed to the end of the same queue. Same process repeats until the player cannot split anymore. After all actions on the current hand is complete, the next hand to be played will be the second hand (i.e. in the order that they are created).</p>
+      
       <p>In addition, the constructor for <tt>Blackjack</tt> takes two arguments: a <tt>Player</tt> object, which is the player playing this game, and a <tt>Shoe</tt> object, which is the shoe for which cards are pulled from to be dealt to both player and dealer. You should look at <em>shoe.h</em> to see how to draw cards from a <tt>Shoe</tt> object.</p>
       
       <p>The results (net monetary gain/loss) can be calculated as follows. Remember that a player may have multiple hands if he/she splits one or more hands:</p>
