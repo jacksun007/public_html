@@ -78,6 +78,9 @@
           <li class="nav-item">
             <a class="nav-link" href="#submission">Code Submission</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#terms">Glossary of Terms</a>
+          </li>
         </ul>
       </div>
     </nav>
@@ -86,7 +89,7 @@
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Assignment 1: Easy Blackjack</h1>
       </div>
-      <p><strong>Due Date: September 29th, 11:59pm</strong></p>
+      <p><strong>Due Date: October 6th, 11:59pm</strong></p>
       <p><strong>Lab TA: Andrew Choi</strong></p>
       <p>In this assignment, you will create a program to play the game of Easy Blackjack&trade; in C++11. Your program will allow the user to choose between playing by hand (i.e. manually), or automatically using a strategy table.</p>
       
@@ -145,7 +148,7 @@ make
       <p>The starter code is organized as follows:</p>
       <ul>
         <li><em>main.cpp</em>: contains the <tt>main</tt> function.</li>
-        <li><em>shoe.cpp</em>: contains two subclasses of the <tt>Shoe</tt> base class. <tt>InfiniteShoe</tt> has an infinite supply of cards, generated at random. <tt>FileShoe</tt> reads in a prearranged shoe from a file and deals out the cards in the exact order as entered in the file.</li>
+        <li><em>shoe.cpp</em>: contains two subclasses of the <a href="#terms">Shoe</a> base class. <tt>InfiniteShoe</tt> has an infinite supply of cards, generated at random. <tt>FileShoe</tt> reads in a prearranged shoe from a file and deals out the cards in the exact order as entered in the file.</li>
         <li><em>shoe.h</em>: contains definition of the <tt>Shoe</tt> base class.</li>
         <li><em>config.cpp</em>: you should modify this file to implement command line parsing.</li>
         <li><em>config.h</em>: contains definition of the <tt>Config</tt> class.</li>
@@ -174,6 +177,16 @@ Options:
  SEED:	random seed
  NUM:	number of hands to be played
 </pre>
+      <p>Here is a summary of the available options to the program:</p>
+
+      <ul>
+        <li><tt>-h</tt>: displays the usage message you see above</li>
+        <li><tt>-f</tt>: the <a href="#terms">shoe</a> used for this game will generate cards from a file. The tester uses this to check the output of your program against various test cases.</li>
+        <li><tt>-i</tt>: the <a href="#terms">shoe</a> used for this game will generate cards from a random-number generator.</li>
+        <li><tt>-r</tt>: allows you to record the cards that are being dealt in the game to a file. You can load the file later using the <tt>-f</tt> option to play the exact same shoe again.</li>
+        <li><tt>-a</tt>: allows you to play the game automatically using a strategy table. See the <a href="#automatic">Automatic Mode</a> section for a sample of the table. When we test your code, we use one of four tables that you can look at. They are stored under <tt>/cad2/ece326f/tester/data/asst1/</tt>. In automatic mode, the player will only play <tt>NUM</tt> number of hands, specified by the command line.</li>
+      </ul>
+
       
       <p>Your program must accept all correct combinations of the options and reject all else. This includes the following restrictions:</p>
       <ul>
@@ -224,7 +237,9 @@ Error: cannot instantiate Shoe. (bad file?)
         <li><b>void finish()</b>: This function may only be called after no more hands are left to be played. Its purpose is to allow the dealer to take action(s) and then updates the player's balance based on the outcome of the game. If the player has no live hands (i.e. all his/her hands busted or surrendered), then the dealer <em>will not</em> draw any cards.</li>
       </ol>  
       
-      <p>When the player splits, the current hand (first hand) will be played out while the new hand (second hand) will be added to the end of a queue. If the current hand is split again, the new hand (third hand) will again be placed to the end of the same queue. Same process repeats until the player cannot split anymore. After all actions on the current hand is complete, the next hand to be played will be the second hand (i.e. in the order that they are created).</p>
+      <p>When the player splits, the immediate next card from the shoe will go to the current hand, and the card after that will go to the new hand. For example, if you have <tt>77</tt> and the next two cards in the shoe are <tt>KQ</tt>, your current hand will become <tt>7K</tt> and the new hand will have <tt>7Q</tt>.</p>
+
+      <p>The current hand (first hand) will be played out while the new hand (second hand) will be added to the end of a queue. If the current hand is split again, the new hand (third hand) will again be placed to the end of the same queue. Same process repeats until the player cannot split anymore. After all actions on the current hand is complete, the next hand to be played will be the second hand (i.e. in the order that they are created).</p>
       
       <p>In addition, the constructor for <tt>Blackjack</tt> takes two arguments: a <tt>Player</tt> object, which is the player playing this game, and a <tt>Shoe</tt> object, which is the shoe for which cards are pulled from to be dealt to both player and dealer. You should look at <em>shoe.h</em> to see how to draw cards from a <tt>Shoe</tt> object.</p>
       
@@ -392,6 +407,15 @@ git tag Asst1-end    // Creates tag for current submission for Assignment 1
 git push --tags
 </pre>
       
+      <h4 id="terms">Glossary of Terms</h4>
+      <p>Here, you can find the definition of commonly seen terms that are used in the assignment. More will be added as people ask questions about the assignment.</p>
+      
+      <ul>
+        <li><b>Shoe</b>: An elongated container used to hold multiple decks of cards. For this assignment, we support two sources of cards: random-generated (<tt>InfiniteShoe</tt>), or pre-arranged (<tt>FileShoe</tt>).</li>
+        <li><b>Seed</b>: A value passed into a random number generator to reset its internal state. For a deterministic random number generator (the one we're using for this assignment), using the same seed will result in the exact same sequence of psuedo-random numbers being generated, which helps you debug your program.</li>
+        <li><b>Hard</b>: In blackjack, a hard hand refers to one where there is no ace that can act as 11 points without going over 21. For example, <tt>69</tt> is a hard 15, and <tt>A5K</tt> is a hard 16.</li>
+        <li><b>Soft</b>: In blackjack, a soft hand refers to one where there is an ace that can act as 11 points without going over 21. For example, <tt>A6</tt> is a soft 17. Soft hands are desirable in blackjack because there is no risk of busting if you hit. In the case of <tt>A6</tt>, if you hit and receive a ten, your hand merely becomes a hard 17 and does not bust.</li>
+      </ul>
       <hr>
       <footer class="container text-center">
         <p>&copy; 2019 Kuei (Jack) Sun, University of Toronto</p>
