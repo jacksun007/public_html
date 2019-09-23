@@ -52,22 +52,33 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#advice">
-              Hints and Advice
+            <a class="nav-link" href="#setup">
+              Setup
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#setup">
-              Setup
+            <a class="nav-link" href="#approach">
+              Approach
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#specification">
               Solution Requirements
             </a>
+             <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="#handclass">Hand Class</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#dealer">Dealer Table</a>
+              </li>
+            </ul>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#submission">Code Submission</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#glossary">Glossary of Terms</a>
           </li>
         </ul>
       </div>
@@ -79,17 +90,41 @@
       </div>
       <p><strong>Due Date: October 20th, 11:59pm</strong></p>
       <p><strong>Lab TA: Wendy Qiu</strong></p>
-      <p>In this assignment, you will calculate the theoretically optimal strategy for Easy Blackjack&trade; in Python 3.</p>
+      <p>In this assignment, you will calculate the theoretically optimal strategy for Easy Blackjack&trade; in Python 3. The assignment is split into multiple milestones, with each one worth partial marks.</p>
       
 
       <h4 id="background">Background</h4>
       <p>This assignment is the kind you can expect if you work in <a href="https://en.wikipedia.org/wiki/Actuary">an actuary</a>, e.g. calculating expected return and assessing risk. Since Easy Blackjack is a game of chance, short term result may fluctuate and not be representative of the expected value of playing the game long term. There are two main methods for measuring expected value of a game: 1) by repeating a random experiment <em>many</em> times until the arithmetic mean of the values in the experiments converges to the expected value, and 2) by calculating it mathematically.</p>
       
-      <p>In <a href="asst1.html">assignment 1</a>, you developed a program that can estimate expected value of the game (i.e. player advantage) through repeated trials. In this assignment, you will come up with the optimal strategy table and calculate the player advantage associated with it. Fortunately, you can double check and/or debug your calculation by using your assignment 1 solution and compare the resultant player advantage with the theoretical one that you have calculated.</p>
+      <p>If you are unfamiliar with the term probability and expected value, you should review these two concepts before continuing. We suggest two YouTube videos to help you get started quickly: 
+      <a href="https://www.youtube.com/watch?v=VqndHpCfUWA">Probability</a> and <a href="https://www.youtube.com/watch?v=DAjVAEDil_Q">Expected Value</a>.</p>
+      
+      <p>In <a href="asst1.html">assignment 1</a>, you developed a program that can estimate expected value of the game (i.e. player advantage) through repeated trials. In this assignment, you will come up with the optimal strategy table and calculate the player advantage associated with it. Fortunately, you can double check and/or debug your calculation by using your assignment 1 solution and compare the result with the theoretical player advantage that you have calculated.</p>
       
       <p>Unlike in a real casino, we will be using an infinite shoe, meaning that the probability of receiving any card on the next draw remains constant and independent (e.g. probability of receiving an ace is always 1/13). This property simplifies our calculation. In the real world, removing a card would reduce the probability that a card of the same value can be drawn. For example, receiving an ace would mean that there is one fewer ace left in the shoe.</p>
+
+      <h4 id="setup">Setup</h4>
+      <p>Add the starter code for this assignment, available in <tt>optimal.tar</tt>, to your repository. You may add additional files to help you organize your code. When we mark your code, we will run <tt>python3 main.py ...</tt></p>
       
-      <h4 id="advice">Hints and Advice</h4>
+<pre>
+cd ~/ece326
+tar -xf /cad2/ece326f/src/optimal.tar
+git status # should say that "asst2/" directory is untracked
+git add asst2
+git commit -m "Initial code for Assignment 2"
+git tag Asst2-start
+git push
+git push --tags
+cd asst2
+</pre>  
+      <p>Here is a rundown of the code provided to you:</p>
+      <ul>
+        <li><em>main.py</em>: contains the <tt>main</tt> function and functions to print the result that you return. You should not change this file, but do try to understand what it's doing. Note that it imports <tt>easybj.py</tt> as a module. Our tester will also import your version of <tt>easybj.py</tt> as a module to mark your solution.</li>
+        <li><em>table.py</em>: you will change this file to implement a two-dimensional, spreadsheet-like table, as part of the first milestone.</li>
+        <li><em>easybj.py</em>: The meat of the assignment. It contains some basic definitions to help you start the assignment. You will have to add substantial code to finish the assignment, but as mentioned, you can do it in steps. You may also add more files and have this file import them, if it helps you organize your work better.</li>
+      </ul>
+      <h4 id="approach">Approach</h4>
+        
       <p>If you have not done so already, you should go back to <a href="asst1.html">assignment 1</a> and make sure you still have a solid understanding of the rules of Easy Blackjack. In this assignment, the same rules of the game still applies.</a>
       
       <p>At a high level, we will use divide and conquer to break down the problem into smaller subproblems. For every possible action in Easy Blackjack, there is an associated expected value (EV). For example, the EV for surrendering is always -0.5, because you lose half of your bet when choosing the action. The optimal action, in each situation, is thus the action that yields the highest EV. For example, you have hard 19 versus dealer hard 20, the expected value of each action is as follows:</p>
@@ -123,7 +158,7 @@
         </table>
       </div>
       
-      <p>From the above, we can see that surrender is the best option because you lose the least amount of money. Stand, for example, always results in losing the entire bet since the dealer will not hit hard 20 and your hard 19 loses to hard 20.</p>
+      <p>Don't worry about where these numbers come from for now. In the table above, we can see that surrender is the best option because you lose the least amount of money. Stand, for example, always results in losing the entire bet since the dealer will not hit hard 20 and your hard 19 loses to hard 20.</p>
       
       <p>Now, it may become clear what the subproblems are: finding the EV of each action for every combination of player's hand and dealer's hand. Once you calculated all of them, then you can determine the optimal action for every step of the game. We call the result of this set of calculations an "EV Table".</p>
       
@@ -301,79 +336,109 @@ def make_dealer_table(table):
       <h5>Player Advantage</h5>
       <p>Once you have calculated the EV of all possible actions for all combinations of hands (note that we intentionally left out hints on calculating the EV table for double and split), you would be able to generate a compact table of the optimal actions and their associated EV. To calculate the player advantage, you need the weighted average of the optimal EV of all possible starting hand combinations (sum of <var>p<sub>i</sub> p<sub>j</sub> EV<sub>ij</sub></var>, where <var>p<sub>i</sub></var> is the probability of the player's starting hand <var>i</var>, and <var>p<sub>j</sub></var> is the probability of the dealer's starting hand <var>j</var>).</p>
       
-      <h4 id="setup">Setup</h4>
-      <p>There is no starter code for this assignment. You should create a folder named <tt>asst2</tt>, and add <tt>asst2.py</tt> to it. You may add additional files to help you organize your code. When we mark your code, we will run <tt>python asst2.py ...</tt></p>
-      
-<pre>
-cd ~/ece326
-mkdir asst2
-touch asst2/asst2.py
-git status # should say that "asst2/" directory is untracked
-git add asst2
-git commit -m "Initial code for Assignment 2"
-git tag Asst2-start
-git push
-git push --tags
-cd asst2
-</pre>      
-
+ 
       <h4 id="specification">Solution Requirements</h4>
-      <p>To help you with this assignment, we break it up into multiple milestones. The program should take zero or more arguments, with the argument being the name of the table that you wish to print. For example:</p>
+      <p>To help you with this assignment, we have broken it up into multiple milestones. The program will take zero or more arguments, with the argument being the name of the table that you wish to print. For example:</p>
       
 <pre>
-python3 asst2.py stand optimal
+python3 main.py stand optimal
 </pre>
 
       <p>This will print both the stand EV table and the optimal EV table. Partial marks will be given for completing some of the milestones. The list of all accepted arguments are as follows:</p>
       
       <ul>
+        <li><b>initial</b>: print the initial probability table (see <a href="#handclass">subsection</a> for more detail)</li>
+        <li><b>dealer</b>: print the dealer probability table (see <a href="#dealer">subsection</a> for more detail)</li>
         <li><b>stand</b>: print the stand EV table</li>
         <li><b>hit</b>: print the hit EV table</li>
         <li><b>double</b>: print the double EV table</li>
         <li><b>split</b>: print the split EV table</li>
         <li><b>optimal</b>: print the optimal EV table</li>
-        <li><b>strategy</b>: print the strategy table followed by the theoretical player advantage</li>
+        <li><b>strategy</b>: print the strategy table </li>
+        <li><b>advantage</b>: print the theoretical player advantage</li>
       </ul>
       
-      <p>If no arguments are given, the program will print the strategy table and the player advantage.</p>
-      <h5>Stand, Hit, Double</h5>
-      <p>For these three tables, do not print the rows for pairs (except for AA). Below is a sample output for the hit EV table (Warning! these values are NOT CORRECT):</p>
+      <p>If no arguments are given, the program will print everything. Note that all of the argument parsing has been done for you. You just need to produce the correct results for each of the milestone.</p>
+      
+      <h5>Table class</h5>
+      <p>The first milestone of the assignment is to complete the implementation for <tt>table.py</tt>. In the file is an incomplete implementation of an ordered, homogeneous, two-dimensional table, similar to an spreadsheet. The table takes a 2-tuple (a tuple with two elements) and either raises an error or returns the value in the corresponding cell. A cell is to a spreadsheet (2D) what an element is to a list (1D). The 2-tuple is in the form <tt>(y, x)</tt>, where <tt>y</tt> is the row name and <tt>x</tt> is the column name. For example, <tt>table["a","m"]</tt> will return the cell value for row <tt>a</tt> column <tt>m</tt>. Let's now describe the interface of the Table class.</p>
+
 <pre>
-HIT
-     4     5     6     7     8     9     10    11    12    13    14    15    16    17    18    19    20    A2    A3    A4    A5    A6  
- 4 -.049 -.012 .0111 -.088 -.159 -.240 -.335 -.385 .0989 .1633 .2231 .2785 .3301 .0834 -.099 -.312 -.557 -.256 -.233 -.203 -.163 -.121
- 5 -.061 -.023 -.001 -.119 -.188 -.266 -.357 -.406 .0889 .1540 .2144 .2705 .3226 .0463 -.130 -.335 -.572 -.282 -.255 -.218 -.177 -.133
- 6 -.072 -.034 -.013 -.151 -.217 -.292 -.380 -.419 .0795 .1452 .2063 .2630 .3156 .0062 -.161 -.359 -.588 -.304 -.270 -.231 -.190 -.145
- 7 -.043 -.007 .0291 -.068 -.210 -.285 -.365 -.399 .1024 .1665 .2261 .2813 .3327 .1068 -.195 -.383 -.603 -.275 -.241 -.202 -.161 -.117
- 8 .0387 .0708 .1149 .0822 -.059 -.210 -.301 -.330 .1686 .2279 .2831 .3343 .3818 .3819 -.036 -.402 -.619 -.181 -.149 -.113 -.075 -.035
- 9 .1289 .1580 .1960 .1718 .0983 -.052 -.213 -.251 .2439 .2979 .3480 .3946 .4378 .4231 .2477 -.191 -.615 -.073 -.045 -.012 .0220 .0585
-10 .2304 .2562 .2877 .2569 .1979 .1165 -.044 -.146 .3314 .3792 .4235 .4647 .5029 .4643 .3015 .1076 -.351 .0517 .0768 .1050 .1355 .1676 
-11 .2830 .3073 .3336 .2921 .2299 .1582 .0596 -.041 .3792 .4235 .4647 .5029 .5384 .4643 .3015 .1076 -.120 .1214 .1439 .1696 .1976 .2272
-12 -.213 -.193 -.170 -.212 -.271 -.340 -.420 -.465 -.132 -.095 -.061 -.029 .0000 -.068 -.220 -.400 -.612 -.354 -.335 -.312 -.287 -.261
-13 -.274 -.257 -.235 -.269 -.323 -.387 -.462 -.503 -.206 -.175 -.146 -.119 -.094 -.135 -.275 -.442 -.640 -.400 -.382 -.361 -.338 -.315
-14 -.334 -.321 -.300 -.321 -.371 -.430 -.500 -.539 -.281 -.255 -.231 -.209 -.189 -.197 -.327 -.482 -.665 -.443 -.426 -.407 -.388 -.370
-15 -.395 -.385 -.365 -.369 -.416 -.471 -.536 -.572 -.355 -.335 -.317 -.299 -.284 -.254 -.375 -.519 -.689 -.483 -.468 -.453 -.439 -.424
-16 -.456 -.449 -.430 -.414 -.458 -.509 -.569 -.604 -.429 -.415 -.402 -.390 -.378 -.307 -.420 -.553 -.711 -.521 -.510 -.500 -.489 -.479
-17 -.527 -.522 -.508 -.483 -.505 -.553 -.610 -.646 -.511 -.502 -.494 -.486 -.479 -.384 -.461 -.585 -.732 -.570 -.563 -.556 -.550 -.543
-18 -.617 -.615 -.607 -.591 -.591 -.616 -.668 -.704 -.610 -.604 -.600 -.595 -.591 -.538 -.538 -.615 -.751 -.643 -.639 -.635 -.631 -.627
-19 -.726 -.725 -.722 -.715 -.713 -.715 -.744 -.779 -.724 -.721 -.719 -.717 -.715 -.692 -.692 -.692 -.769 -.738 -.737 -.735 -.733 -.732
-20 -.854 -.854 -.853 -.851 -.851 -.850 -.854 -.872 -.854 -.853 -.853 -.852 -.852 -.846 -.846 -.846 -.846 -.857 -.857 -.856 -.856 -.856
-AA .1265 .1564 .1859 .1654 .0951 .0000 -.128 -.205 .2453 .2992 .3492 .3957 .4389 .3832 .1903 -.051 -.358 -.038 -.015 .0107 .0387 .0682
-A2 .1024 .1333 .1616 .1223 .0540 -.037 -.160 -.234 .2253 .2806 .3320 .3797 .4240 .3319 .1450 -.088 -.384 -.074 -.051 -.026 .0008 .0359
-A3 .0800 .1118 .1391 .0795 .0132 -.075 -.193 -.264 .2067 .2634 .3160 .3648 .4102 .2809 .1002 -.125 -.409 -.109 -.087 -.061 -.025 .0125
-A4 .0592 .0919 .1182 .0370 -.027 -.112 -.225 -.293 .1895 .2474 .3011 .3510 .3974 .2303 .0559 -.161 -.435 -.144 -.120 -.085 -.048 -.009
-A5 .0399 .0734 .0988 -.004 -.066 -.148 -.257 -.314 .1735 .2325 .2873 .3382 .3855 .1805 .0123 -.196 -.459 -.176 -.144 -.107 -.069 -.029
-A6 .0593 .0911 .1280 .0538 -.072 -.149 -.249 -.300 .1881 .2461 .3000 .3500 .3964 .2335 -.030 -.231 -.483 -.157 -.124 -.088 -.050 -.011
-A7 .1185 .1476 .1907 .1706 .0396 -.100 -.201 -.249 .2359 .2905 .3411 .3882 .4319 .4643 .0707 -.265 -.506 -.087 -.057 -.024 .0113 .0484
-A8 .1755 .2029 .2397 .2206 .1522 .0078 -.149 -.198 .2837 .3348 .3823 .4264 .4674 .4643 .3015 -.123 -.529 -.017 .0096 .0404 .0734 .1080
-A9 .2304 .2562 .2877 .2569 .1979 .1165 -.044 -.146 .3314 .3792 .4235 .4647 .5029 .4643 .3015 .1076 -.351 .0517 .0768 .1050 .1355 .1676
+Table.__init__(self, celltype, xlabels, ylabels, unit="")
 </pre>
 
-      <h5>Split</h5>
-      <p>For this EV table, print only the row containing pairs, and print the result for the <b>first</b> split (i.e., from 1 to 2 hands).</p>
+      <ul>
+        <li><b>celltype</b>: the data type of each cell, e.g., str, int, or float. It is an error to set a cell with a value that is not specified cell type.</li>
+        <li><b>xlabels</b>: a sequence of all x-axis labels (i.e. column names) accepted by the table.</li>
+        <li><b>ylabels</b>: a sequence of all y-axis labels (i.e. row names) accepted by the table.</li>
+        <li><b>unit</b>: this argument is used to print the table. You do not need to do anything about it.</li>
+      </ul>
+      
+      <p>For example, the table <tt>Table(str, "abcd", range(1,5))</tt> will create the following table:</p>
+      
+<pre>
+  a  b  c  d
+1 -- -- -- --
+2 -- -- -- --
+3 -- -- -- --
+4 -- -- -- --
+</pre>
+
+      <p>Notice that the cell values are "empty", that is because their values by default is set to <tt>None</tt> unless you set it. For example, <tt>table[3,'b'] = "HI"</tt> will update the table:</p>
+
+<pre>
+  a  b  c  d
+1 -- -- -- --
+2 -- -- -- --
+3 -- HI -- --
+4 -- -- -- --
+</pre>
+
+      <p>You must create a suitable data structure to store data for the table, and implement all operations supportd by the index operator: get, set, and delete. </p>
+      
+      <ul>
+        <li><tt>__getitem__(self, idx)</tt>: return the cell value given a valid 2-tuple, or <tt>None</tt> if the cell is empty.</li>
+        <li><tt>__setitem__(self, idx, val)</tt>: set the cell value to <tt>val</tt> given a valid 2-tuple. Note that type checking on <tt>val</tt> is already done for you.</li>
+        <li><tt>__delitem__(self, idx)</tt>: set the cell value to <tt>None</tt> given a valid 2-tuple.</li>
+      </ul>
+      
+      <h5 id="handclass">Hand class</h5>
+      <p>We provide you the skeleton code for the hand class in <tt>easybj.py</tt>, which currently stores the cards that are in the hand and specifies whether the hand belongs to player or dealer. With this, it is enough for you to complete an important method, <tt>Hand.code</tt>, which will be used throughout this assignment to fill the table.</p>
+      
+      <p>For the purpose of this assignment, the code of a hand represents its strength and potential. It comes in three forms: hard hands, soft hands, and split hands. For hard hands, the code is the <em>score</em> of the hand. We define the score of a hand to be equal to the point value of the hand, except that the score is zero if the hand is busted. This simplifies comparing hand strength using integer comparison. As an example, the code '15' represents hard 15. For soft hands, it will start with an ace 'A'. For example, 'A6' denotes soft 17, and 'A9' denotes soft 20. Note that the actual hand can have more cards than what the code depicts. For example, <tt>A45</tt> is also soft 20. If the point value of the hand is 21, then if it is also blackjack, the hand code is 'BJ', otherwise it is '21', regardless of whether it is hard or soft. Lastly, split hands are always two of the same number or letter, for example, 'AA', '55', or 'TT'. Remember that 'AA' is both a soft hand and a split hand.</p>
+      
+      <p>Hand code can vary based on whether split is possible and who owns the hand. In the first case, if split is not possible, then the hand code is the correponding hard or soft hand code. For example, '22' becomes '4', and '99' becomes '18'. However, 'AA' remains 'AA' since it has dual meanings. In the second case, if the hand belongs to a dealer, then there are two adjustments. 1) the dealer never splits, so he/she does not use any split codes. 2) the dealer treats soft 18 or above as hard 18, so 'A7' or higher becomes '18' and higher, respectively.</p>
+      
+      <p>Your next milestone is to complete <tt>Hand.code</tt> according to the above specificaiton. Once this is done, it will automatically finish the implementation for calculating the initial probability table. This table shows the probability of receiving a specific hand against a specific dealer hand. You can see it via the following command:</p>
+      
+<pre>
+python3 main.py initial
+</pre>
+      
+      <p>At this point, you may have already noticed how these codes are used by the table. The x-axis is a list of all possible starting hands for the dealer, and the y-axis is a list of all possible hands for the player for a particular situation. At the top of <tt>easybj.py</tt> are a list of codes. For example, <tt>INITIAL_CODE</tt> is a list of player's hand code for the initial deal. We will explain what other lists are used for in the next few subsections.</p>
+      
+      <h5 id="dealer">Dealer Table</h5>
+      <p>The dealer probabilities table is a collection of subtables that contain the exact probability of each dealer outcome for a particular dealer starting hand. For example, if the dealer starts with hard 17, then there would only be one entry in the subtable: <tt>17: 1.000</tt>, since the dealer does not hit hard 17 or higher. You will need this table to be able to complete the stand EV table (it is also possible to complete both tables together using memoisation technique instead of dynamic programming).</p>
+      
+      <p>The format of the dealer table is different from other EV tables: it is a dictionary of dictionaries. At the top level, the key is the dealer's starting hand code and the value is the associated subtable (also a dictionary). At the bottom level, the dictionary stores each outcome in <b>score</b> (using zero for busted hands) and the value of each outcome is its probability. Use the methodology as described in the <a href="#approach">Approach section</a> to complete this table. Below is out of the example output for dealer hard 16:</p>
+      
+<pre>
+Dealer 16
+ 0: 0.615385  17: 0.076923  18: 0.076923  19: 0.076923  20: 0.076923  21: 0.076923
+</pre>      
+      
+      <h5>EV Tables</h5>
+      <p>You will need to produce an EV table for each of the actions: stand, hit, double, and split. Note that surrender is not necessary since all entries will be filled with -0.5. The tables have already been initialized for you in the <tt>Calculator</tt> class constructor. Your task is to populate the cells of each table with the correct expected value for each player/dealer encounter. Notice that these tables ignore the situation if either the player or dealer (or both) has blackjack. This is done mainly to compact the table since the game ends immediately and no actions need to be taken. You should study how the initial probability table was populated and use a similar method to work on the other tables.</p>
+      
+      <p>There are two irregularities worth mentioning in these tables that may help you gain a better understanding of the process. First, the stand table has an extra entry, 21, for the player. While the player stands on 21 automatically, the game continues and the player is <em>not</em> guaranteed to win in this situation (e.g., if the dealer also gets 21). Second, the split table only contains entries for split hands. This may be more obvious since all other hand types cannot be split. One hint for the split table is considering what happens after the split. Similar to how the hit table requires you to finish the stand table first, you may need all other EV tables before tackling the split table.</p>
+
+      <p>Lastly, for the optimal table, as described in the <a href="#approach">Approach section</a>, you will need to compare all available actions (including surrender) for each player/dealer encounter and choose the one with the highest expected value.</p>
 
       <h5>Strategy Table</h5>
-      <p>For this table, the tester expects the program to complete within a limited amount of time to make sure dynamic programming was implemented correctly. You will lose marks if your code has inefficiencies.</p>
+      <p>This part can be done as part of calculating the optimal EV table. Instead of entering numbers into the table, you enter the exact action that should be taken for each encounter. For double, surrender, and split, an alternative action needs to be specified in case the primary is unavailable. The format of the strategy table is the same as described in <a href="asst1.html#automatic">assignment 1</a>.</p>
+      
+      <h5>Player Advantage</h5>
+      <p>Calculate the theoretical player advantage using the optimal EV table and the initial probability table, as described in the Approach section.</p>
 
       <h4 id="submission">Code Submission</h4>
       <p>To submit your code with the current commit, use the <tt>Asst2-end</tt> tag. Remember to push the new tag to the remote repository.</p>
@@ -382,6 +447,15 @@ A9 .2304 .2562 .2877 .2569 .1979 .1165 -.044 -.146 .3314 .3792 .4235 .4647 .5029
 git tag Asst2-end    // Creates tag for current submission for Assignment 2
 git push --tags
 </pre>
+      <h4 id="glossary">Glossary of Terms</h4>
+      <p>Here, you can find the definition of commonly seen terms that are used in the assignment. More will be added as people ask questions about the assignment.</p>
+      
+      <ul>
+        <li><b>point</b>: refers to the point value of the hand. For example, <tt>88</tt> is 16 and <tt>999</tt> is 27 (which is busted)</li>
+        <li><b>score</b>: refers to the relative strength of the hand when compared with another. Score and point are the same for a hand that has not busted. If a hand is busted, it's score is zero.</li>
+        <li><b>code</b>: a two character name used to signify the strength and the potential of the hand.</li>
+        <li><b>encounter</b>: a player having a particular hand versus the dealer's particular hand.</li>
+      </ul>
       
       <hr>
       <footer class="container text-center">
