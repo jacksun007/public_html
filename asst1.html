@@ -397,6 +397,65 @@ Hands Played: 2000000
 Final Balance: +$208725.50
 Player Advantage: 10.44%
 </pre>
+      <p>Note that the meaning of the word "hand" here is slightly different than our usual usage. It means how many rounds of the game have been played, rather than have many specific hands were played (e.g., in cases where splitting occurred). Therefore, if you played only 1 round of the game, but split during the game, the final "hands played" is still just 1. Below is sample output from manual mode to show how number of hands is counted.</p>
+      
+<pre>
+Dealer: Q 7 (17)
+Player: 9 K (19)
+Stand (S) Hit (H) Double (D) Surrender (R): s
+Dealer: Q 7 (17)
+Hand 1: 9 K (19)
+Result: +$1.00
+Current Balance: +$1.00
+Press Any Key to Continue, (Q to Quit): 
+Dealer: Q J (20)
+Player: Q 7 (17)
+Stand (S) Hit (H) Double (D) Surrender (R): r
+Dealer: Q J (20)
+Hand 1: Q 7 (17) SURRENDER
+Result: -$0.50
+Current Balance: +$0.50
+Press Any Key to Continue, (Q to Quit): 
+Dealer: 3 3 (6)
+Player: A 6 (soft 17)
+Stand (S) Hit (H) Double (D) Surrender (R): h
+Dealer: 3 3 (6)
+Player: A 6 5 (12)
+Stand (S) Hit (H): h
+Dealer: 3 3 (6)
+Player: A 6 5 6 (18)
+Stand (S) Hit (H): s
+Dealer: 3 3 K K (bust)
+Hand 1: A 6 5 6 (18)
+Result: +$1.00
+Current Balance: +$1.50
+Press Any Key to Continue, (Q to Quit): 
+Dealer: K 4 (14)
+Player: 4 4 (8)
+Stand (S) Hit (H) Double (D) Split (P) Surrender (R): p
+Dealer: K 4 (14)
+Player: 4 A (soft 15)
+Stand (S) Hit (H) Double (D): d
+Dealer: K 4 (14)
+Player: 4 2 (6)
+Stand (S) Hit (H) Double (D): h
+Dealer: K 4 (14)
+Player: 4 2 4 (10)
+Stand (S) Hit (H): h
+Dealer: K 4 (14)
+Player: 4 2 4 4 (14)
+Stand (S) Hit (H): s
+Dealer: K 4 K (bust)
+Hand 1: 4 A A (soft 16) DOUBLE
+Hand 2: 4 2 4 4 (14)
+Result: +$3.00
+Current Balance: +$4.50
+Press Any Key to Continue, (Q to Quit): q
+Hands Played: 4
+Final Balance: +$4.50
+Player Advantage: 112.5%
+</pre>
+    
       <h4 id="submission">Code Submission</h4>
       <p>Before you submit, we highly suggest you run the tester to verify the correctness of your solution.</p>
       
@@ -415,6 +474,7 @@ git push --tags
         <li><b>Seed</b>: A value passed into a random number generator to reset its internal state. For a deterministic random number generator (the one we're using for this assignment), using the same seed will result in the exact same sequence of psuedo-random numbers being generated, which helps you debug your program.</li>
         <li><b>Hard</b>: In blackjack, a hard hand refers to one where there is no ace that can act as 11 points without going over 21. For example, <tt>69</tt> is a hard 15, and <tt>A5K</tt> is a hard 16.</li>
         <li><b>Soft</b>: In blackjack, a soft hand refers to one where there is an ace that can act as 11 points without going over 21. For example, <tt>A6</tt> is a soft 17. Soft hands are desirable in blackjack because there is no risk of busting if you hit. In the case of <tt>A6</tt>, if you hit and receive a ten, your hand merely becomes a hard 17 and does not bust.</li>
+        <li><b>Hand</b>: In card games, a hand usually has two meanings: 1) number of times a game is played, and 2) a set of cards that is played as a unit. The question "How many hands did you play?" usually refers to how many times you played the game (meaning 1), whereas "How many hands were you playing" refers to how many hands you were playing simultaneously per round of the game (meaning 2). In regular blackjack, you are allowed to start off playing more than one hand, and each of the starting hands can be split up to 4 times!. The usage text (<tt>./asst1 -h</tt>) for number of hands to be played and the final results text that prints at the end of the program (e.g. Hands Played: 5) refers to meaning 1.</li>
       </ul>
       <hr>
       <footer class="container text-center">
