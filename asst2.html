@@ -60,6 +60,14 @@
             <a class="nav-link" href="#approach">
               Approach
             </a>
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link" href="#dynamic">Dynamic Programming</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#split_ev">Split EV</a>
+              </li>
+            </ul>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#specification">
@@ -160,8 +168,14 @@ cd asst2
       
       <p>Don't worry about where these numbers come from for now. In the table above, we can see that surrender is the best option because you lose the least amount of money. Stand, for example, always results in losing the entire bet since the dealer will not hit hard 20 and your hard 19 loses to hard 20.</p>
       
-      <p>Now, it may become clear what the subproblems are: finding the EV of each action for every combination of player's hand and dealer's hand. Once you calculated all of them, then you can determine the optimal action for every step of the game. We call the result of this set of calculations an "EV Table".</p>
+      <p>Now, it may become clear what the subproblems are: finding the EV of each action for every combination of player's hand and dealer's hand. For the purpose of this assignment, we call each specific combination of player/dealer hands an <em>encounter</em>. Once you calculated all of them, then you can determine the optimal action for every step of the game. We call the result of this set of calculations an "EV Table".</p>
       
+      <p>Fundamentally, there are two types of actions: <em>terminal</em> versus <em>non-terminal</em>. Terminal actions are ones where you may no longer take any more actions, i.e., surrender, stand, double, or split aces. Non-terminal actions in Blackjack are hit and split non-aces hands.</p>
+      
+      <p>To calculate the EV tables for terminal actions, you simply need to take the action, let the dealer take his/her actions (if necessary, e.g. for surrender, dealer wins automatically), then you compare hands. For non-terminal actions, you still need to first take the action (e.g., hit). However, since the action is non-terminal, then what happens after the initial action if there are further actions (i.e., you did not bust nor did you reach 21, at which you stand automatically)?</p>
+      
+      <p>The answer is that you should take the <em>optimal</em> action, meaning you are picking the best available options after the initial action based on the expected value of each action. This is logically sound because our objective is to maximize expected value, and thus every action we take should always return the highest expected value out of all available actions. If you do not know which action is optimal, then you will need to solve the subproblems (calculating the EVs of all actions) before you can solve this problem (choosing the optimal action).</p>
+
       <h5>Stand EV</h5>
       <p>The easiest EV table (besides surrender) to calculate is for standing. Since the player won't take any more cards, the points for his/her hand is fixed. However, the dealer may take more cards. Therefore, the EV of standing is the weighted average of all outcomes after the dealer is done. For example, if you stand on hard 18 against the dealer's hard 16, the following outcomes are possible:</p>
       
@@ -208,7 +222,7 @@ cd asst2
       
       <p>Of course, if the dealer has a low starting hand, then it is possible that the dealer will hit multiple times. In this case, you will need recursion and dynamic programming to help you solve the problem more elegantly. Since you should already be familiar with recursion, we will explain dynamic programming and how it works.</p>
       
-      <h5>Dynamic Programming</h5>
+      <h5 id="dynamic">Dynamic Programming</h5>
       <p>Dynamic programming is an optimization technique where the result of a function is cached (saved) so that the cached result is returned on future invocation. This technique will greatly speed up the calculation by avoiding redundant and possibly expensive recomputation. There are some restrictions as to when dynamic programming can be used (i.e. the function must be "pure" -- see lecture note for more thorough explanation). For our purposes, you only need to know that the function may not depend on any mutable non-local variables (constant ones are fine).</p>
       
       <p>Continuing from previous example, suppose this time the dealer has hard 15 (the player's hand is not relevant), and we want to calculate the probability distribution <var>F(hard 15)</var> for all possible points that the dealer ends with. We would arrive at the following table:</p>
@@ -289,12 +303,12 @@ def make_dealer_table(table):
    assert(isclose(sum(table.values()), 1.0))
 </pre>      
       
-      <p>Lastly, we would save the result for <var>F(hard 15)</var> so that future calculation that uses it does not require recomputation. There are many opportunities to take advantage of dynamic programming in this assignment. We have showed you one scenario where it can be applied. It is up to you for the remainder of the assignment to identify where else to apply this technique.</p>
+      <p>Lastly, we would save the result for <var>F(hard 15)</var> so that future calculation that uses it does not require recomputation. There are many opportunities to take advantage of dynamic programming in this assignment, and you will see as you continue reading.</p>
       
       <p><b>Question:</b> How many dealer probability tables do you need to complete the stand EV table?</p>
       
       <h5>Hit EV</h5>
-      <p>Correctly calculating the Hit EV table requires that you first complete the Stand EV table. The reason is that the EV for hitting depends on the optimal action between hitting and standing. Let's suppose you hit on hard 17 against dealer's hard 18. Your possible outcomes are as follows:</p>
+      <p>Correctly calculating the Hit EV table requires that you first complete the Stand EV table. The reason is that the EV for hitting depends on the optimal action between hitting and standing, i.e. it is a non-terminal action. Let's suppose you hit on hard 17 against dealer's hard 18. Your possible outcomes are as follows:</p>
       
       <div class="table-responsive">
         <table class="table table-hover">
@@ -329,12 +343,30 @@ def make_dealer_table(table):
         </table>
       </div>
       
-      <p>You may be asking, why is the outcome of achieving 18 to 20 points unknown? It is because the algorithm is unsure whether it is better to hit or stand, for example, on hard 20 against dealer's hard 18. On the surface, it seems obvious that you would stand in this case, but there are many other situations where it may be a close call. Therefore, your algorithm must cast aside all doubt and verify that it is indeed better to stand than to hit, or vice versa.</p>
+      <p>You may be asking, why is the outcome of achieving 18 to 20 points unknown? It is because the algorithm is unsure whether it is better to hit or stand after the initial hit, for example, on hard 20 against dealer's hard 18. On the surface, it seems obvious that you would stand in this case, but there are many other situations where it may be a close call. Therefore, your algorithm must cast aside all doubt and verify that it is indeed better to stand than to hit, or vice versa.</p>
       
       <p>There are always two base cases in the recursion where you would stop hitting: arriving at 21 points or busting. In the above example, hitting on hard 20 results in an EV of 1/13 - 12/13 (only an ace will save you) = -11/13. On the other hand, standing on hard 20 guarantees a win because the dealer does not hit hard 18, so it's EV is +1.000. In this case, it is now clear that you should pick stand and not hit.</p> 
       
+      <p>Both memoisation and dynamic programming can be effective for calculating hit EV. Using memoisation, you would make the initial hit, and for all subsequent encounters, recursively calculate the hit EVs if they are not in the hit EV table, or just use the value straight from the table and compare with the stand EV, which you have already calculated. For dynamic programming, you would iterate through all hands, starting from the base case (hard 20), and ending at hard 4.</p>
+      
+      <h5>Double EV</h5>
+      <p>Since doubling down is a terminal action, it is very similar to stand, except you would hit before you stand, making it possible that you bust in the process. Otherwise, the algorithm is similar, except the expected value is doubled since the player is risking twice the amount of money to take this action.</p>
+      
+      <h5 id="split_ev">Split EV</h5>
+      <p>Because split is a non-terminal action, except in the case of splitting aces, again, you will need to make the optimal decision after the initial split occurs. However, because of the hand limit of up to 4, using recursion and memoisation may not be intuitive. Therefore, we suggest that you use dynamic programming, where you start from the smallest subproblem and work our way up.</p>
+      
+      <p>Assuming you have already completed all other tables, then split EV's base subproblem is deciding the optimal action after you cannot split anymore, either because the hand cannot be split or the hand limit has been reached. At this point, the valid actions remaining are hit, double, or stand. Therefore, using the existing tables, you can calculate a base table for splitting. You should use <tt>STAND_CODE</tt> for the <tt>ylabels</tt> of this table since one of the actions includes standing and none of the actions involves splitting (you can't split anymore!).</p> 
+      
+      <p>One complication of splitting is dealing with the many ways where the hand limit can be reached. Fortunately, it is actually not an issue you need to worry about, because unlike in assignment 1, we are exploring all possible outcomes of having <tt>N</tt> hands. As such, how we arrived at <tt>N</tt> hands has no impact on the expected value having <tt>N</tt> hands.</p>
+      
+      <p>As an example, suppose you have <tt>99</tt> and <tt>99</tt>. Assuming the hand limit is only 3, you may only split one more time. Now, does it matter which of the <tt>99</tt> you split? No. Because the expected value of splitting the first <tt>99</tt> and the second <tt>99</tt> is exactly the same. With this insight, then the problem of splitting up to 4 times is a lot more tractable. While you are going through the set of hands that can result from a split, always split a hand as long as the hand limit has not been reached. So in the case where the initial <tt>XX</tt> is split into <tt>XX</tt><sub>1</sub> and <tt>XX</tt><sub>2</sub>, you should assume that both of them will be split, meaning that no subsequent split after the two resplits are possible.</p>
+      
+      <p>The only situation that you have to worry about is when you split into two hands, both of which can be split again, but there's only room for one more. For example, <tt>88</tt><sub>0</sub> splits into <tt>8T</tt> and <tt>88</tt><sub>1</sub>, and <tt>88</tt><sub>1</sub> is split into <tt>88</tt><sub>2</sub> and <tt>88</tt><sub>3</sub>. In this case, one of the <tt>88</tt> cannot be split again and must be treated as base case.</p>
+      
+      <p>Since there are multiple levels after the initial split to consider, you will actually need a total of 4 tables for the split action. The base case table (discussed earlier), split<sub>1</sub>, split<sub>2</sub>, and split<sub>3</sub>, where the subscript of each split table is the number of hands remaining that can be split. The split<sub>3</sub> table represents the initial split from one hand, and is the one that the tester expects. split<sub>3</sub> will include the EV for splitting <tt>AA</tt>, whereas split<sub>2</sub> and split<sub>1</sub> should not, since you are not allowed to resplit <tt>AA</tt>.</p>
+      
       <h5>Player Advantage</h5>
-      <p>Once you have calculated the EV of all possible actions for all combinations of hands (note that we intentionally left out hints on calculating the EV table for double and split), you would be able to generate a compact table of the optimal actions and their associated EV. To calculate the player advantage, you need the weighted average of the optimal EV of all possible starting hand combinations (sum of <var>p<sub>i</sub> p<sub>j</sub> EV<sub>ij</sub></var>, where <var>p<sub>i</sub></var> is the probability of the player's starting hand <var>i</var>, and <var>p<sub>j</sub></var> is the probability of the dealer's starting hand <var>j</var>).</p>
+      <p>Once you have calculated the EV of all possible actions for all combinations of hands, you would be able to generate a compact table of the optimal actions and their associated EV. To calculate the player advantage, you need the weighted average of the optimal EV of all possible starting hand combinations (sum of <var>p<sub>i</sub> p<sub>j</sub> EV<sub>ij</sub></var>, where <var>p<sub>i</sub></var> is the probability of the player's starting hand <var>i</var>, and <var>p<sub>j</sub></var> is the probability of the dealer's starting hand <var>j</var>).</p>
       
  
       <h4 id="specification">Solution Requirements</h4>
@@ -430,15 +462,15 @@ Dealer 16
       <h5>EV Tables</h5>
       <p>You will need to produce an EV table for each of the actions: stand, hit, double, and split. Note that surrender is not necessary since all entries will be filled with -0.5. The tables have already been initialized for you in the <tt>Calculator</tt> class constructor. Your task is to populate the cells of each table with the correct expected value for each player/dealer encounter. Notice that these tables ignore the situation if either the player or dealer (or both) has blackjack. This is done mainly to compact the table since the game ends immediately and no actions need to be taken. You should study how the initial probability table was populated and use a similar method to work on the other tables.</p>
       
-      <p>There are two irregularities worth mentioning in these tables that may help you gain a better understanding of the process. First, the stand table has an extra entry, 21, for the player. While the player stands on 21 automatically, the game continues and the player is <em>not</em> guaranteed to win in this situation (e.g., if the dealer also gets 21). Second, the split table only contains entries for split hands. This may be more obvious since all other hand types cannot be split. One hint for the split table is considering what happens after the split. Similar to how the hit table requires you to finish the stand table first, you may need all other EV tables before tackling the split table.</p>
+      <p>There are two irregularities worth mentioning in these tables that may help you gain a better understanding of the process. First, the stand table has an extra entry, 21, for the player. While the player stands on 21 automatically, the game continues and the player is <em>not</em> guaranteed to win in this situation (e.g., if the dealer also gets 21). Second, the split table only contains entries for split hands. This may be more obvious since all other hand types cannot be split. You should return the initial split table, as described in the <a href="#split_ev">Split EV section</a>, and not the resplit tables.</p>
 
       <p>Lastly, for the optimal table, as described in the <a href="#approach">Approach section</a>, you will need to compare all available actions (including surrender) for each player/dealer encounter and choose the one with the highest expected value.</p>
 
       <h5>Strategy Table</h5>
-      <p>This part can be done as part of calculating the optimal EV table. Instead of entering numbers into the table, you enter the exact action that should be taken for each encounter. For double, surrender, and split, an alternative action needs to be specified in case the primary is unavailable. The format of the strategy table is the same as described in <a href="asst1.html#automatic">assignment 1</a>.</p>
+      <p>This part can be done as part of calculating the optimal EV table. Instead of entering numbers into the table, you enter the exact action that should be taken for each encounter. For double and surrender, an alternative action (hit or stand only) needs to be specified in case the primary is unavailable. Split does not need an alternative action since the reader of the strategy table should instead look up the hand as a hard total. The format of the strategy table is the same as described in <a href="asst1.html#automatic">assignment 1</a>.</p>
       
       <h5>Player Advantage</h5>
-      <p>Calculate the theoretical player advantage using the optimal EV table and the initial probability table, as described in the Approach section.</p>
+      <p>Calculate the theoretical player advantage using the optimal EV table and the initial probability table, as described in the <a href="#approach">Approach section</a>.</p>
 
       <h4 id="submission">Code Submission</h4>
       <p>To submit your code with the current commit, use the <tt>Asst2-end</tt> tag. Remember to push the new tag to the remote repository.</p>
