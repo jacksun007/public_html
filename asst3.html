@@ -629,7 +629,14 @@ joe.version               # 2 (new version of the object)
 joe.age = 34
 joe.save()                # this will call easydb.update, which may raise TransactionAbort
 joe.delete()              # deletes the row from the database
-</pre>      
+</pre>
+
+      <p>All foreign key references are converted automatically to their objects. Hint: you can implement this lazily (only retrieve from database when field is accessed), or eagerly (retrieve foreign keys during the get ORM operation). You should raise <tt>IntegrityError</tt> if the referenced object is not in the database.</p>
+      
+<pre>
+account = Account.get(pk=2)
+account.user  # &lt;User: Joe Smith&gt;
+</pre>
       
 <h5>Get Method</h5>  
 <pre>
@@ -650,7 +657,13 @@ results = Table.filter(firstName="Joe")
 results # [&lt;User: Joe Smith&gt;]
 </pre>      
       
-      <p>The supported operators are <tt>ne</tt> (not equal), <tt>gt</tt> (greater than), and <tt>lt</tt> (less than).</p>
+      <p>The supported operators are <tt>ne</tt> (not equal), <tt>gt</tt> (greater than), and <tt>lt</tt> (less than). When the field is a foreign key, you can use either the object itself or its id. For example:</p>
+
+<pre>
+results = Account.filter(user=joe)
+# or
+results = Account.filter(user=2)
+</pre>  
       
 <h5>Count Method</h5>
 <pre>
