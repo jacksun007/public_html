@@ -103,6 +103,9 @@
           <li class="nav-item">
             <a class="nav-link" href="#submission">Code Submission</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#glossary">Glossary of Terms</a>
+          </li>
         </ul>
       </div>
     </nav>
@@ -111,7 +114,7 @@
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Assignment 3: Object-Relational Mapping</h1>
       </div>
-      <p><strong>Due Date: November 10th, 11:59pm</strong></p>
+      <p><strong>Due Date: November 17th, 11:59pm</strong></p>
       <p><strong>Lab TA: Jeffrey Fang</strong></p>
       <p>In this assignment, you will develop an object relational mapping (ORM) framework for EasyDB&trade; in Python.</p>
       
@@ -604,7 +607,7 @@ object = Table(...)
 joe = User(firstName="Joe", age=32)
 </pre>
 
-      <p>Each instance has the following attributes on top of the fields:</p>
+      <p>Each instance has the following attributes on top of the column fields:</p>
       <ul>
         <li><b>save</b>: Saves the object to the database. For new objects in EasyDB, this will call <tt>insert</tt>. For existing objects, this will call <tt>update</tt>. For fields where <tt>blank</tt> is true, saving the object will convert the value from <tt>None</tt> to the default type value. <tt>save</tt> takes an optional parameter, <tt>atomic</tt>, which is by default true. If set to false, disables atomic update for that save.</li>
         <li><b>delete</b>: Deletes the object. In EasyDB, this will call the <tt>drop</tt> command.</li>
@@ -700,11 +703,20 @@ ottawa.location   #(45.4215, 75.6972)
  
       <h4 id="submission">Code Submission</h4>
       <p>To submit your code with the current commit, use the <tt>Asst3-end</tt> tag. Remember to push the new tag to the remote repository.</p>
-      
+ 
 <pre>
 git tag Asst3-end    // Creates tag for current submission for Assignment 3
 git push --tags
 </pre>
+      
+      <h4 id="glossary">Glossary of Terms</h4>
+      <p>Here, you can find the definition of commonly seen terms that are used in the assignment. More will be added as people ask questions about the assignment.</p>
+      
+      <ul>
+        <li><b>table</b>: a group of data with the same user-defined format, similar to a class in object-oriented programming.</li>
+        <li><b>row</b>: a record in a database table, similar to an instance of a class.</li>
+        <li><b>column</b>: a "field" in a database row, with an associated name.</li>
+      </ul>
       
       <hr>
       <footer class="container text-center">
