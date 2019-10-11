@@ -565,7 +565,7 @@ class Account(orm.Table):
     balance = orm.Float()
 </pre> 
      
-      <p>For all database tables, the client will inherit <tt>orm.Table</tt>. For each column in the table, it is presented by an instance of one of the following classes: <tt>String</tt>, <tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. For the first three classes, there are no parameters. For <tt>Foreign</tt>, it takes one parameter: the class of the referenced table. For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
+      <p>For all database tables, the client will inherit <tt>orm.Table</tt>. Column names must start with a letter, followed by letters of either case, or numbers, but underscore is <em>not</em> allowed (the ORM layer uses it for special purposes). For each column in the table, it is presented by an instance of one of the following classes: <tt>String</tt>, <tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. For the first three classes, there are no positional parameters. For <tt>Foreign</tt>, it takes one positional parameter: the class of the referenced table. For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
       
       <p>Every field types, except for Foreign, support the following options:</p>
       
@@ -574,7 +574,7 @@ class Account(orm.Table):
         <li><b>default</b>: the default value for this field if it is unspecified in the constructor. Unlike <tt>blank</tt>, <tt>default</tt> will automatically set the missing attribute to the default value. For <tt>blank</tt>, the field will be set to <tt>None</tt> for new objects before it is saved.</li>
         <li><b>choices</b>: a list of allowed values for this field. <tt>ValueError</tt> will be raised if the field has value not in <tt>choices</tt> when insert or update is attempted.</li>
       </ul>
-      <p>Foreign, on the other hand, only supports <i>blank</i>, and it takes a position argument: <i>table</i>, which is the table that it references. If blank is true, the field can reference nothing (i.e. set to None).</p>
+      <p>Foreign, on the other hand, only supports <i>blank</i>. If blank is true, the field can reference nothing (i.e. set to None).</p>
       <p>Our ORM provides two interfaces to initialize the underlying database client.</p>
 
 <h5>Setup</h5>
