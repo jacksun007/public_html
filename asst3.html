@@ -159,7 +159,7 @@ except ObjectDoesNotExist:
       }
       </p>
       
-      <p>In EasyDB, each column in a table can be one of four types: <tt>integer</tt>, <tt>float</tt>, <tt>string</tt>, or foreign key (i.e. a "pointer" to a record in another table). To specify a foreign key type, use the name of the referenced table. The names of a table or column must start with a letter, followed by letters (either case) or numbers; underscore is not allowed. Also, the name of a column cannot be id (explained below). Here is an example of a complete database schema:</p>
+      <p>In EasyDB, each column in a table can be one of four types: <tt>integer</tt>, <tt>float</tt>, <tt>string</tt>, or foreign key (i.e. a "pointer" to a record in another table). To specify a foreign key type, use the name of the referenced table. The names of a table or column must start with a letter, followed by letters (either case),numbers, or underscore. Also, the name of a column cannot be <tt>id</tt> or <tt>pk</tt> (explained below). Here is an example of a complete database schema:</p>
       
 <pre>
 User {
@@ -567,13 +567,14 @@ class Account(orm.Table):
      
       <p>For all database tables, the client will inherit <tt>orm.Table</tt>. For each column in the table, it is presented by an instance of one of the following classes: <tt>String</tt>, <tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. For the first three classes, there are no parameters. For <tt>Foreign</tt>, it takes one parameter: the class of the referenced table. For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
       
-      <p>Every field types support the following options:</p>
+      <p>Every field types, except for Foreign, support the following options:</p>
       
       <ul>
         <li><b>blank</b>: this field is allowed to be left unspecified when creating new objects. When this option is set to False (which is the default), <tt>AttributeError</tt> will be raised when database insert is attempted if the field is not specified. Otherwise, default value of the type (e.g. 0 for int, "" for string) will automatically be used for objects with the field missing.</li>
         <li><b>default</b>: the default value for this field if it is unspecified in the constructor. Unlike <tt>blank</tt>, <tt>default</tt> will automatically set the missing attribute to the default value. For <tt>blank</tt>, the field will be set to <tt>None</tt> for new objects before it is saved.</li>
         <li><b>choices</b>: a list of allowed values for this field. <tt>ValueError</tt> will be raised if the field has value not in <tt>choices</tt> when insert or update is attempted.</li>
       </ul>
+      <p>Foreign, on the other hand, only supports <i>blank</i>, and it takes a position argument: <i>table</i>, which is the table that it references. If blank is true, the field can reference nothing (i.e. set to None).</p>
       <p>Our ORM provides two interfaces to initialize the underlying database client.</p>
 
 <h5>Setup</h5>
@@ -591,8 +592,25 @@ db.connect("127.0.0.1", 8080)
 <pre>
 orm.export(database_name, module)
 </pre>
-      <p><em>export</em> will return a string which can be read by the underlying database to create the corresponding database tables, each with the specified columns, similar to the example shown in the <a href="#schema">Database Schema</a> section. This feature is helpful so that you do not have to write the database schema manually in EasyDB format on top of writing the Python ORM format.</p>
-         
+      <p><em>export</em> will return a string which can be read by the underlying database to create the corresponding database tables, each with the specified columns, similar to the example shown in the <a href="#schema">Database Schema</a> section. This feature is helpful so that you do not have to write the database schema manually in EasyDB format on top of writing the Python ORM format. For example: the following Python schema:</p>
+      
+<pre>
+class Account(orm.Table):
+    user = orm.Foreign(User)
+    type = orm.String()
+    balance = orm.Float()
+    maxWithdrawal = orm.Integer(default=5)
+</pre>
+      <p>is exported as a string shown here:</p>
+<pre>
+Account {
+    user : User;
+    type : string;
+    balance : float;
+    maxWithdrawal : integer;
+}
+</pre>      
+      <p>Note that if there are multiple tables in the schema, then there will be multiple tables in the exported format. Also, all field options are dropped because they are only enforced by the ORM layer. The user of the export function will likely save the output to a file to be used to initiate the database server.</p>
       <h4 id="methods">Table Methods</h4>
       
       <p>For each table in the schema, the following class methods are defined. For each of these methods, Table should be replaced by the actual Table in the schema (e.g., User, Account).</p>
@@ -601,15 +619,15 @@ orm.export(database_name, module)
 <pre>
 object = Table(...)
 </pre>      
-      <p>Create a new object (row) of type Table. The constructor accepts keyword arguments which are the column names of the table. Default values are used for unspecified columns. For example:</p>
+      <p>Create a new object (row) of type Table. The constructor accepts keyword arguments which are the column names of the table. Default values are used for unspecified columns. If blank is not true and no default is specified, then the field must be initialized in the constructor. For example:</p>
 <pre>
-# joe.lastName is None, joe.height is 0.0
-joe = User(firstName="Joe", age=32)
+# joe.height is 0.0
+joe = User(firstName="Joe", lastName="Harris", age=32)
 </pre>
 
       <p>Each instance has the following attributes on top of the column fields:</p>
       <ul>
-        <li><b>save</b>: Saves the object to the database. For new objects in EasyDB, this will call <tt>insert</tt>. For existing objects, this will call <tt>update</tt>. For fields where <tt>blank</tt> is true, saving the object will convert the value from <tt>None</tt> to the default type value. <tt>save</tt> takes an optional parameter, <tt>atomic</tt>, which is by default true. If set to false, disables atomic update for that save.</li>
+        <li><b>save</b>: Saves the object to the database. For new objects in EasyDB, this will call <tt>insert</tt>. For existing objects, this will call <tt>update</tt>. For fields where <tt>blank</tt> is true, the field is set to the default type value. <tt>save</tt> takes an optional parameter, <tt>atomic</tt>, which is by default true. If set to false, disables atomic update for that save.</li>
         <li><b>delete</b>: Deletes the object. In EasyDB, this will call the <tt>drop</tt> command.</li>
         <li><b>pk</b>: the id of the object (i.e. primary key). This field is <tt>None</tt> before it is in the database.</li>
         <li><b>version</b>: the version of the object. This field is <tt>None</tt> before it is in the database.</li>
@@ -618,7 +636,6 @@ joe = User(firstName="Joe", age=32)
 <pre>
 joe.pk is None    # True
 joe.height == 0.  # True
-joe.save()        # AttributeError: lastName is not specified
 joe.lastName = "Smith"
 joe.save()
 joe.pk            # 2 (the id of the object)
@@ -636,6 +653,14 @@ joe.delete()              # deletes the row from the database
 <pre>
 account = Account.get(pk=2)
 account.user  # &lt;User: Joe Smith&gt;
+</pre>
+
+      <p>If referenced object is not in the database when you save another object, the referenced object will be saved first before the object is saved. For example:</p>
+      
+<pre>
+greg = User(firstName="Greg", lastName="Russell", age=27)
+account = Account(user=greg, type="Chequing", balance=100.0)
+account.save()  # will save 'greg' first before saving 'account'
 </pre>
       
 <h5>Get Method</h5>  
