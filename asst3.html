@@ -453,6 +453,17 @@ git push --tags
 cd asst3
 </pre>
 
+      <p>The starter code include the following files. Note that we will only test the files that are part of the orm package.</p>
+      <ul>
+        <li><em>schema.py</em>: includes user-defined tables. You are encouraged to change this file to help you with testing your ORM layer.</li>
+        <li><em>main.py</em>: contains the <tt>main</tt> function which allows you to either run in interactive mode for testing purposes, or export the currently loaded schema.</li>
+        <li><em>orm/__init__.py</em>: you will change this file to implement the <tt>setup</tt> and <tt>export</tt> functions.</li>
+        <li><em>orm/easydb.py</em>: includes a database client which is needed to communicate with an EasyDB server. You will implement a Database class to send and receive packets to and from the server.</li>
+        <li><em>orm/table.py</em>: definition for a database table. You will implement the <tt>Table</tt> class and its associated metaclass (you do not have to use a metaclass if you prefer other implementation).</li>
+        <li><em>orm/fields.py</em>: You will change this file to implement all the fields supported by the ORM layer, including custom fields not natively supported by the underlying database.</li>
+        <li><em>orm/exceptions.py</em>: contains all the exception classes used by the database implementation or the ORM layer. You should not need to change this file.</li>
+      </ul>
+
       <h4 id="specification">Solution Requirements</h4>
       <p>This assignment has a couple of milestones, each of which can work independently and thus are worth partial marks. You and your partner should take on one of each part of the assignment.</p>
       
@@ -575,8 +586,8 @@ class Account(orm.Table):
       <p>Every field types, except for Foreign, support the following options:</p>
       
       <ul>
-        <li><b>blank</b>: this field is allowed to be left unspecified when creating new objects. When this option is set to False (which is the default), <tt>AttributeError</tt> will be raised when database insert is attempted if the field is not specified. Otherwise, default value of the type (e.g. 0 for int, "" for string) will automatically be used for objects with the field missing.</li>
-        <li><b>default</b>: the default value for this field if it is unspecified in the constructor. Unlike <tt>blank</tt>, <tt>default</tt> will automatically set the missing attribute to the default value. For <tt>blank</tt>, the field will be set to <tt>None</tt> for new objects before it is saved.</li>
+        <li><b>blank</b>: this field is allowed to be left unspecified when creating new objects. When this option is set to False (which is the default), <tt>AttributeError</tt> will be raised when attempting to create a new object if the field is not specified. Otherwise, default value of the type (e.g. 0 for int, "" for string) will automatically be used for objects with the field missing.</li>
+        <li><b>default</b>: the default value for this field if it is unspecified in the constructor. Unlike <tt>blank</tt>, <tt>default</tt> will automatically set the missing attribute to the default value. .</li>
         <li><b>choices</b>: a list of allowed values for this field. <tt>ValueError</tt> will be raised if the field has value not in <tt>choices</tt> when insert or update is attempted.</li>
       </ul>
       <p>Foreign, on the other hand, only supports <i>blank</i>. If blank is true, the field can reference nothing (i.e. set to None).</p>
@@ -615,7 +626,7 @@ Course {
     numEnrolled : integer;
 }
 </pre>      
-      <p>Note that if there are multiple tables in the schema, then there will be multiple tables in the exported format. Also, all field options are dropped because they are only enforced by the ORM layer. The user of the export function will likely save the output to a file to be used to initiate the database server.</p>
+      <p>Note that if there are multiple tables in the schema, then there will be multiple tables in the exported format. Also, all field options are ignored because they are only enforced by the ORM layer. The user of the export function will likely save the output to a file to be used to initiate the database server.</p>
       <h4 id="methods">Table Methods</h4>
       
       <p>For each table in the schema, the following class methods are defined. For each of these methods, Table should be replaced by the actual Table in the schema (e.g., User, Account).</p>
@@ -652,7 +663,12 @@ joe.age = 34
 joe.save()                # this will call easydb.update, which may raise TransactionAbort
 joe.delete()              # deletes the row from the database
 </pre>
-
+      <p>Note that when setting field value, if the type does not match, <tt>TypeError</tt> should be thrown. The only exception is when assigning an integer to a float field. In this case, you should accept implicit type conversion. For example:</p>
+<pre>
+joe.age = "55"    # NO - assigning string to integer field
+joe.height = 3    # OK - assigning integer to float field
+joe.age = 3.5     # NO - assigning float to integer field
+</pre>      
       <p>All foreign key references are converted automatically to their objects. Hint: you can implement this lazily (only retrieve from database when field is accessed), or eagerly (retrieve foreign keys during the get ORM operation). You should raise <tt>IntegrityError</tt> if the referenced object is not in the database.</p>
       
 <pre>
@@ -674,8 +690,10 @@ account.save()  # will save 'greg' first before saving 'account'
 account.user = greg             # OK
 account.user = 3                # NO - cannot use object id
 account.user = User.get(db, 3)  # OK
-account.user = None             # NO - blank is not specified for this fields
+account.user = None             # NO - blank is not specified for this field
+account.user = account2         # NO - incorrect object type (only instance of User accepted)
 </pre>      
+      <p>You are suggested to use descriptors to implement fields. However, other implementations are possible, such as using __getattr__, __getattribute__, or property. You may not defer type checking until save(), so using an ordinary data field is not a viable option.</p>
       
 <h5>Get Method</h5>  
 <pre>
