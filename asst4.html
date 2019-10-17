@@ -93,7 +93,22 @@ git push
 git push --tags
 cd asst4
 </pre>
-      <p>TODO: The student's starter code should be code that you can copy-paste from Rust book's multi-threaded webserver example.</p>
+      <p>To setup the rust compiler, <tt>rustc</tt>, you need to set the environment variable <tt>RUSTUP_HOME</tt>. You can do so, similar to how you set up to tester.</p>
+      
+      <pre>% echo $0</pre>
+
+      <p>If the output shows <tt>sh</tt> or <tt>bash</tt>, then you are using <tt>bash</tt>. If the output shows <tt>csh</tt> or <tt>tcsh</tt>, then you are using <tt>csh</tt>.</p>
+      
+      <ol>
+        <li>
+          <p>For csh, add the following to the end of your ~/.cshrc:</p>
+          <pre>setenv RUSTUP_HOME /cad2/ece326f/rust</pre>
+        </li>
+        <li>
+          <p>For bash, add the following to the end of your ~/.bashrc:</p>
+          <pre>export RUSTUP_HOME=/cad2/ece326f/rust</pre>
+        </li>
+      </ol>
 
       <h4 id="specification">Solution Requirements</h4>
 
