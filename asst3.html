@@ -232,14 +232,15 @@ struct request {
 <pre>
 enum Code {
     OK = 1,
-    NOT_FOUND = 2,   /* id not found */
-    BAD_TABLE = 3,   /* table not found */
-    BAD_QUERY = 4,   /* error during scan */ 
-    TXN_ABORT = 5,   /* update aborted */
-    BAD_VALUE = 6,   /* column value type mismatch */
-    BAD_ROW = 7,     /* number of values is incorrect */
-    BAD_REQUEST = 8, /* malformed packet */
-    BAD_FOREIGN = 9, /* foreign key not found */
+    NOT_FOUND = 2,       /* id not found */
+    BAD_TABLE = 3,       /* table not found */
+    BAD_QUERY = 4,       /* error during scan */ 
+    TXN_ABORT = 5,       /* update aborted */
+    BAD_VALUE = 6,       /* column value type mismatch */
+    BAD_ROW = 7,         /* number of values is incorrect */
+    BAD_REQUEST = 8,     /* malformed packet */
+    BAD_FOREIGN = 9,     /* foreign key not found */
+    UNIMPLEMENTED = 10,  /* you can ignore this (you will return this for asst4) */
 };
 </pre>
 
@@ -729,9 +730,9 @@ object = Table.get(db, pk)
       <p>Returns a list of objects that matches the query. If no argument is given, returns all objects in the table. The query arguments uses the following format: <em>columnname__op</em>=<em>value</em> where <em>columnname</em> is the column name of the object, <em>op</em> is the operator, and <em>value</em> is the right operand. For the equality operator, <em>__eq</em> is not needed. For example:</p>
       
 <pre>
-results = Table.filter(db, age__gt=33)
+results = User.filter(db, age__gt=33)
 ...
-results = Table.filter(db, firstName="Joe")
+results = User.filter(db, firstName="Joe")
 results # [&lt;User: Joe Smith&gt;]
 </pre>      
       
