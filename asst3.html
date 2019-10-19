@@ -239,6 +239,7 @@ enum Code {
     BAD_VALUE = 6,   /* column value type mismatch */
     BAD_ROW = 7,     /* number of values is incorrect */
     BAD_REQUEST = 8, /* malformed packet */
+    BAD_FOREIGN = 9, /* foreign key not found */
 };
 </pre>
 
@@ -352,7 +353,7 @@ SET balance 900 --------------------&gt; NO
       </table>
       </div>
 
-      <p>Note that <tt>struct key</tt> only appears if the response code is <tt>OK</tt>.
+      <p>Note that <tt>struct key</tt> only appears if the response code is <tt>OK</tt>. The insert command can fail if foreign key reference is not found (<tt>BAD_FOREIGN</tt>). A foreign field is a 64-bit integer that refers to the id of a row in another table. If this field is set to zero, then it does not reference anything and it would not be possible to receive <tt>BAD_FOREIGN</tt>.</p>
  
       <h5>Update Command</h5>
  
@@ -374,7 +375,7 @@ SET balance 900 --------------------&gt; NO
       </table>
       </div>
 
-      <p>The response for the update command is similar to insert, except only the new version number is returned. <tt>NOT_FOUND</tt> is returned if the row is not found. <tt>TXN_ABORT</tt> is returned if atomic update failed.</p>
+      <p>The response for the update command is similar to insert, except only the new version number is returned. <tt>NOT_FOUND</tt> is returned if the row is not found. <tt>TXN_ABORT</tt> is returned if atomic update failed. <tt>BAD_FOREIGN</tt> is returned if a foreign field reference does not exist.</p>
  
       <h5>Drop command</h5>
       
@@ -431,7 +432,7 @@ enum Operator {
       </table>
       </div>
       
-      <p>The scan command compares a column of every row in a table against a value and returns the id of all rows that matched. The <tt>column</tt> field is the column number to be matched, based on the order it appears in the table definition, starting with 1. Column 0 corresponds to the internal <tt>id</tt> field. The <tt>operator</tt> field specifies how to compare against the value stored in <tt>struct value</tt>.</p>
+      <p>The scan command compares a column of every row in a table against a value and returns the id of all rows that matched. The <tt>column</tt> field is the column number to be matched, based on the order it appears in the table definition, starting with 1. Column 0 corresponds to the internal <tt>id</tt> field. The column type of the <tt>id</tt> field is <tt>FOREIGN</tt> The <tt>operator</tt> field specifies how to compare against the value stored in <tt>struct value</tt>.</p>
       
       <div class="table-responsive">
       <table class="packet">
@@ -441,7 +442,7 @@ enum Operator {
       </table>
       </div>
       
-      <p>On success, the response will contain zero or more ids (zero is possible if there were no matches). <tt>BAD_QUERY</tt> is returned if one of the following errors occurred: 1) column type and value type mismatched, or 2) operator for the given type is not supported. In EasyDB, id and foreign key only support <tt>OP_EQ</tt> and <tt>OP_NE</tt>. For <tt>string</tt>, <a href="https://en.cppreference.com/w/c/string/byte/strcmp">lexicographical comparison</a> is performed (e.g., "A" is less than "B" and "5" is less than "-2").</p>
+      <p>On success, the response will contain zero or more ids (zero is possible if there were no matches). <tt>BAD_QUERY</tt> is returned if one of the following errors occurred: 1) column type and value type mismatched, or 2) operator for the given type is not supported. In EasyDB, id and foreign field only support <tt>OP_EQ</tt> and <tt>OP_NE</tt>. For <tt>string</tt>, <a href="https://en.cppreference.com/w/c/string/byte/strcmp">lexicographical comparison</a> is performed (e.g., "A" is less than "B" and "5" is less than "-2").</p>
       
       <h5>Exit Command</h5>
       
@@ -512,7 +513,7 @@ db = easydb.Database(tb)
       <ul>
         <li><tt>TypeError</tt>: thrown when either table name or column name is not a string.</li>
         <li><tt>ValueError</tt>: thrown when type is not one of str, float, int, or a string referencing another table name.</li>
-        <li><tt>orm.IntegrityError</tt>: thrown when foreign keys causes a cycle.</li>
+        <li><tt>orm.IntegrityError</tt>: thrown when foreign keys causes a cycle or if foreign field references a nonexistent table.</li>
       </ul>
       
       <p>Next, we connect to the server via the <tt>connect</tt> member function.</p>
@@ -530,8 +531,9 @@ db.close()
       
       <ul>
         <li><tt>orm.ObjectDoesNotExist</tt>: corresponds to the error code <tt>NOT_FOUND</tt>.</li>
+        <li><tt>orm.InvalidReference</tt>: corresponds to the error code <tt>BAD_FOREIGN</tt>.</li>
         <li><tt>orm.TransactionAbort</tt>: corresponds to the error code <tt>TXN_ABORT</tt>.</li>
-        <li><tt>orm.PacketError</tt>: corresponds to the error code <tt>BAD_TABLE</tt>, <tt>BAD_VALUE<tt>,
+        <li><tt>orm.PacketError</tt>: corresponds to the error code <tt>BAD_TABLE</tt>, <tt>BAD_VALUE</tt>,
           <tt>BAD_ROW</tt>, and <tt>BAD_REQUEST</tt>. They all fall under the same category because either the ORM layer or the database client is supposed to have caught these mistakes before sending off the request.</li>
       </ul>
       
@@ -568,7 +570,8 @@ print(values)
       <p><em>table_name</em> is the name of the table, and <em>query</em> is a tuple of 3 elements: name of column, the operator, and the right operand, in that order. Similar to insert, <tt>ValueError</tt> should be thrown if the column name does not exist, operator is not supported, or the right operand is the wrong data type. If the response is OK, return a list of all matching ids (may be empty). For example:</p>
 
 <pre>
-results = db.scan("Account", ("balance", easydb.OP_GT, 10000))
+import orm.easydb
+results = db.scan("Account", ("balance", orm.easydb.OP_GT, 10000))
 print(results)
 # [1, 3, 7]
 </pre>
@@ -684,22 +687,24 @@ joe.age = "55"    # NO - assigning string to integer field
 joe.height = 3    # OK - assigning integer to float field
 joe.age = 3.5     # NO - assigning float to integer field
 </pre>      
-      <p>All foreign key references are converted automatically to their objects. Hint: you can implement this lazily (only retrieve from database when field is accessed), or eagerly (retrieve foreign keys during the get ORM operation). You should raise <tt>IntegrityError</tt> if the referenced object is not in the database.</p>
+      <p>All foreign key references are converted automatically to their objects. Hint: you can implement this lazily (only retrieve from database when field is accessed), or eagerly (retrieve foreign keys during the get ORM operation). You should raise <tt>InvalidReference</tt> if the referenced object is not in the database (you will know this when the server returns <tt>BAD_FOREIGN</t>.</p>
       
 <pre>
 account = Account.get(db, pk=2)
 account.user  # &lt;User: Joe Smith&gt;
 </pre>
 
-      <p>If referenced object is not in the database when you save another object, the referenced object will be saved first before the object is saved. For example:</p>
+      <p>When calling save(), if referenced object is already in the database (i.e. pk field is set and not None), then you should only save the current object. However, if it is not in the database when you save another object, the referenced object will be saved first before the object is saved. For example:</p>
       
 <pre>
 greg = User(db, firstName="Greg", lastName="Russell", age=27)
 account = Account(db, user=greg, type="Chequing", balance=100.0)
 account.save()  # will save 'greg' first before saving 'account'
+saving = Account(db, user=greg, type="Saving", balance=200.0)
+saving.save()   # will not save 'greg' first since it already exists in database
 </pre>
 
-      <p>Note that for a foreign field, you must set it with an object of the expected type.</p>
+      <p>The above scenario can be recursive for multiple levels of references. Note that for a foreign field, you must set it with an object of the expected type, or None is the field is allowed to be blank.</p>
       
 <pre>
 account.user = greg             # OK
@@ -708,6 +713,7 @@ account.user = User.get(db, 3)  # OK
 account.user = None             # NO - blank is not specified for this field
 account.user = account2         # NO - incorrect object type (only instance of User accepted)
 </pre>      
+
       <p>You are suggested to use descriptors to implement fields. However, other implementations are possible, such as using __getattr__, __getattribute__, or property. You may not defer type checking until save(), so using an ordinary data field is not a viable option.</p>
       
 <h5>Get Method</h5>  
@@ -799,9 +805,9 @@ Capital {
 }
 </pre>
       <h4 id="testing">Testing Your Code</h4>
-      <p>To test your database client, you will need to run the server. You can start the server by running <tt>easydb PORT</tt> on one terminal while running the client on a different terminal. It will load <tt>default.txt</tt> for the database schema, but you will need to supply a different one if your ORM schema differs.</p>
+      <p>To test your database client, you will need to run the server. You can start the server by running <tt>easydb -g PORT</tt> on one terminal while running the client on a different terminal, where the <tt>-g</tt> option will print everything the database is doing, and <tt>PORT</tt> is the port number. You should choose a unique port number so that other people also working on your machine would not accidentally connect to your database. By default, the server will load <tt>default.txt</tt> for the database schema, but you will need to supply a different one if your ORM schema differs. Type <tt>easydb</tt> to see the usage on how to specify a different schema file.</p>
       
-      <p>To test the database client or the ORM layer, you can either write a custom script that imports <tt>schema.py</tt>, or you can run in interactive mode using the <tt>main.py run</tt> command. It will start interactive mode with all the classes and functions defined in <tt>schema.py</tt>, as well as automatically starting connection to the database, and storing the database object as <tt>db</tt>. For example:</p>
+      <p>To test the database client or the ORM layer, you can either write a custom script that imports <tt>schema.py</tt>, or you can run in interactive mode using the <tt>main.py run</tt> command. It will start interactive mode with all the classes and functions defined in <tt>schema.py</tt> loaded, as well as automatically connecting to the database, and storing the database object as <tt>db</tt>. For example:</p>
       
 <pre>
 student:~/asst3$ ./main.py run
