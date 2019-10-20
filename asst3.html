@@ -206,10 +206,10 @@ Animal {
   owner: User;
 }
 </pre>  
-      
+      <p>Hint: you can guarantee that there's no cycle if a foreign field can only reference already defined table (except for the current one). This is how the instructor's version of the server works.</p>
       <h4 id="protocol">Access Protocol</h4>
       
-      <p>To access a running EasyDB server, you must know the host name and its port number. Once you are connected, you can make one of five EasyDB queries that is available. Note that EasyDB assumes that the client (the program that is connected to the server) is aware of the current schema and does not provide an API for introspection. EasyDB uses binary format as its mean of communication. Therefore, we describe common structures in the network packets that are used in EasyDB. All structures are defined using C syntax and assumed to be 4-byte aligned, with <tt>int</tt> being 32-bit signed integer, and <tt>long</tt>being 64-bit signed integer. All integers are in <a href="https://en.wikipedia.org/wiki/Endianness">network byte order</a>.</p>
+      <p>To access a running EasyDB server, you must know the host name and its port number. Once you are connected, you can make one of five EasyDB queries that is available. Note that EasyDB assumes that the client (the program that is connected to the server) is aware of the current schema and does not provide an API for introspection. EasyDB uses binary format as its mean of communication. Therefore, we describe common structures in the network packets that are used in EasyDB. All structures are defined using C syntax and assumed to be 4-byte aligned, with <tt>int</tt> being 32-bit signed integer, and <tt>long</tt> being 64-bit signed integer. All integers are in <a href="https://en.wikipedia.org/wiki/Endianness">network byte order</a>.</p>
       
 <pre>
 enum Command {
@@ -250,7 +250,7 @@ struct response {
 };
 </pre>
 
-      <p>All EasyDB requests begin with <tt>request</tt>. The <tt>command</tt> field is one of the five commands listed above, and the <tt>table</tt> field is the table number. A table's number is the order in which it appears in the schema, starting at 1 (in earlier example, User's table number would be 1, and Account's would be 2). All responses begin with <tt>response</tt>, which contains a code for success (i.e. OK), or error. <tt>BAD_TABLE, BAD_ROW, BAD_VALUE</tt>, and <tt>BAD_REQUEST</tt> is possible for all EasyDB commands except for the Exit command (only <tt>BAD_REQUEST</tt> is possible).</p>
+      <p>All EasyDB requests begin with <tt>request</tt>. The <tt>command</tt> field is one of the five commands listed above, and the <tt>table</tt> field is the table number. A table's number is the order in which it appears in the schema, starting at 1 (in earlier example, User's table number would be 1, and Account's would be 2). All responses begin with <tt>response</tt>, which contains a code for success (i.e. OK), or error. <tt>BAD_TABLE, BAD_ROW, BAD_VALUE</tt>, and <tt>BAD_REQUEST</tt> are possible for all EasyDB commands except for the Exit command (only <tt>BAD_REQUEST</tt> is possible).</p>
  
 <pre>
 enum Column {
@@ -688,7 +688,7 @@ joe.age = "55"    # NO - assigning string to integer field
 joe.height = 3    # OK - assigning integer to float field
 joe.age = 3.5     # NO - assigning float to integer field
 </pre>      
-      <p>All foreign key references are converted automatically to their objects. Hint: you can implement this lazily (only retrieve from database when field is accessed), or eagerly (retrieve foreign keys during the get ORM operation). You should raise <tt>InvalidReference</tt> if the referenced object is not in the database (you will know this when the server returns <tt>BAD_FOREIGN</t>.</p>
+      <p>All foreign key references are converted automatically to their objects. Hint: you can implement this lazily (only retrieve from database when field is accessed), or eagerly (retrieve foreign keys during the get ORM operation). You should raise <tt>InvalidReference</tt> if the referenced object is not in the database (you will know this when the server returns <tt>BAD_FOREIGN</tt>).</p>
       
 <pre>
 account = Account.get(db, pk=2)
