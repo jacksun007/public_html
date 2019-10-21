@@ -681,6 +681,9 @@ joe.version               # 2 (new version of the object)
 joe.age = 34
 joe.save()                # this will call easydb.update, which may raise TransactionAbort
 joe.delete()              # deletes the row from the database
+joe.pk is None            # True
+joe.save()                #
+joe.pk                    # 4 (the new id of the object)
 </pre>
       <p>Note that when setting field value, if the type does not match, <tt>TypeError</tt> should be thrown. The only exception is when assigning an integer to a float field. In this case, you should accept implicit type conversion. For example:</p>
 <pre>
@@ -774,9 +777,8 @@ class Lecture(orm.Table):
     end = orm.DateTime()
 
 # main.py
-ece326 = Lecture(db, location="BA1190")
+ece326 = Lecture(db, location="BA1190", end=datetime(2019, 10, 15, 13))
 ece326.start = datetime(2019, 10, 15, 12)
-ece326.end = datetime(2019, 10, 15, 13)
 ece326.save()
 </pre>       
       <p>For the default value, you must support calling a function if <tt>default</tt> is assigned a function. For the datetime instance, you can ignore time zone related settings.</p>
