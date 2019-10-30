@@ -206,7 +206,7 @@ Animal {
   owner: User;
 }
 </pre>  
-      <p>Hint: you can guarantee that there's no cycle if a foreign field can only reference already defined table (except for the current one). This is how the instructor's version of the server works.</p>
+      <p>You can guarantee that there's no cycle if a foreign field can only reference already defined table (except for the current one). This is how the instructor's version of the server works. You should disallow references to future tables, even if no cycle would occur.</p>
       <h4 id="protocol">Access Protocol</h4>
       
       <p>To access a running EasyDB server, you must know the host name and its port number. Once you are connected, you can make one of five EasyDB queries that is available. Note that EasyDB assumes that the client (the program that is connected to the server) is aware of the current schema and does not provide an API for introspection. EasyDB uses binary format as its mean of communication. Therefore, we describe common structures in the network packets that are used in EasyDB. All structures are defined using C syntax and assumed to be 4-byte aligned, with <tt>int</tt> being 32-bit signed integer, and <tt>long</tt> being 64-bit signed integer. All integers are in <a href="https://en.wikipedia.org/wiki/Endianness">network byte order</a>.</p>
@@ -554,11 +554,11 @@ pk, version = db.insert("User", ["Jay", "Sung", 5.5, 31])
       
       <h5>Drop Command</h5>
       <pre>drop(table_name, pk)</pre>
-      <p><em>table_name</em> is the name of the table, and <em>pk</em> is the id of the row to be deleted. This method does not return a value, but <tt>orm.ObjectDoesNotExist</tt> is raised if the id does not exist in the specified table.</p>
+      <p><em>table_name</em> is the name of the table, and <em>pk</em> is the id of the row to be deleted. This method does not return a value, but <tt>orm.ObjectDoesNotExist</tt> is raised if the id does not exist in the specified table. Throw <tt>ValueError</tt> if table name does not exist.</p>
       
       <h5>Get Command</h5>
       <pre>get(table_name, pk)</pre>
-      <p><em>table_name</em> is the name of the table, and <em>pk</em> is the id of the row to be retrieved. If the response is OK, return a list of the values and the version. For example:</p>
+      <p><em>table_name</em> is the name of the table, and <em>pk</em> is the id of the row to be retrieved. Throw <tt>ValueError</tt> if table name does not exist. If the response is OK, return a list of the values and the version. For example:</p>
 
 <pre>
 values, version = db.insert("User", 1)
@@ -568,7 +568,7 @@ print(values)
       
       <h5>Scan Command</h5>
       <pre>scan(table_name, query)</pre>
-      <p><em>table_name</em> is the name of the table, and <em>query</em> is a tuple of 3 elements: name of column, the operator, and the right operand, in that order. Similar to insert, <tt>ValueError</tt> should be thrown if the column name does not exist, operator is not supported, or the right operand is the wrong data type. If the response is OK, return a list of all matching ids (may be empty). For example:</p>
+      <p><em>table_name</em> is the name of the table, and <em>query</em> is a tuple of 3 elements: name of column, the operator, and the right operand, in that order. Similar to insert, <tt>ValueError</tt> should be thrown if the column name does not exist, operator is not supported, the right operand is the wrong data type, or table name does not exist. If the response is OK, return a list of all matching ids (may be empty). For example:</p>
 
 <pre>
 import orm.easydb
@@ -600,7 +600,7 @@ class Account(orm.Table):
     balance = orm.Float()
 </pre> 
      
-      <p>For all database tables, the client will inherit <tt>orm.Table</tt>. Column names must start with a letter, followed by letters of either case, or numbers, but underscore is <em>not</em> allowed (the ORM layer uses it for special purposes). For each column in the table, it is presented by an instance of one of the following classes: <tt>String</tt>, <tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. For the first three classes, there are no positional parameters. For <tt>Foreign</tt>, it takes one positional parameter: the class of the referenced table. For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
+      <p>For all database tables, the client will inherit <tt>orm.Table</tt>. Column names must start with a letter, followed by letters of either case, or numbers, but underscore is <em>not</em> allowed (the ORM layer uses it for special purposes). For each column in the table, it is presented by an instance of one of the following classes: <tt>String</tt>, <tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. For the first three classes, there are no positional parameters. For <tt>Foreign</tt>, it takes one positional parameter: the class of the referenced table. Notice that it is not possibe to reference a class that has yet to be defined. For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
       
       <p>Every field types, except for Foreign, support the following options:</p>
       
@@ -610,6 +610,12 @@ class Account(orm.Table):
         <li><b>choices</b>: a list of allowed values for this field. <tt>ValueError</tt> will be raised if the field has value not in <tt>choices</tt> when insert or update is attempted.</li>
       </ul>
       <p>Foreign, on the other hand, only supports <i>blank</i>. If blank is true, the field can reference nothing (i.e. set to None).</p>
+      
+      <p>Hint: your metaclass should overload the <tt>__prepare__</tt> method and return <a href="https://docs.python.org/3.5/library/collections.html">OrderedDict</a> 
+      to ensure that the order of the fields are preserved. Otherwise they may
+      end up out of order and you will wonder why the insert command complains
+      about mismatching types.</p>
+      
       <p>Our ORM provides two interfaces to initialize the underlying database client.</p>
 
 <h5>Setup</h5>
