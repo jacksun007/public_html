@@ -147,6 +147,8 @@ except ObjectDoesNotExist:
       
       <p>Another important advantage is that ORM can help you convert to and from in-memory types to storage types seamlessly. For example, some relational databases, such as EasyDB, do not natively support an IP Address type. Therefore, to store an IP address in these databases, it must first be converted to a string (e.g. "127.0.0.1"). Unmarshalling code is required to read it back from the database and convert it back to an IP Address object. These tedious tasks can be automated with ORM.</p>
       
+      <p>Your first task in this assignment is to build a database client which connects to an EasyDB server. The client is in charge of sending and receiving data to and from the server. Then, you will develop an ORM framework which is used by other programmers to build their web applications. This ORM layer allows web developers to specify the layout of their database directly in Python, and be able to work with Python objects in their program, rather than having to use the low level database client. The ORM layer can also support complex data types not generally available natively in database solutions, which improves the robustness of the web applications built on top of the ORM layer.</p>
+      
       <h4 id="easydb">EasyDB</h4>
       
       <p>EasyDB is a toy relational database that provides minimalistic features for managing structured data. In a relational database, data is organized into tables of columns and rows. A column in a database table is a set of data of a primitive type (that is supported by the database). A table is defined with a list of one or more named columns before any data can be inserted. A row is a set of related data that is given meaning through the table it exists in. To insert a row into a table, each value of the row must have the same type as what is defined in the table, in the same order. Also, the number of values in a row must be exactly equal to the number of columns defined in the table. For example, a User table may have the columns: <tt>firstName</tt>, <tt>lastName</tt>, <tt>height</tt> and <tt>age</tt>. A row in a User table may be ("Jay", "Sung", 5.5, 31), which correctly represents a single user in this table. A table, of course, can have many rows, allowing you to store multiple users in a User table. </p>
@@ -162,7 +164,7 @@ except ObjectDoesNotExist:
       }
       </p>
       
-      <p>In EasyDB, each column in a table can be one of four types: <tt>integer</tt>, <tt>float</tt>, <tt>string</tt>, or foreign key (i.e. a "pointer" to a record in another table). To specify a foreign key type, use the name of the referenced table. The names of a table or column must start with a letter, followed by letters (either case), numbers, or underscore. However, only the ORM layer may use the underscore character for column names (see <a href="#custom_types">Custom Type</a> section for more information). In addition, the name of a column cannot be <tt>id</tt> or <tt>pk</tt> (explained below). Here is an example of a complete database schema:</p>
+      <p>In EasyDB, each column in a table can be one of four types: <tt>integer</tt>, <tt>float</tt>, <tt>string</tt>, or foreign key (i.e. a "pointer" to a record in another table). To specify a foreign key type, use the name of the referenced table. The names of a table or column must start with a letter, followed by letters (either case), numbers, or underscore. However, only the ORM layer may use the underscore character for column names (see <a href="#custom_types">Custom Type</a> section for more information). In addition, the ORM layer reserves a couple of words for its object interface: <tt>pk</tt>, <tt>id</tt>, <tt>version</tt>, <tt>save</tt> and <tt>delete</tt>. Therefore, you should disallow those words to be used for column names. Here is an example of a complete database schema:</p>
       
 <pre>
 User {
@@ -179,7 +181,7 @@ Account {
 }
 </pre>      
       
-      <p>In the definitions above, we have two tables: User and Account. For every user, we track his/her names, height, and age. For an account, we store the account type and its balance. But most importantly, an account references the User table. <tt>user</tt> stores the <em>id</em> of a row in the User table. Every row in EasyDB has an automatically generated unique integer id value which allows the row to be unambiguously referenced. In this manner, a user can have zero or more associated accounts. Because the ORM layer references object id using either the name <tt>id</tt> or <tt>pk</tt>, we disallow those two names to be used for column names.</p>
+      <p>In the definitions above, we have two tables: User and Account. For every user, we track his/her names, height, and age. For an account, we store the account type and its balance. But most importantly, an account references the User table. <tt>user</tt> stores the <em>id</em> of a row in the User table. Every row in EasyDB has an automatically generated unique integer id value which allows the row to be unambiguously referenced. In this manner, a user can have zero or more associated accounts.</p>
       
       <p>EasyDB currently disallows cycles in foreign keys. Here are two examples where a cycle occurs:</p>
 
@@ -600,21 +602,31 @@ class Account(orm.Table):
     balance = orm.Float()
 </pre> 
      
-      <p>For all database tables, the client will inherit <tt>orm.Table</tt>. Column names must start with a letter, followed by letters of either case, or numbers, but underscore is <em>not</em> allowed (the ORM layer uses it for special purposes). For each column in the table, it is presented by an instance of one of the following classes: <tt>String</tt>, <tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. For the first three classes, there are no positional parameters. For <tt>Foreign</tt>, it takes one positional parameter: the class of the referenced table. Notice that it is not possibe to reference a class that has yet to be defined. For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
+      <p>For all database tables, the client will inherit <tt>orm.Table</tt>. Column names must start with a letter, followed by letters of either case, or numbers, but underscore is <em>not</em> allowed (the ORM layer uses it for special purposes). For each column in the table, it is presented by an instance of one of the following <tt>Field</tt> subclasses: <tt>String</tt>, <tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. For the first three classes, there are no positional parameters. For <tt>Foreign</tt>, it takes one positional parameter: the class of the referenced table. Notice that it is not possibe to reference a class that has yet to be defined. For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
       
       <p>Every field types, except for Foreign, support the following options:</p>
       
       <ul>
         <li><b>blank</b>: this field is allowed to be left unspecified when creating new objects. When this option is set to False (which is the default), <tt>AttributeError</tt> will be raised when attempting to create a new object if the field is not specified. Otherwise, default value of the type (e.g. 0 for int, "" for string) will automatically be used for objects with the field missing.</li>
-        <li><b>default</b>: the default value for this field if it is unspecified in the constructor. Unlike <tt>blank</tt>, <tt>default</tt> will automatically set the missing attribute to the default value. .</li>
+        <li><b>default</b>: the default value for this field if it is unspecified in the constructor. Unlike <tt>blank</tt>, <tt>default</tt> will automatically set the missing attribute to the default value.</li>
         <li><b>choices</b>: a list of allowed values for this field. <tt>ValueError</tt> will be raised if the field has value not in <tt>choices</tt> when insert or update is attempted.</li>
       </ul>
       <p>Foreign, on the other hand, only supports <i>blank</i>. If blank is true, the field can reference nothing (i.e. set to None).</p>
       
-      <p>Hint: your metaclass should overload the <tt>__prepare__</tt> method and return <a href="https://docs.python.org/3.5/library/collections.html">OrderedDict</a> 
-      to ensure that the order of the fields are preserved. Otherwise they may
-      end up out of order and you will wonder why the insert command complains
-      about mismatching types.</p>
+      <p>The Field subclasses must raise <tt>TypeError</tt> during initialization (i.e., while the class is being created) if either one or more of the choices or default value is the wrong type. For example:</p>
+
+<pre>      
+class User(orm.Table):
+    firstName = orm.String()
+    lastName = orm.String(default=123)
+    height = orm.Float(choices=["wrong", "type"])    
+</pre>    
+  
+      <p>Similarly, <tt>AttributeError</tt> should be raised when field or class name contains and underscore, or if field name uses one of the reserved attribute names: <tt>pk</tt>, <tt>id</tt>, <tt>version</tt>, <tt>save</tt>, or <tt>delete</tt> (see next section for what each of these attributes do).</p>
+  
+      <p>Lastly, you should ensure that the order of the fields are preserved. Otherwise they may
+      end up scrambled and you will wonder why the insert command complains
+      about mismatching types. Hint: your metaclass should overload the <tt>__prepare__</tt> method and return an <a href="https://docs.python.org/3.5/library/collections.html">OrderedDict</a>.</p>
       
       <p>Our ORM provides two interfaces to initialize the underlying database client.</p>
 
