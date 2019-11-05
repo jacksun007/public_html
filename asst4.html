@@ -79,7 +79,7 @@
 
       <h4 id="background">Background</h4>
       
-      <p>TODO: talk about concurrency and synchronization.</p>
+      <p>Since we have built the ORM client in the previous lab, we will extend this by creating the EasyDB server so it can serve requests using an in-memory database. EasyDB is a toy relational database that provides minimalistic features for managing structured data. In a relational database, data is organized into tables of columns and rows. A column in a database table is a set of data of a primitive type (that is supported by the database). A table is defined with a list of one or more named columns before any data can be inserted. A row is a set of related data that is given meaning through the table it exists in. To insert a row into a table, each value of the row must have the same type as what is defined in the table, in the same order. Also, the number of values in a row must be exactly equal to the number of columns defined in the table. For example, a User table may have the columns: <tt>firstName, lastName, height</tt> and <tt>age</tt>. A row in a User table may be ("Jay", "Sung", 5.5, 31), which correctly represents a single user in this table. A table, of course, can have many rows, allowing you to store multiple users in a User table.</p>
       
       <h4 id="setup">Setup</h4>
       <pre>
@@ -110,17 +110,46 @@ cd asst4
         </li>
       </ol>
 
+      <p>The starter code is organized as follows:</p>
+      <ul>
+        <li><i>main.rs</i>: Contains the main function and parses command line arguments.</li>
+        <li><i>packet.rs</i>: Handles network packets by serializing and deserializing requests from the client and responses from the server.</li>
+        <li><i>schema.rs</i>: Parses the schema from a specified txt file into tables and columns. </li>
+        <li><i>server.rs</i>: Handles connections and client requests. <b>You should modify this file </b>to implement the server response logic.</li>
+      </ul>
+
       <h4 id="specification">Solution Requirements</h4>
 
       <p>Please first familiarize yourself again with the <a href="asst3.html">features of EasyDB</a>. You will need to make sure that your solution can read an EasyDB schema file, and implements the access protocol as described. You are highly suggested to use your ORM software, developed in assignment 3, to test the correctness of your EasyDB server.</p>
 
+      <p>To recap the previous assignment, you are responsible for the 5 commands in EasyDB (<tt>INSERT, UPDATE, DROP, GET</tt>, and <tt>SCAN</tt>) from Lab 3. <b>You should not use any external Rust libraries</b>, aside from the standard Rust library. It is <b>solely your responsibility</b> to make sure your Rust code compiles on the lab machines.</p>
+
       <h4 id="submission">Code Submission</h4>
       <p>To submit your code with the current commit, use the <tt>Asst4-end</tt> tag. Remember to push the new tag to the remote repository.</p>
-      
+
 <pre>
 git tag Asst4-end    // Creates tag for current submission for Assignment 4
 git push --tags
 </pre>
+
+      <h4 id="advice">Tips and Advice</h4>
+
+      <b>General</b>
+      <ul>
+        <li>Make sure you start early - Rust is not as forgiving as Python or even C++.</li>    
+        <li>Plan how you will store the data using structs and data structures in the standard library. Try to think about how you will handle more complicated features such as cascade delete (if a row is referenced by rows in other tables, those rows will also be deleted).</li>
+      </ul>
+
+      <b>Rust</b>
+      <ul>
+        <li>The Rust compiler is very explicit in pinpointing where an error occurs, and often suggests hints to fix the problem. Try to read the error message carefully: it is often helpful!</li>    
+        <li>By default, <a href="https://doc.rust-lang.org/book/ch03-01-variables-and-mutability.html">Rust variables are immutable</a>. Make sure you add <tt>mut</tt> in front of the variable to make it mutable.</li>
+        <li>Rust has <a href="https://doc.rust-lang.org/book/ch08-02-strings.html">two commonly used string types</a>: <tt>str</tt> and <tt>String</tt>. <tt>str</tt> is a string slice or an immutable reference to data (e.g. string literals stored in program binary), while the <tt>String</tt> type is growable, mutable and owned (stored in heap). Don't try to change <tt>str</tt> type strings!</li>
+        <li>Get familiar with <a href="https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html">ownership and borrowing in Rust</a>, especially when you pass around data between functions. </li>
+        <li><a href="https://doc.rust-lang.org/book/ch06-02-match.html">Rust matches are exhaustive</a>. If you don't match for a <tt>None</tt> case, the Rust compiler will throw an error.</li>
+      </ul>
+      
+
       
       <hr>
       <footer class="container text-center">

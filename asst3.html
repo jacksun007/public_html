@@ -530,7 +530,7 @@ db.connect("127.0.0.1", 8080)
 db.close()
 </pre> 
       
-      <p>The main part of this milestone is implementing all of EasyDB commands. You are suggested to use Python's <tt>struct</tt> library to help build packets and read responses from the server. When the server responds in error, you should throw objects of the corresponding error classes.</p>
+      <p>The main part of this milestone is implementing all of EasyDB commands. You are suggested to use Python's <tt>struct</tt> library to help build packets and read responses from the server. <tt>io.BytesIO</tt> is another great option. When the server responds in error, you should throw objects of the corresponding error classes.</p>
       
       <ul>
         <li><tt>orm.ObjectDoesNotExist</tt>: corresponds to the error code <tt>NOT_FOUND</tt>.</li>
