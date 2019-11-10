@@ -37,6 +37,7 @@
       <li class="nav-item">
         <a class="nav-link" href="https://q.utoronto.ca/">Quercus Website</a>
       </li>
+      
     </ul>
   </div>  
 </nav>
@@ -62,7 +63,20 @@
             </a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" href="#commands">
+              Database Commands
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#concurrency">
+              Adding Concurrency
+            </a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="#submission">Code Submission</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#advice">Hints and Advice</a>
           </li>
         </ul>
       </div>
@@ -74,12 +88,12 @@
       </div>
       <p><strong>Due Date: December 8th, 11:59pm</strong></p>
       <p><strong>Lab TA: Andrew Choi</strong></p>
-      <p>In this assignment, you will build EasyDB&trade;, a multithreaded, highly concurrent in-memory database, using the Rust programming language.</p>
+      <p>In this assignment, you will build EasyDB&trade;, a multithreaded, concurrent in-memory database, using the Rust programming language.</p>
       
 
       <h4 id="background">Background</h4>
       
-      <p>Since we have built the ORM client in the previous lab, we will extend this by creating the EasyDB server so it can serve requests using an in-memory database. EasyDB is a toy relational database that provides minimalistic features for managing structured data. In a relational database, data is organized into tables of columns and rows. A column in a database table is a set of data of a primitive type (that is supported by the database). A table is defined with a list of one or more named columns before any data can be inserted. A row is a set of related data that is given meaning through the table it exists in. To insert a row into a table, each value of the row must have the same type as what is defined in the table, in the same order. Also, the number of values in a row must be exactly equal to the number of columns defined in the table. For example, a User table may have the columns: <tt>firstName, lastName, height</tt> and <tt>age</tt>. A row in a User table may be ("Jay", "Sung", 5.5, 31), which correctly represents a single user in this table. A table, of course, can have many rows, allowing you to store multiple users in a User table.</p>
+      <p>A concurrent database supports connections with multiple clients. This requires care in the implementation such that the interaction between multiple clients does not cause errors to occur with the database object. In this assignment, you will implement all the EasyDB commands as described in <a href="asst3.html">assignment 3</a>. In addition, your implementation should allow multiple clients to connect to the same EasyDB server. When one client makes changes to the database, all other clients should observe those changes. </p> 
       
       <h4 id="setup">Setup</h4>
       <pre>
@@ -113,16 +127,98 @@ cd asst4
       <p>The starter code is organized as follows:</p>
       <ul>
         <li><i>main.rs</i>: Contains the main function and parses command line arguments.</li>
-        <li><i>packet.rs</i>: Handles network packets by serializing and deserializing requests from the client and responses from the server.</li>
-        <li><i>schema.rs</i>: Parses the schema from a specified txt file into tables and columns. </li>
-        <li><i>server.rs</i>: Handles connections and client requests. <b>You should modify this file </b>to implement the server response logic.</li>
+        <li><i>packet.rs</i>: Handles network packets by deserializing requests from the client and serializing responses from the server to the client.</li>
+        <li><i>schema.rs</i>: Parses the database schema from a file into table definitions. </li>
+        <li><i>server.rs</i>: Handles connections and client requests. <b>You should modify this file </b>to initialize the database object and also to add support for multiple simultaneous connections.</li>
+        <li><i>database.rs</i>: Implements EasyDB database logic. <b>You should modify this file </b>to define your database object and to complete each of the EasyDB commands.</li>
       </ul>
 
       <h4 id="specification">Solution Requirements</h4>
 
-      <p>Please first familiarize yourself again with the <a href="asst3.html">features of EasyDB</a>. You will need to make sure that your solution can read an EasyDB schema file, and implements the access protocol as described. You are highly suggested to use your ORM software, developed in assignment 3, to test the correctness of your EasyDB server.</p>
+      <p>Please first familiarize yourself again with the <a href="asst3.html#protocol">features of EasyDB</a>. You will need to make sure that the behaviour of your solution matches what is described in that handout. You are highly suggested to use your ORM software, developed in assignment 3, to test the correctness of your EasyDB server.</p>
 
-      <p>To recap the previous assignment, you are responsible for the 5 commands in EasyDB (<tt>INSERT, UPDATE, DROP, GET</tt>, and <tt>SCAN</tt>) from Lab 3. <b>You should not use any external Rust libraries</b>, aside from the standard Rust library. It is <b>solely your responsibility</b> to make sure your Rust code compiles on the lab machines.</p>
+      <p>Also take some time to read through the code that has been provided to you. <i>schema.rs</i> contains structure definition for tables and their columns, which you can use directly as part of your Database object (e.g. make it a field in your Database structure). Schema parsing has already been completed for you, as well as parsing of Request packets and serialization of Response packets. Familiarize yourself with <i>packet.rs</i> and the structures that is defined within. You should be able to reuse many definitions, especially <tt>Value</tt>, for the rows in your database table. You will also need to understand how to create Response objects to be sent back to the client.</p>
+      
+      <p>To recap the previous assignment, you are responsible for the 5 commands in EasyDB (<tt>INSERT, UPDATE, DROP, GET</tt>, and <tt>SCAN</tt>). <b>You should not use any external Rust libraries (i.e. crates)</b>, aside from the standard Rust library. It is <b>solely your responsibility</b> to make sure your Rust code compiles on the lab machines.</p>
+      
+      <h4 id="commands">Database Commands</h4>
+      <h5>Insert</h5>
+<pre>
+fn handle_insert(db: &amp; mut Database, table_id: i32, values: Vec&lt;Value&gt;) -&gt; Result&lt;Response, i32&gt; 
+</pre>
+      <p><tt>handle_insert</tt> adds a new row, consisting of <tt>values</tt>, to a database table with id <tt>table_id</tt>. Note that during packet parsing, the values have been sanitized. However, they have not been validated. You need to check that the type of each value corresponds to the type of their respective columns, and that foreign key references a valid row (i.e. the row in the other table actually exists). You also need to make sure the number of values supplied by the packet is the same as the number of columns expected for the table. Your response packet should return the following error codes:</p>
+      
+      <ul>
+        <li><tt>BAD_TABLE</tt>: if table id is not valid.</li>
+        <li><tt>BAD_VALUE</tt>: upon column type mismatch.</li>
+        <li><tt>BAD_ROW</tt>: if number of values does not match number of columns.</li>
+        <li><tt>BAD_FOREIGN</tt>: if foreign key reference does not exist.</li>
+      </ul>  
+      <p>Upon success, you should return a Response::Insert object. You are free to choose a unique row id and version number for the newly inserted row.</p>
+
+      <h5>Update</h5>
+<pre>
+fn handle_update(db: &amp; mut Database, table_id: i32, object_id: i64, version: i64, values: Vec&lt;Value&gt;) -&gt; Result&lt;Response, i32&gt; 
+</pre>
+      <p><tt>handle_update</tt> updates an existing row, specified by <tt>object_id</tt>. Similar to <tt>handle_insert</tt>, you will need to validate the input values before allowing the specified row to be update. In addition to the error codes that <tt>handle_insert</tt> can send back to the client, you will also need to handle the following errors:</p>
+      
+      <ul>
+        <li><tt>NOT_FOUND</tt>: if object_id is not found.</li>
+        <li><tt>TXN_ABORT</tt>: if input version number does not match version number of this row. However, if <tt>version</tt> is 0, you should always allow the update if the input values are valid.</li>
+      </ul> 
+
+      <p>Upon success, you should return a Response::Update object with a new version number for the row.</p>
+
+      <h5>Drop</h5>
+<pre>
+fn handle_drop(db: &amp; mut Database, table_id: i32, object_id: i64) -&gt; Result&lt;Response, i32&gt; 
+</pre>
+      <p><tt>handle_drop</tt> deletes an existing row, specified by <tt>object_id</tt>. It can respond with the following error codes:</p>
+
+      <ul>
+        <li><tt>BAD_TABLE</tt>: if table id is not valid.</li>
+        <li><tt>NOT_FOUND</tt>: if object_id is not found.</li>
+      </ul>  
+
+      <p>Remember that you must implement cascading drop, which will delete all rows in other tables that have a foreign key reference to the row being deleted. This may start a chain reaction where rows deleted as a result of cascading delete causes more rows on other tables to be deleted. For example, if there are three tables, Country, Province, and City, deleting a country will cause all its provinces to be deleted, along with every city in those provinces.</p>
+      
+      <p>Upon success, you should return a Response::Drop object.</p>
+      
+      <h5>Get</h5>
+<pre>
+fn handle_get(db: &amp; Database, table_id: i32, object_id: i64) -&gt; Result&lt;Response, i32&gt; 
+</pre>
+      <p><tt>handle_get</tt> retrieves an existing row, specified by <tt>object_id</tt>. It can respond with the following error codes:</p>
+      
+      <ul>
+        <li><tt>BAD_TABLE</tt>: if table id is not valid.</li>
+        <li><tt>NOT_FOUND</tt>: if object_id is not found.</li>
+      </ul>  
+      
+      <p>Upon success, you should return a Response::Get object, with the values of the row and the current version of the row.</p>
+      
+      <h5>Scan</h5>
+<pre>
+fn handle_scan(db: &amp; Database, table_id: i32, column_id: i32, operator: i32, other: Value) -&gt; Result&lt;Response, i32&gt; 
+</pre>
+      <p><tt>handle_scan</tt> compares a column of every row in a table against a value and returns the id of all rows that matched the query. It can respond with the following error codes:</p>
+      
+      <ul>
+        <li><tt>BAD_TABLE</tt>: if table id is not valid.</li>
+        <li><tt>BAD_QUERY</tt>: if any of <tt>column_id</tt> or <tt>operator</tt> is invalid (e.g. column_id out of bound, operator not supported for the column type, or invalid operator number).</li>
+      </ul>  
+      
+      <p>Recall that it is possible to scan a table for id of a row, using <tt>column_id</tt> 0. Also recall that for id field or foreign field, only equal and not equal operators are supported.</p>
+      
+      <p>Upon success, you should return a Response::Query object, with the ids of all the rows that matched the query.</p>      
+      
+      <h4 id="concurrency">Adding Concurrency</h4>
+
+      <p>You should only work on this part once you have completed all of the database commands. You will need to make <em>small</em> changes to <i>server.rs</i> to enable multithreading. First, you should <b>spawn a new thread</b> via <tt>thread::spawn</tt> for every incoming connection. You can create a thread pool as well, but just remember that EasyDB connections are persistent. The HTTP protocol, on the other hand, its connection only lasts for the duration of one command and one response. In EasyDB, the connection remains open until the client sends the Exit command.</p>
+
+      <p>The argument to <tt>spawn</tt> should be a function (or closure) that calls <tt>handle_connection</tt>. You will require use of mutex and a referenced counted smart pointer to be able to share your database object among multiple threads safely.</p>
+      
+      <p>Lastly, to prevent overloading the server, you MUST restrict the number of threads to exactly 4. After 4 threads have been created, you should refuse any additional connections until some existing connections have ended. </p>
 
       <h4 id="submission">Code Submission</h4>
       <p>To submit your code with the current commit, use the <tt>Asst4-end</tt> tag. Remember to push the new tag to the remote repository.</p>
@@ -134,13 +230,13 @@ git push --tags
 
       <h4 id="advice">Tips and Advice</h4>
 
-      <b>General</b>
+      <p><b>General</b></p>
       <ul>
         <li>Make sure you start early - Rust is not as forgiving as Python or even C++.</li>    
         <li>Plan how you will store the data using structs and data structures in the standard library. Try to think about how you will handle more complicated features such as cascade delete (if a row is referenced by rows in other tables, those rows will also be deleted).</li>
       </ul>
 
-      <b>Rust</b>
+      <p><b>Rust</b></p>
       <ul>
         <li>The Rust compiler is very explicit in pinpointing where an error occurs, and often suggests hints to fix the problem. Try to read the error message carefully: it is often helpful!</li>    
         <li>By default, <a href="https://doc.rust-lang.org/book/ch03-01-variables-and-mutability.html">Rust variables are immutable</a>. Make sure you add <tt>mut</tt> in front of the variable to make it mutable.</li>
