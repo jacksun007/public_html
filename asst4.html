@@ -208,6 +208,18 @@ fn handle_scan(db: &amp; Database, table_id: i32, column_id: i32, operator: i32,
         <li><tt>BAD_QUERY</tt>: if any of <tt>column_id</tt> or <tt>operator</tt> is invalid (e.g. column_id out of bound, operator not supported for the column type, or invalid operator number).</li>
       </ul>  
       
+      <p>You are responsible for implementing the following operators:</p>
+      
+      <ul>
+        <li><tt>OP_AL</tt>: Return all valid rows in the table. If column_id is not zero, return <tt>BAD_QUERY</tt>. <tt>other</tt> should be a Value::Null object, but you can ignore it.</li>
+        <li><tt>OP_EQ</tt>: equal to operator.</li>
+        <li><tt>OP_NE</tt>: not equal to operator.</li>
+        <li><tt>OP_LT</tt>: less than operator.</li>
+        <li><tt>OP_GT</tt>: greater than operator.</li>
+        <li><tt>OP_LE</tt>: less than or equal to operator.</li>
+        <li><tt>OP_GE</tt>: greater than or equal to operator.</li> 
+      </ul>
+      
       <p>Recall that it is possible to scan a table for id of a row, using <tt>column_id</tt> 0. Also recall that for id field or foreign field, only equal and not equal operators are supported.</p>
       
       <p>Upon success, you should return a Response::Query object, with the ids of all the rows that matched the query.</p>      
@@ -218,7 +230,7 @@ fn handle_scan(db: &amp; Database, table_id: i32, column_id: i32, operator: i32,
 
       <p>The argument to <tt>spawn</tt> should be a function (or closure) that calls <tt>handle_connection</tt>. You will require use of mutex and a referenced counted smart pointer to be able to share your database object among multiple threads safely.</p>
       
-      <p>Lastly, to prevent overloading the server, you MUST restrict the number of threads to exactly 4. After 4 threads have been created, you should refuse any additional connections until some existing connections have ended. </p>
+      <p>Lastly, to prevent overloading the server, you MUST restrict the number of threads to at most 4. After 4 threads have been created, you should refuse any additional connections until some existing connections have ended. </p>
 
       <h4 id="submission">Code Submission</h4>
       <p>To submit your code with the current commit, use the <tt>Asst4-end</tt> tag. Remember to push the new tag to the remote repository.</p>

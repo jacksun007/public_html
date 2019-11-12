@@ -117,7 +117,7 @@
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Assignment 3: Object-Relational Mapping</h1>
       </div>
-      <p><strong>Due Date: November 17th, 11:59pm</strong></p>
+      <p><strong>Due Date: November 24th, 11:59pm</strong></p>
       <p><strong>Lab TA: Jeffrey Fang</strong></p>
       <p>In this assignment, you will develop an object relational mapping (ORM) framework for EasyDB&trade; in Python.</p>
       
@@ -424,6 +424,7 @@ enum Operator {
     OP_NE = 2,  /* not equal */
     OP_LT = 3,  /* less than */
     OP_GT = 4,  /* greater than */
+    OP_AL = 7,  /* everything */
 };
 </pre>
       
@@ -437,6 +438,8 @@ enum Operator {
       
       <p>The scan command compares a column of every row in a table against a value and returns the id of all rows that matched. The <tt>column</tt> field is the column number to be matched, based on the order it appears in the table definition, starting with 1. Column 0 corresponds to the internal <tt>id</tt> field. The column type of the <tt>id</tt> field is <tt>FOREIGN</tt> The <tt>operator</tt> field specifies how to compare against the value stored in <tt>struct value</tt>.</p>
       
+      <p>When the operator is <tt>OP_AL</tt>, the server will return valid ids of every row in a table. In this case, the column type of struct value should be NULL, and the size should be zero.</p>
+      
       <div class="table-responsive">
       <table class="packet">
         <tr>
@@ -444,7 +447,7 @@ enum Operator {
         </tr>
       </table>
       </div>
-      
+
       <p>On success, the response will contain zero or more ids (zero is possible if there were no matches). <tt>BAD_QUERY</tt> is returned if one of the following errors occurred: 1) column type and value type mismatched, or 2) operator for the given type is not supported. In EasyDB, id and foreign field only support <tt>OP_EQ</tt> and <tt>OP_NE</tt>. For <tt>string</tt>, <a href="https://en.cppreference.com/w/c/string/byte/strcmp">lexicographical comparison</a> is performed (e.g., "A" is less than "B" and "5" is less than "-2").</p>
       
       <h5>Exit Command</h5>
