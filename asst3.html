@@ -420,11 +420,11 @@ SET balance 900 --------------------&gt; NO
 
 <pre>
 enum Operator {
+    OP_AL = 0,  /* everything */
     OP_EQ = 1,  /* equal */
     OP_NE = 2,  /* not equal */
     OP_LT = 3,  /* less than */
     OP_GT = 4,  /* greater than */
-    OP_AL = 7,  /* everything */
 };
 </pre>
       
@@ -438,7 +438,7 @@ enum Operator {
       
       <p>The scan command compares a column of every row in a table against a value and returns the id of all rows that matched. The <tt>column</tt> field is the column number to be matched, based on the order it appears in the table definition, starting with 1. Column 0 corresponds to the internal <tt>id</tt> field. The column type of the <tt>id</tt> field is <tt>FOREIGN</tt> The <tt>operator</tt> field specifies how to compare against the value stored in <tt>struct value</tt>.</p>
       
-      <p>When the operator is <tt>OP_AL</tt>, the server will return valid ids of every row in a table. In this case, the column type of struct value should be NULL, and the size should be zero.</p>
+      <p>When the operator is <tt>OP_AL</tt>, the server will return valid ids of every row in a table. In this case, the column type of struct value should be NULL, and the size should be zero. Note that this operator does not need to be implemented for assignment 3. It is only for assignment 4.</p>
       
       <div class="table-responsive">
       <table class="packet">
