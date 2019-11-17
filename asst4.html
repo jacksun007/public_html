@@ -132,6 +132,13 @@ cd asst4
         <li><i>server.rs</i>: Handles connections and client requests. <b>You should modify this file </b>to initialize the database object and also to add support for multiple simultaneous connections.</li>
         <li><i>database.rs</i>: Implements EasyDB database logic. <b>You should modify this file </b>to define your database object and to complete each of the EasyDB commands.</li>
       </ul>
+      
+      <p>Recall you can start the server on the command line as such:</p>
+<pre>
+cd asst4
+make
+./server [-g] PORT [FILE=default.txt] [HOST=localhost]
+</pre>      
 
       <h4 id="specification">Solution Requirements</h4>
 
@@ -154,7 +161,7 @@ fn handle_insert(db: &amp; mut Database, table_id: i32, values: Vec&lt;Value&gt;
         <li><tt>BAD_ROW</tt>: if number of values does not match number of columns.</li>
         <li><tt>BAD_FOREIGN</tt>: if foreign key reference does not exist.</li>
       </ul>  
-      <p>Upon success, you should return a Response::Insert object. You are free to choose a unique row id and version number for the newly inserted row.</p>
+      <p>Upon success, you should return a Response::Insert object. You are free to choose a unique row id and version number for the newly inserted row, but they both must be positive non-zero integers.</p>
 
       <h5>Update</h5>
 <pre>
@@ -167,7 +174,7 @@ fn handle_update(db: &amp; mut Database, table_id: i32, object_id: i64, version:
         <li><tt>TXN_ABORT</tt>: if input version number does not match version number of this row. However, if <tt>version</tt> is 0, you should always allow the update if the input values are valid.</li>
       </ul> 
 
-      <p>Upon success, you should return a Response::Update object with a new version number for the row.</p>
+      <p>Upon success, you should return a Response::Update object with a new version number for the row. The new version number can be any positive non-zero integer that has definitely not been used previously.</p>
 
       <h5>Drop</h5>
 <pre>
@@ -222,7 +229,7 @@ fn handle_scan(db: &amp; Database, table_id: i32, column_id: i32, operator: i32,
       
       <p>Recall that it is possible to scan a table for id of a row, using <tt>column_id</tt> 0. Also recall that for id field or foreign field, only equal and not equal operators are supported.</p>
       
-      <p>Upon success, you should return a Response::Query object, with the ids of all the rows that matched the query.</p>      
+      <p>Upon success, you should return a Response::Query object, with the ids of all the rows that matched the query. You are not required to sort the ids in the response. </p>      
       
       <h4 id="concurrency">Adding Concurrency</h4>
 
