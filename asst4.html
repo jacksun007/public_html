@@ -237,7 +237,9 @@ fn handle_scan(db: &amp; Database, table_id: i32, column_id: i32, operator: i32,
 
       <p>The argument to <tt>spawn</tt> should be a function (or closure) that calls <tt>handle_connection</tt>. You will require use of mutex and a referenced counted smart pointer to be able to share your database object among multiple threads safely.</p>
       
-      <p>Lastly, to prevent overloading the server, you MUST restrict the number of threads to at most 4. After 4 threads have been created, you should refuse any additional connections until some existing connections have ended. </p>
+      <p>To prevent overloading the server, you MUST restrict the number of threads to at most 4. After 4 threads have been created, you should refuse any additional connections until some existing connections have ended. Do so by shutting down the connection stream immediately after accepting the request.</p>
+      
+      <p>In order to get full marks on the assignment (the final 5%), you will need to support parallelism between independent table accesses. This means that if one thread is working on one table, another thread can simultaneously work on a different table without contention. This will require you to change your database design so that each table can be independently shared, and you will have to deal with the potential issue of deadlocks due to multiple mutexes. You should ensure that all other parts of your database is working before attempting this feat. This last part may require you to change packet.rs.</p> 
 
       <h4 id="submission">Code Submission</h4>
       <p>To submit your code with the current commit, use the <tt>Asst4-end</tt> tag. Remember to push the new tag to the remote repository.</p>
