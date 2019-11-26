@@ -174,7 +174,7 @@ fn handle_update(db: &amp; mut Database, table_id: i32, object_id: i64, version:
         <li><tt>TXN_ABORT</tt>: if input version number does not match version number of this row. However, if <tt>version</tt> is 0, you should always allow the update if the input values are valid.</li>
       </ul> 
 
-      <p>Upon success, you should return a Response::Update object with a new version number for the row. The new version number can be any positive non-zero integer that has definitely not been used previously.</p>
+      <p>Upon success, you should return a Response::Update object with a new version number for the row. The new version number must be strictly larger in value than the previous version number. You do not need to handle the case when the version number overflows 64-bit integer.</p>
 
       <h5>Drop</h5>
 <pre>
@@ -255,6 +255,7 @@ git push --tags
       <ul>
         <li>Make sure you start early - Rust is not as forgiving as Python or even C++.</li>    
         <li>Plan how you will store the data using structs and data structures in the standard library. Try to think about how you will handle more complicated features such as cascade delete (if a row is referenced by rows in other tables, those rows will also be deleted).</li>
+        <li>When running the tester. Use the <tt>-v</tt> option to turn on the <tt>-g</tt> option on your server. Your server's output will be saved to <tt>server.log</tt>.</li>
       </ul>
 
       <p><b>Rust</b></p>
