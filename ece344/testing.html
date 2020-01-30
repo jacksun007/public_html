@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>
+Operating Systems, ECE344, Winter 2020
+</title>
+  <link title="compact" rel="stylesheet" type="text/css" href="default.css">
+</head>
+
+<body>
+<table class="maintable">
+<tr>
+
+<td class="left">
+<img src="spacer.gif"  alt="" height="1" width="200">
+Instructor: <a href="http://www.eecg.toronto.edu/~yuan/">Ding Yuan</a><br>
+Course Number: ECE344<br>
+<a class="invisible" href="http://validator.w3.org/check?uri=referer">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+<h2></h2>
+<a href="index.html">Home</a><br>
+<a href="https://piazza.com/utoronto.ca/winter2020/ece344/home">Discussion (Piazza)</a><br>
+<a href="lab-documentation.html"><b>Lab Documentation</a></b><br>
+<a href="lab-assignments.html">Lab Assignments</a><br>
+<a href="lectures.html">Schedule and Lecture Notes</a><br>
+<a href="https://portal.utoronto.ca">Grades (Quercus)</a><br>
+</td>
+
+<td class="right">
+<div class="centeralign">
+<h1>Operating Systems</h1>
+<h2 class="noborder">ECE344, Winter 2020<br>
+University of Toronto</h2>
+<br>
+</div>
+
+<div class="main">
+
+
+
+<h2>The OS161 AutoTester</h2>
+
+<p>We have provided you a program called <tt>os161-tester</tt> that allows you
+to test your code with various test cases. It also simulates the way
+we will be marking your code automatically. Please use this program before
+submitting your code so that you can catch obvious svn checkout errors,
+compilation errors, etc. Please note that while we run the exact same tests to
+mark your assignments, your actual mark <em>may not</em> be the same as the mark
+you received earlier when running the tester by yourself (e.g., due to race condition). You are
+encouraged to write additional test cases to reassure yourself that your solution
+works correctly in all corner case situations. We will not accept remark requests
+if the tester exposes bugs in your code that it did not catch previously. We only
+accept remark requests when there is a bug in the tester itself.</p>
+
+<h3>Testing Your Code</h3>
+
+<p>Please use the following commands after you
+have <a href="asst1.html#build">built your kernel</a>:</p>
+
+<pre>
+  % cd ~/ece344/build
+  % os161-tester assignment_nr [test]
+</pre>
+
+<p>You will need to run the tester from the OS161 <tt>build</tt> directory. You
+must specify the assignment number to run the tests.
+If you optionally specify the name of a test then only that test will be run. 
+Otherwise, all tests available for the assignment will be run. For each test,
+you will see one or more PASS or FAIL results. You can see more verbose output
+from the tester by specifying the <tt>-v</tt> or the <tt>-V</tt> options to the
+tester. Please use <tt>os161-tester -h</tt> for more details.
+</p>
+
+<p>The output of the tester will be stored in two files in the <tt>build</tt>
+directory:
+</p>
+
+<table border="0">
+  <tr>
+    <td>os161.log:</td>
+    <td>Shows the output of your kernel when running the os161 tester.</td>
+  </tr>
+  <tr>
+    <td>os161-mark.txt:</td>
+    <td>Summarizes the marks for the various tests.</td>
+  </tr>
+</table>
+<p></p>
+
+<h3>Simulating the Marker</h3>
+
+<p>You can simulate the marker with the following commands:</p>
+
+<pre>
+  % cd ~/ece344
+  # make a brand new directory
+  % mkdir marker
+  % cd marker
+  % os161-tester -m assignment_nr
+</pre>
+
+<p>The <tt>-m</tt> option will simulate the marker functionality. It will
+checkout your code from Git using the assignment's end tag
+(e.g., <tt>asst1-end</tt>), build the code, and then run the testing
+functionality on this code.
+</p>
+
+<p>The output of the marker will be stored in four files in
+the <tt>~/ece344/marker</tt> directory. The last two files are copies of the outputs of
+  the tester.
+</p>
+
+<table border="0">
+  <tr>
+    <td>marker-&lt;group-nr&gt;.log:</td>
+    <td>Shows the output of git checkout, and configuring and building the os161 code.</td>
+  </tr>
+  <tr>
+    <td>tester-&lt;group-nr&gt;.log:</td>
+    <td>Shows the output of running the os161 tester functionality.</td>
+  </tr>
+  <tr>
+    <td>os161-&lt;group-nr&gt;.log:</td>
+    <td>Shows the output of your kernel when running the os161 tester.</td>
+  </tr>
+  <tr>
+    <td>mark-&lt;group-nr&gt;.txt:</td>
+    <td>Summarizes the marks for the various tests.</td>
+  </tr>
+</table>
+<p>You are strongly suggested to simulate the marker to ensure that your assignment has been successfully submitted.</p>
+
+</div>
+</td>
+</tr>
+</table>
+</body>
+</html>
+
+

@@ -1,0 +1,1230 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>
+Operating Systems, ECE344, Winter 2020
+</title>
+  <link title="compact" rel="stylesheet" type="text/css" href="default.css">
+</head>
+
+<body>
+<table class="maintable">
+<tr>
+
+<td class="left">
+<img src="spacer.gif"  alt="" height="1" width="200">
+Instructor: <a href="http://www.eecg.toronto.edu/~yuan/">Ding Yuan</a><br>
+Course Number: ECE344<br>
+<a class="invisible" href="http://validator.w3.org/check?uri=referer">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+<h2></h2>
+<a href="index.html">Home</a><br>
+<a href="https://piazza.com/utoronto.ca/winter2020/ece344/home">Discussion (Piazza)</a><br>
+<a href="lab-documentation.html">Lab Documentation</a><br>
+<a href="lab-assignments.html"><b>Lab Assignments</b></a><br>
+<a href="lectures.html">Schedule and Lecture Notes</a><br>
+<a href="https://q.utoronto.ca">Grades (Quercus)</a><br>
+</td>
+
+<td class="right">
+<div class="centeralign">
+<h1>Operating Systems</h1>
+<h2 class="noborder">ECE344, Winter 2020<br>
+University of Toronto</h2>
+<br>
+</div>
+
+<div class="main">
+
+<h2>Assignment 1: An Introduction to OS161</h2>
+                                
+<p>
+<b>Release date</b>: Jan. 17<br>
+<b>Due date (hard deadline, no extension)</b>: Jan. 31, 5:59 pm.<br>
+</p>
+
+<h3>Objectives</h3>
+
+<p>After this assignment, you should:</p>
+
+<ul>
+
+<li>Be familiar with Git and GDB (the GNU Debugger).</li>
+
+<li>Understand the source code structure of OS161, the software system we will
+be using this term.</li>
+
+
+<li>Understand how System/161 emulates the MIPS hardware environment on which
+OS161 runs.</li>
+
+<li>Understand the source code structure of System/161.</li>
+
+<li>Be comfortable reading the OS161 source code and figuring out where things
+are done and how they are done.</li>
+
+<li>Write some initial testing code to familiarize yourself with making changes
+to the OS161 environment.</li>
+
+<li>Understand how to implement simple system calls.</li>
+
+</ul>
+
+<h3>Introduction</h3>
+
+<p>In this assignment, we will introduce:</p>
+
+<dl>
+
+<dt><strong>System/161</strong></dt>
+
+<dd>The machine simulator for which you are building an operating system this
+  term.</dd>
+
+<dt><strong>OS161</strong></dt>
+
+<dd>The operating system you will be designing, extending, and running this
+term.</dd>
+
+<dt><strong>Git</strong></dt>
+
+<dd>Git is a source code revision control system. It manages the source files of
+a software package so that multiple programmers may work simultaneously. Each
+programmer has a private copy of the source tree and makes modifications
+independently. The main copy of the source tree is stored in an area called the
+<em>remote repository</em>. The private copy of the code is
+called the working copy. Each programmer makes modifications to their working
+copy and then commits their modifications to the remote repository. Git attempts to
+intelligently merge multiple people's modifications, highlighting potential
+conflicts when it fails.</dd>
+
+<dt><strong>GDB (Gnu Debugger)</strong></dt>
+
+
+<dd>GDB allows you to examine what is happening inside a program while it is
+running. It lets you execute programs in a controlled manner and view and set
+the values of variables. In the case of OS161, it allows you to debug the
+operating system you are building instead of the machine simulator on which that
+operating system is running.</dd>
+
+</dl>
+
+<p>The first part of this document briefly discusses the code on which you'll be
+working and the tools you'll be using. You can find more detailed information
+on <a href="git.html">Git</a> and <a href="gdb.html">GDB</a>. The following
+sections provide instructions on what you must do for this assignment.<br></p>
+
+<h3>What are OS161 and System/161?</h3>
+
+<p>The code is divided into two main parts:</p>
+
+
+<ul>
+
+<li>
+<b>OS161:</b> the operating system that you will augment in subsequent homework
+assignments.</li>
+
+
+<li>
+<b>System/161:</b> the machine simulator that emulates the physical hardware on
+which your operating system will run. This course is about writing operating
+systems, not designing or simulating hardware. Therefore, you may not change the
+machine simulator.</li>
+
+</ul>
+
+
+<p>The OS161 distribution contains a barebones operating system source tree,
+including some utility programs and libraries. After you build the operating
+system you boot, run, and test it on the simulator.</p>
+
+
+<p>We use a simulator in OS161 because debugging and testing an operating system
+on real hardware is extremely difficult. The System/161 machine simulator has
+been found to be an excellent platform for rapid development of operating system
+code, while still retaining a high degree of realism. Apart from floating point
+support and certain issues relating to RAM cache management, it provides an
+accurate emulation of a MIPS processor.</p>
+
+
+<p>Besides this initial assignment, there will be an OS161 programming
+assignment for each of the following topics:</p>
+
+
+<ul>
+
+<li>ASST2 : Synchronization and concurrent programming</li>
+
+
+<li>ASST3 : System calls and multiprogramming</li>
+
+
+<li>ASST4 : Virtual memory</li>
+
+
+</ul>
+
+
+<p>OS161 assignments are cumulative. You will need to build each assignment on
+top of your previous submission. So you will have to make sure that each of your
+assignments work correctly!</p>
+
+<h3>About Git</h3>
+
+<p>Most programming you have probably done has been in the form of 'one-off'
+assignments: you get an assignment, you complete it yourself, you turn it in,
+you get a grade, and then you never look at it again.</p>
+
+
+<p>The commercial software world uses a very different paradigm: development
+continues on the same code base producing releases at regular intervals. This
+kind of development normally requires multiple people working simultaneously
+within the same code base, and necessitates a system for tracking and merging
+changes.  Your will be working in teams of 2 on OS161 and will be developing a
+code base that will change over the couse of several assignments. Therefore, it
+is imperative that you start becoming comfortable with Git, an open source
+version control system.</p>
+
+
+<p>Git is a powerful tool, but for OS161 you only need to know a subset of its
+functionality. The <a href="git.html">Git</a> handout contains all the
+information you need to know and should serve as a reference throughout the
+term. If you'd like to learn more, there is comprehensive documentation
+available <a href="http://git-scm.com/docs">here</a>.</p>
+
+<h3>About GDB</h3>
+
+<p>In some ways debugging a kernel is no different from debugging an ordinary
+program. On real hardware, however, a kernel crash will crash the whole machine,
+necessitating a time-consuming reboot. The use of a machine simulator such as
+System/161 provides several debugging benefits. First, a kernel crash will only
+crash the simulator, which only takes a few keystrokes to restart. Second, the
+simulator can sometimes provide useful information about what the kernel did to
+cause the crash, information that may or may not be easily available when
+running directly on top of real hardware.</p>
+
+<p>To debug OS161 you must use a version of GDB configured to understand OS161
+and MIPS. This is called <tt>cs161-gdb</tt>. This version of GDB has been
+patched to be able to communicate with your kernel through System/161.</p>
+
+<p>An important difference between debugging a regular program and debugging an
+OS161 kernel is that you need to make sure that you are debugging the operating
+system, not the machine simulator. Type:</p>
+
+<pre>  % cs161-gdb sys161</pre>
+
+<p>and you are debugging the simulator. Not good. The
+handout <a href="gdb.html">Debugging with GDB</a> provides detailed instructions
+on how to debug your operating system and a brief introduction to GDB.</p>
+
+<h3>Setting up your account</h3>
+
+<p>Login to the lab machines. On your first log-in, you should change the password on your account for security purposes. You can use the <tt>passwd</tt> command to do so.</p>
+      
+<p>Start by setting up your personal information for Git, if you have not done it previously. The "--global" option will update the <tt>.gitconfig</tt> file in your home directory.</p>
+
+<pre>
+cd
+git config --global user.name "Your Name"
+git config --global user.email you@example.com
+</pre>
+   
+<p>Next step, make sure that your home directory is not accessible to others. This way you can ensure that you code will not be available to others accidentally.</p>
+      
+<pre>
+cd
+chmod 700 .  
+</pre>
+
+<p>Here, the permission <tt>700</tt> grants yourself full access to the home directory, and denies any access (no read, write or execute access) to group members or other users. For more information on Linux file permissions, you can read <a href="https://www.linux.com/tutorials/understanding-linux-file-permissions/">this article</a>.</p>
+
+<p>The OS161 tools are accessible from the
+workstation lab machines (<tt>ug*.eecg.utoronto.ca</tt>).  The ranges of
+machines that are accessible are
+roughly <tt>ug51-ug100</tt>, <tt>ug132-ug180</tt> and <tt>ug201-250</tt>. You
+will need to setup your path to access the OS161 tools. To do so, you should
+check whether you use <tt>csh</tt> or <tt>bash</tt> as follows:</p>
+
+<pre>
+  % echo $0
+</pre>
+
+<p>If the output shows <tt>sh</tt> or <tt>bash</tt>, then you are
+  using <tt>bash</tt>. If the output shows <tt>csh</tt> or <tt>tcsh</tt>, then
+  you are using <tt>csh</tt>.
+
+<ol>
+<li>For <tt>csh</tt>, add the following to the end of your <tt>~/.cshrc</tt>:
+
+<pre>  set path=( /cad2/ece344s/cs161/bin $path)</pre>
+</li>
+
+<li>For <tt>bash</tt>, add the following to the end of your <tt>~/.bashrc</tt>:
+
+<pre>  export PATH=/cad2/ece344s/cs161/bin:$PATH</pre>
+</li>
+</ol>
+
+
+<p>Then log out and log back in. Run <tt>echo $PATH</tt> and you should see the
+new path.</p>
+
+<p>At this point, one of the group members should follow the instruction under <a href="#remote">Remote Repository</a>, while the other group member should follow the instruction under <a href="#cloning">Cloning Repository</a> <em>after</em> the remote repository has been created.</p>
+      
+<a name="remote"></a><h3>Setting up Remote Repository</h3>
+
+<ol>
+<li>Make a directory in which you will do all your work. For the purposes of the
+remainder of this assignment, we'll assume that it will be
+called <tt>~/ece344</tt>.
+
+<pre>  % mkdir ~/ece344
+  % cd ~/ece344
+  % mkdir os161
+  % cd os161
+  % git init
+</pre>
+
+<p>The last command should show the following:</p>
+      
+<pre>
+Initialized empty Git repository in ~/ece344/os161/.git/
+</pre>
+</li>
+
+<li>
+<p>At this point, we (i.e., the instructor and the TAs) cannot access this repository because it is local within your home directory (that should not be accessible to others). Instead, you will submit your assignment code by creating a clone (copy) of your repository to a remote repository location that is accessible to you and to us.
+
+<p>
+You need to run these instructions once to setup your remote repository. After that, you can update the remote repository by following the instructions in the next step.</p>
+
+<p>
+Each of you has been <a href="lab-assignments.html">assigned a group number</a> for this course. Below, we use XXX to denote your 3-digit group number. The remote repository will be located on the <tt>ug250.eecg.utoronto.ca</tt> machine. Log in this machine.</p>
+
+<pre>
+ssh ug250.eecg.utoronto.ca
+</pre>
+</li>
+
+<li>
+<p>Now create your repository as follows:</p>
+      
+<pre>
+cd /srv/ece344s/os-XXX
+mkdir ece344
+chmod 770 ece344
+cd ece344
+git init --bare --shared=group
+</pre>
+
+<p>Make sure to replace XXX with your 3-digit (not 2-digit) group number. The <tt>chmod</tt> command above ensures that the repository will be accessible to the instructor and the TAs but not to other students. The <tt>git init</tt> command creates an empty Git repository:</p>
+
+<pre>
+Initialized empty shared Git repository in /srv/ece344s/os-XXX/ece344/
+</pre>
+
+<p>If this command returns an error, either you did not specify your group number
+correctly, or your remote repository exists already (e.g., your partner has already
+created it). If you really need to remove your repository (generally, a really
+bad idea), you will need to log into the remote repository machine and remove the
+repository directory.</p>
+
+</li>
+
+<li>
+<p>Now, you are done with this machine, so exit out of it. Back on your local machine, you need to tell the local repository about the location of the remote repository.</p>
+
+<pre>
+cd ~/ece344/os161/
+git remote add origin ssh://ug250.eecg.toronto.edu/srv/ece344s/os-XXX/ece344
+</pre>
+
+<p>The command shown above is run in your local repository. It associates the name origin with the remote repository. You can see that by using the git remote command.
+</p>
+
+<pre>
+git remote -v
+</pre>
+
+<p>It will show the following:</p>
+
+<pre>
+    origin  ssh://ug250.eecg.toronto.edu/srv/ece344s/os-XXX/ece344 (fetch)
+    origin  ssh://ug250.eecg.toronto.edu/srv/ece344s/os-XXX/ece344 (push)
+</pre>
+
+</li>
+
+<li>You are now ready to make the first commit to your remote repository. Unpack the OS161 distribution (available in the course directory) by typing 
+
+<pre>  
+% cd ~/ece344/os161
+% tar xzf /cad2/ece344s/tester/src/os161-1.11a.tar.gz
+</pre>
+</li>
+
+<li><p>Your next step is to stage the starter code for commit, which means to add the files into a list of files to be committed.</p>
+
+<pre>
+git add .
+</pre>
+
+<p>Now, type <tt>git status</tt> to see what happens:</p>
+<pre>
+On branch master
+
+Initial commit
+
+Changes to be committed:
+  (use "git rm --cached &lt;file&gt;..." to unstage)
+
+	new file:   .gitignore
+	new file:   CHANGES
+	new file:   COPYING
+    ...
+</pre>   
+</li>
+
+<li>
+<p>The starter code is now ready to be committed, which means the repository will track the files and possibly keep multiple versions of them for your debugging or auditing purposes. To commit the all staged files, type the following:</p>
+      
+<pre>
+git commit -m "added starter code"
+</pre>
+
+<p>The "-m" option allows you to associate a message about what changed to the commit. You should see a large message that says 546 files changed, 43001 insertions, followed by a list of the files created.</p>
+</li>
+
+<li>
+<p>Now we want to push the changes that we made to the remote repository, thus making it available to your partner and us. You can do so with the following command:</p>
+
+<pre>
+git push origin master
+</pre>
+
+<p>You should see something like this:</p>
+
+<pre>
+Counting objects: 640, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (638/638), done.
+Writing objects: 100% (640/640), 384.18 KiB | 0 bytes/s, done.
+Total 640 (delta 51), reused 0 (delta 0)
+remote: Resolving deltas: 100% (51/51), done.
+To ssh://ug250.eecg.toronto.edu/srv/ece344s/os-XXX/ece344
+ * [new branch]      master -&gt; master
+</pre>
+
+<p>Note that from now on, you do not need to specify "origin master" to push to remote repository anymore. Simply <tt>git push</tt> is sufficient.</p>
+</li> 
+
+<li>To start the assignment, use the <tt>git tag</tt> command to tag the current version of the repository so that you can later reference this initial version of the code base by name for commands such as <tt>git diff</tt> or <tt>git checkout</tt>. Read the <a href="https://git-scm.com/docs/git-tag">Git-tag Manual Page</a> for more information about git tags.
+
+<pre>
+% cd ~/ece344/os161
+% git tag asst1-start
+% git push --tags
+</pre>
+
+You will later use git tags to submit your assignment, so become familiar with this command.
+</li>
+
+</ol>
+
+<p>Note that in addition to OS161, you can also download the distributions for System/161,
+the machine simulator, and the OS161 toolchain. If you are developing on the lab
+machines, you <b>do not</b> need these additional files, as they are already
+installed.  If you wish to develop on your home machine at home, you will need
+to download, build, and
+install <a href="./os161/sources/os161-toolchain.tar.gz">this package</a> as
+well. Note that we do not provide support for installing this package. Also, you
+must ensure that your assignment works on the lab machines.</p>
+
+<p>You're done! It is now time for your partner to get a copy of the repository.</p>
+
+
+<a name="cloning"></a><h3>Checkout Code by Cloning Repository</h3>
+
+<p>After the remote repository setup is complete, the second partner can clone a copy of
+the OS161 code in their own directory as follows:</p>
+
+<ol>
+<li>You will first need to create the <tt>~/ece344</tt> directory, if it does not exist already:
+<pre>
+% cd ~
+% mkdir ece344
+</pre>
+</li>
+
+<li>Now, clone the remote repository into the os161 folder (replace XXX with your group number):
+
+<pre>
+% cd ~/ece344
+% git clone ssh://ug250.eecg.toronto.edu/srv/ece344s/os-XXX/ece344 os161
+</pre>
+
+<p>This will create a local repository in <tt>~/ece344/os161</tt>. Now both you and your partner have a copy of the repository and are connected to the same remote repository.</p>
+</li>
+
+<li>When any one of you pushes new commits to the remote repository, the other partner
+will need to update his/her local repository with your changes. This can be done as such:
+
+<pre>
+% cd ~/ece344/os161
+% git pull
+</pre>
+
+Note that it is possible that your partner's commits will conflict with yours. In this case, you will need to <em>merge</em> your changes. Merging requires that you carefully consider your changes and decide which one should be used. Git will alter all files in conflict such that each file shows what you need to manually handle. For more information, please read the <a href="https://www.atlassian.com/git/tutorials/using-branches/git-merge">Git-merge Manual Page</a>.
+</li>
+
+</ol>
+
+<h3>Code reading</h3>
+
+<p>One of the challenges of OS161 is that you are going to be working with a
+large body of code that was written by someone else.  When doing so, it is
+important that you grasp the overall organization of the entire code base,
+understand where different pieces of functionality are implemented, and learn
+how to augment it in a natural and correct fashion. As you and your partner
+develop code, although you needn't understand every detail of your partner's
+implementation, you still need to understand its overall structure, how it fits
+into the greater whole, and how it works.</p>
+
+
+<p>In order to become familiar with a code base, there is no substitute for
+actually sitting down and reading the code.  Admittedly, most code makes poor
+bedtime reading (except perhaps as a soporific), but it is essential that you
+read the code. It is all right if you don't understand most of the assembly code
+in the codebase; it is not important for this class that you know assembly.</p>
+
+
+<p>You should use the code reading questions included below to help guide you
+through reviewing the existing code. While you needn't review every line of code
+in the system in order to answer all the questions, we strongly recommend that
+you look over at least <strong>every</strong> file in the kernel.</p>
+
+
+<p>The key part of this exercise is understanding the base system. Your goal is
+to understand how it all fits together so that you can make intelligent design
+decisions when you approach future assignments. This may seem tedious, but if
+you understand how the system fits together now, you will have much less
+difficulty completing future assignments. Also, it may not be apparent yet, but
+you have much more time to do so now than you will at any other point in the
+term.</p>
+
+
+<p>The file system, I/O, and network sections may seem confusing since we have
+not discussed how these components work. However, it is still useful to review
+the code now and get a high-level idea of what is happening in each
+subsystem. If you do not understand the low-level details now, that is OK.</p>
+
+
+<p>These questions are not meant to be tricky -- most of the answers can be
+found in comments in the OS161 source, though you may have to look elsewhere
+(such as Tanenbaum) for some background information. Make sure that you can
+answer these questions, which may be asked during the midterm or the final exams.</p>
+
+<h4>Top level directory</h4>
+
+<p>In the top-level os161 directory (created by the checkout above), you will
+find the following files:</p>
+
+
+<p><tt>configure: </tt>top-level configuration script; configures the OS161
+distribution, including all the provided utilities, but does not configure the
+operating system kernel.</p>
+
+
+<p><tt>Makefile: </tt>top-level makefile; builds the OS161 distribution,
+including all the provided utilities, but does not build the operating system
+kernel.</p>
+
+
+<p>You will also find the following directories:</p>
+
+
+<p><tt>kern: </tt>the kernel source code.</p>
+
+<p><tt>lib: </tt> user-level library code lives here. We have only two
+libraries: <tt>libc</tt>, the C standard library, and
+<tt>hostcompat</tt>, which is for recompiling OS161 programs for
+the host UNIX system. There is also a <tt>crt0</tt> directory,
+which contains the startup code for user programs.</p>
+
+<p><tt>include: </tt> these are the include files that you would typically find
+in <tt>/usr/include</tt> (in our case, a subset of them). These are user level
+include files; not kernel include files.</p>
+
+<p><tt>testbin: </tt> these are pieces of test code.</p>
+
+<p><tt>bin: </tt> all the utilities that are typically found in
+<tt>/bin</tt>, e.g., <tt>cat, cp, ls</tt>, etc. The things in bin are considered
+"fundamental" utilities that the system needs to run.</p>
+
+<p><tt>sbin:</tt> this is the source code for the utilities typically found
+in <tt>/sbin</tt> on a typical UNIX installation.  In our case, there are some
+utilities that let you halt the machine, power it off and reboot it, among other
+things.</p>
+
+<p><tt>man: </tt>the OS161 manual ("man pages") appear here. The man pages
+document (or specify) every program, every function in the C library, and every
+system call. You will use the system call man pages for reference in the course
+of assignment 2. The man pages are HTML and can be read with any browser.</p>
+
+
+<p><tt>mk: </tt>fragments of makefiles used to build the system.</p>
+
+<p>You needn't understand all the files in bin, sbin, and testbin now, but you
+certainly will later on. In fact, you will be adding a directory to testbin in
+this assignment. Eventually, you will want to modify other files in these
+directories and/or write your own utilities and these are good
+models. Similarly, you need not read and understand everything in lib and
+include, but you should know enough about what's there to be able to get around
+the source tree easily. The rest of this code walk-through is going to concern
+itself with the kern subtree.</p>
+
+<h4>The kern subdirectory</h4>
+
+
+<p>Once again, there is a Makefile. This Makefile installs header files but does
+not build anything.</p>
+
+
+<p>In addition, we have more subdirectories for each component of the kernel as
+well as some utility directories. <tt>kern/arch:</tt> This is where
+architecture-specific code goes. By architecture-specific, we mean the code that
+differs depending on the hardware platform on which you're running. There is one
+directory here: <tt>mips</tt> which contains code specific to the MIPS
+processor.</p>
+
+
+<p><tt>kern/arch/mips/conf/conf.arch:</tt> This tells the kernel config script
+where to find the machine-specific, low-level functions it needs (throughout
+kern/arch/mips/*).</p>
+
+
+<p><b>Question 0.</b> What is the default compile option that we use for OS161's
+virtual memory system?</p>
+
+
+<p><tt>kern/arch/mips/include:</tt> This folder and its subdirectories include
+files for the machine-specific constants and functions.</p>
+
+
+<p><b>Question 1.</b> In what file would you look to figure out how the various
+machine registers are labeled in OS161?</p>
+
+
+<p><b>Question 2.</b> What are some of the details which would make a function
+"machine dependent"? Why might it be important to maintain this separation,
+instead of just putting all of the code in one function?</p>
+
+
+<p><tt>kern/arch/mips/*:</tt> The other directories contain source files for the
+machine-dependent code that the kernel needs to run.  Most of this code is quite
+low-level.</p>
+
+
+<p>
+<b>Question 3.</b> What will happen if you try to run on a
+machine with more than 512 MB of memory?</p>
+
+<p><b>Question 4.</b> What bus/busses does OS161 support?</p>
+
+<p><tt>kern/compile:</tt> This is where you build kernels. In the compile
+directory, you will eventually find one subdirectory for each kernel you want to
+build. In a real installation, these will often correspond to things like a
+debug build, a profiling build, etc. In our world, each build directory will
+correspond to a programming assignment, e.g., ASST1, ASST2, etc. These
+directories are created when you configure a kernel (described in the next
+section). This directory and build organization is typical of UNIX installations
+and is not universal across all operating systems.
+<tt>kern/conf:</tt> <tt>config</tt> is the script that takes a
+config file, like ASST1, and creates the corresponding build
+directory (shown later).</p>
+
+<p><tt>kern/include:</tt> These are the include files that the kernel
+needs. The <tt>kern</tt> subdirectory contains include files that are visible
+not only to the operating system itself, but also to user-level programs. (Think
+about why it's named "kern" and where the files end up when installed.)</p>
+
+<p><b>Question 5.</b> What would splx(splhigh()) do?</p>
+
+<p><b>Question 6.</b> Why do you think types.h defines explicitly-sized types
+such as int32_t instead of using the shorter int?</p>
+
+<p><b>Question 7.</b> What about type names such as __time_t? What other purpose
+might these type definitions serve?</p>
+
+
+<p><b>Question 8.</b> What is the interface to a device driver (i.e., what
+functions must you implement to add a new device)?</p>
+
+
+<p><b>Question 9.</b> What is the easiest way to add debug messages to your
+operating system?</p>
+
+
+<p><b>Question 10.</b> What synchronization primitives are defined for
+OS161?</p>
+
+
+<p><b>Question 11.</b> What is the difference between a thread_yield and a
+thread_sleep?</p>
+
+
+<p><b>Question 12.</b> What version of OS161 are you running? Why might this be
+important to know?</p>
+
+
+<p><tt>kern/lib:</tt> These are library routines used throughout the kernel,
+e.g., arrays, kernel printf, etc.</p>
+
+
+<p><tt>kern/main:</tt> This is where the kernel is initialized and where the
+kernel main function is implemented.</p>
+
+
+<p><tt>kern/thread:</tt> Threads are the fundamental abstraction on which the
+kernel is built (do not forget to look back at header files!)</p>
+
+
+<p><b>Question 13.</b> What data structure do we use to keep track of the
+runnable threads in the system?</p>
+
+
+<p><b>Question 14.</b> Which synchronization primitives are completely provided
+for you? (Guess when the others will exist.)</p>
+
+
+<p><b>Question 15.</b> What is a zombie?</p>
+
+
+<p><tt>kern/asst1:</tt> This is the directory that contains the framework
+code that you will need to complete assignment 1. You can safely ignore it for
+now.</p>
+
+
+<p><tt>kern/userprog:</tt> This is where you will add code to create and manage
+user level processes. As it stands now, OS161 runs only kernel threads; there is
+no support for user level code. In Assignment 2, you'll implement this
+support.</p>
+
+
+<p>
+<tt>kern/vm:</tt> This directory is also fairly vacant. In Assignment 3, you'll
+implement virtual memory and most of your code will go in here.</p>
+
+
+<p>
+<b>Question 16.</b> What is the purpose of functions like copyin and copyout in
+copyinout.c? What do they protect against? Where might you want to use these
+functions?</p>
+
+
+<p><tt>kern/dev:</tt> This is where all the low level device management code is
+stored. </p>
+
+<p><b>Question 17.</b> Look at how <tt>getch</tt> is implemented. It is the
+function for reading a character from the terminal. Which function in the kernel
+will the hardware call when a character is received from the terminal?</p>
+
+<p><tt>kern/fs:</tt> The file system implementation has two directories. We'll
+talk about each in turn. <tt>kern/fs/vfs</tt> is the file-system independent
+layer (<tt>vfs</tt> stands for "Virtual File System"). It establishes a
+framework into which you can add new file systems easily. You will want to go
+look at <tt>vfs.h</tt> and <tt>vnode.h</tt> before looking at this
+directory.</p>
+
+
+<p><b>Question 18.</b> What happens when you do a read on /dev/null?</p>
+
+
+<p><b>Question 19.</b> What lock protects the current working directory?</p>
+
+
+<p><tt>kern/fs:</tt> This is where the actual file systems go. The
+subdirectory <tt>sfs</tt> contains a simple default file system.  You will
+augment this file system as part of Assignment 4, so we'll ask you more
+questions about it then.</p>
+
+
+<p><b>Question 20.</b> The vnode layer is file system independent; why is there
+a file sfs_vnode.c in the sfs directory? What is the purpose of the routines in
+that file?</p>
+
+
+<a name="build"></a><h3>Building a kernel</h3>
+
+<p>Now it is time to build a kernel. You will need to configure a kernel and
+then build it.</p>
+
+<ol>
+
+<li>Configure your tree for the machine on which you are
+working.
+
+<pre>  % cd ~/ece344/os161
+  % ./configure --werror --ostree=$HOME/ece344/build
+</pre>
+
+Note the use of <tt>$HOME</tt> instead of <tt>~</tt>. The <tt>--ostree</tt>
+option specifies the root of the OS tree, and the <tt>--werror</tt> option will turn
+compiler warnings into errors. All programs will be installed in the <tt>build</tt> folder
+after the next step. Within the simulator, the root directory within the <tt>build</tt> folder
+will be accessible as
+the <tt>/</tt> directory. For example, programs in the <tt>bin</tt> directory
+will be installed in <tt>~/ece344/build/root/bin</tt> and accessible as <tt>/bin</tt>
+within the simulator. <tt>./configure --help</tt> explains other configure
+options.
+</li>
+
+<li>Now let's build and install the user level utilities. If you have any
+  compilation issues, make sure that your <tt>$PATH</tt> variable is set
+  correctly as described above.
+
+<pre>  % make
+</pre>
+
+</li>
+
+<li>Now for the kernel. Configure a kernel named ASST1. 
+
+<pre>  % cd ~/ece344/os161
+  % cd kern/conf
+  % ./config ASST1
+</pre>
+
+This will create the ASST1 build directory in <tt>kern/compile</tt>. The next
+step will actually build a kernel in this directory. Note that you should
+specify the complete pathname <tt>./config</tt> when you configure OS161. If you
+omit the <tt>./</tt>, you may end up running the configuration command for the
+system on which you are building OS161, and that is almost guaranteed to produce
+rather strange results!</li>
+
+<li>Build and install the ASST1 kernel. 
+
+<pre>  % cd ~/ece344/os161/kern
+  % cd compile/ASST1
+  % make depend
+  % make
+  % make install
+</pre>
+</li>
+
+</ol>
+
+<h3>Running your kernel</h3>
+
+<ol>
+
+<li>Change to your build directory. Copy the assignment 1 simulator configuration file
+into the build directory.
+
+<pre>  % cd ~/ece344/build
+  % cp /cad2/ece344s/tester/sysconfig/sys161-asst1.conf sys161.conf
+</pre>
+
+You should take a look at this file, as it describes how to configure the
+simulator you will be running your code in.</li>
+
+<li>Run the machine simulator on your operating system. 
+<pre>  % sys161 kernel
+</pre>
+</li>
+
+<li>At the OS161 command prompt, run the <tt>poweroff</tt> command that tells
+  the system to shut down as follows.
+
+<pre>
+  OS/161 kernel [? for menu]: p /sbin/poweroff
+</pre>
+
+Note that the <tt>p</tt> command in OS161 is used to run a program.
+
+</li>
+
+</ol>
+
+<h3>Deliverable 1: Practice modifying your kernel</h3>
+
+<p>Locate the code that prints the name of your group and change it to print
+anything else other than the current message. For example:</p>
+
+<pre>
+sys161: System/161 release 1.14, compiled Jan 13 2015 13:55:47
+
+OS/161 base system version 1.11a
+Copyright (c) 2000, 2001, 2002, 2003
+   President and Fellows of Harvard College.  All rights reserved.
+
+My-Little-Pony's system version 0 (ASST1 #1)
+
+Cpu is MIPS r2000/r3000
+348k physical memory available
+Device probe...
+lamebus0 (system main bus)
+...
+</pre>
+
+<p>Note that the name of the fictitious group is My-Little-Pony, in case you are not sure what got changed.</p>
+<!--
+<ol>
+
+<li>Create a file called <tt>~/ece344/os161/kern/main/hello.c</tt>.</li>
+
+
+<li>In this file, write a function called <tt>hello</tt> that
+uses <tt>kprintf()</tt> to print "Hello World\n".</li>
+
+
+<li>Edit <tt>kern/main/main.c</tt> and add a call (in a suitable place)
+to <tt>hello()</tt>.</li>
+
+
+<li>You must place a function prototype for <tt>hello()</tt> in some header file
+that both <tt>hello.c</tt> and <tt>main.c</tt> include. For example, you could
+place it in <tt>kern/include/lib.h</tt>. If you do so, you may need to include
+some header files other than <tt>lib.h</tt> in <tt>hello.c</tt>. Or, you could
+create <tt>kern/include/hello.h</tt>, and have <tt>hello.c</tt>
+and <tt>main.c</tt> include <tt>hello.h</tt>.</li>
+
+
+<li>You must also add <tt>hello.c</tt> to your <tt>conf.kern</tt>
+in <tt>kern/conf/</tt>.</li>
+
+<li>Reconfigure and rebuild your kernel. Note that you should only need to
+reconfigure the kernel (with the <tt>./config</tt> command shown earlier) when
+you add or remove files from the kernel. Otherwise, running <tt>make</tt>
+and <tt>make install</tt> is sufficient for rebuilding the kernel.</li>
+
+<li>Make sure that your new kernel runs and displays the new
+message.</li>
+
+</ol>
+-->
+
+<h3>Using GDB</h3>
+
+<ol>
+
+<li>For using gdb, you will need two windows (terminals). If you are logged in
+remotely, now is a good time to learn about the <a href="screen.html">screen</a>
+command, which will make it easier for you to work with multiple windows.  Run
+the kernel in gdb by first running the kernel in the run window, and then attach
+gdb to the kernel from the debug window.
+
+<pre>  (In the run window:)
+  % cd ~/ece344/root
+  % sys161 -w kernel
+
+  (In the debug window:)
+  % cd ~/ece344/root
+  % cs161-gdb kernel
+  (gdb) target remote unix:.sockets/gdb
+  (gdb) break menu
+  (gdb) c
+     [gdb will stop at menu() ...]
+  (gdb) where
+     [displays a nice back trace...]
+  (gdb) detach
+  (gdb) quit
+</pre>
+
+</li>
+
+</ol>
+
+<h3>Practice with Git</h3>
+
+
+<p>In order to build your kernel above, you already checked out a
+source tree. Now we'll demonstrate some of the most common features
+of Git.</p>
+
+<ol>
+
+<li>First, make sure that you have completed updating your working copy to
+include the necessary file(s) from deliverable 1 above. <tt>git
+status</tt> is your friend here. Run this command
+in <tt>~/ece344/os161</tt>. You should only see files that you have modified or
+added to your working copy.
+</li>
+
+<li>From within your <tt>~/ece344/os161/kern</tt> directory, execute: 
+
+<pre>  % git status
+</pre>
+
+Note that the files you changed shows status 'modified'.</li>
+
+<li>Execute 
+
+<pre>  % cd ~/ece344/os161/
+  % git diff
+</pre>
+
+to display the differences between your changes versus the previously committed version.</li>
+
+<li>Now stage your changes with the add command:
+
+<pre>git add :/</pre>
+
+:/ means everything in the repository that has been created, modified, or deleted. Alternatively, you
+can specify the <tt>-u</tt> option to only stage only existing files (modified
+or deleted). You can also specify a subdirectory or specific file with <tt>git add</tt>,
+e.g.:
+
+<pre>
+git add path/to/file
+</pre>
+
+You may wish to consult the <a href="https://mirrors.edge.kernel.org/pub/software/scm/git/docs/git-add.html">git-add Manual Page</a> for more information.
+</li>
+
+<li>Now commit your changes using <tt>git commit</tt>. This command will commit your changes. The
+command invokes an editor so that you can add a log message. For short commit messages, you
+can use the <tt>-m</tt> option of commit.</li>
+
+<li>Push your changes to the remote repository so that your partner will have access to it.
+<pre>
+% git push
+</pre>
+</li>
+
+<li>As an exercise, try removing the first 100 lines of <tt>kern/main/main.c</tt>.</li>
+
+<li>Try to build your kernel (this ought to fail).</li>
+
+<li>Realize the error of your ways and get back a good copy of the file.
+
+<pre>
+% cd ~/ece344/os161/kern
+% git checkout main/main.c
+</pre>
+
+</li>
+
+
+<li>Try to build your tree again.</li>
+
+
+<li>Now, examine the <tt>DEBUG</tt> macro in <tt>lib.h</tt>. Based on your
+earlier reading of the operating system, try adding ten useful debugging messages to
+your operating system.</li>
+
+<li>Now, see where you inserted these DEBUG statements by doing a diff.
+
+<pre>  % cd ~/ece344/os161/kern
+  % git diff
+</pre>
+
+</li>
+
+</ol>
+
+<h3>Deliverable 2: Changing the OS menu</h3>
+
+<p>When you run your kernel under the simulator, typing <tt>?</tt> shows a kernel
+menu. This menu allows running various commands. For example, <tt>?t</tt> shows
+various tests that you can run.</p>
+
+<p>In this part of the lab, you will add some new options to the OS menu.</p>
+
+<p>The <tt>DEBUG</tt> macro uses the <tt>dbflags</tt> variable in the
+kernel. Depending on the value of this variable, different types of debugging
+messages are printed. For example, if its value is 0x012,
+then <tt>DB_SYSCALL</tt> and
+<tt>DB_THREADS</tt> messages are printed. Why?</p>
+
+<p>The problem is that if you want to see different types of messages, the
+  <tt>dbflags</tt> variable has to be changed and the kernel has to be
+recompiled. The reason you may want to see different types of messages is that
+printing all types of messages may make it harder to debug a specific
+problem.</p>
+
+<p>Your task is to allow changing the value of the <tt>dbflags</tt> variable
+from the OS menu.</p>
+
+<p>First, find out the initial value of this variable. Then change the OS menu
+  code (where is it located?) so that the menu output is as follows:</p>
+
+<pre>
+OS/161 kernel [? for menu]: ?o
+
+OS/161 operations menu
+    [s]       Shell                     [pf]      Print a file
+    [p]       Other program             [cd]      Change directory
+    [dbflags] Debug flags               [pwd]     Print current directory
+    [mount]   Mount a filesystem        [sync]    Sync filesystems
+    [unmount] Unmount a filesystem      [panic]   Intentional panic
+    [bootfs]  Set "boot" filesystem     [q]       Quit and shut down
+
+Operation took 0.058339600 seconds
+OS/161 kernel [? for menu]: dbflags
+
+OS/161 Debug flags
+    [df 1 on/off]        DB_LOCORE      [df 7 on/off]        DB_EXEC
+    [df 2 on/off]        DB_SYSCALL     [df 8 on/off]        DB_VFS
+    [df 3 on/off]        DB_INTERRUPT   [df 9 on/off]        DB_SFS
+    [df 4 on/off]        DB_DEVICE      [df 10 on/off]       DB_NET
+    [df 5 on/off]        DB_THREADS     [df 11 on/off]       DB_NETFS
+    [df 6 on/off]        DB_VM          [df 12 on/off]       DB_KMALLOC
+
+Current value of dbflags is 0x0
+Operation took 0.058040000 seconds
+</pre>
+
+<p>Note that <tt>?o</tt> produces a new
+option <tt>[dbflags]</tt>. Typing <tt>dbflags</tt> produces the new menu. With
+this menu, typing <tt>df 5 on</tt> will turn on <tt>DB_THREADS</tt> messages,
+and typing <tt>df 5 off</tt> will turn off these messages.</p>
+
+
+<pre>
+OS/161 kernel [? for menu]: df 5 on
+Operation took 0.000024960 seconds
+OS/161 kernel [? for menu]: dbflags
+
+OS/161 Debug flags
+    [df 1 on/off]     DB_LOCORE         [df 7 on/off]     DB_EXEC
+    [df 2 on/off]     DB_SYSCALL        [df 8 on/off]     DB_VFS
+    [df 3 on/off]     DB_INTERRUPT      [df 9 on/off]     DB_SFS
+    [df 4 on/off]     DB_DEVICE         [df 10 on/off]    DB_NET
+    [df 5 on/off]     DB_THREADS        [df 11 on/off]    DB_NETFS
+    [df 6 on/off]     DB_VM             [df 12 on/off]    DB_KMALLOC
+
+Current value of dbflags is 0x10
+Operation took 0.062876880 seconds
+</pre>
+
+<p>If you type <tt>df 3 on</tt> after the code shown above, the dbflags value
+should then be 0x14. This part of the lab will help you exercise bit
+manipulation skills, which will be useful in later labs.</p>
+
+<p>Your code should also ensure that the arguments to <tt>df</tt> are passed
+correctly, or else your code should print the following in a separate line:</p>
+
+<pre>
+Usage: df nr on/off
+</pre>
+
+<h3>Deliverable 3: System Calls (OPTIONAL)</h3>
+<a name="syscalls"></a>
+
+<p><em>Please note that deliverable 3 is <b>optional</b>. It is not for marks and 
+is intended for you to get ahead in the later assignments if you so choose. These system calls, however,
+are required for assignment 3 and 4, so finishing them now can save you some time down the road. The
+<a href="testing.html">os161-tester</a> does provide test cases for them, but
+they do not affect your marks for this assignment. It is important to note 
+that you <b>must</b> finish deliverable 1 and 2 to get full marks for this 
+assignment.</em></p> 
+
+<p>In a real operating system, the main purpose of a kernel is
+to provide support for user-level programs.  Most such support is accessed via
+system calls. We have provided you with the <tt>reboot</tt> system call. 
+In this assignment, you will implement some simple system calls.</p>
+
+<p>The full range of system calls that we think you might want over the
+course of the semester is listed in <tt>kern/include/kern/callno.h</tt>. 
+For this assignment, you need to design and implement the following system calls:</p>
+
+<ul>
+<li> <h5>_exit</h5> 
+<p>
+Right now, when you run any program (not a command), you will see the message:
+<tt>Unknown syscall 0</tt>. You can try this by running a dummy program with the
+command: <tt>p /bin/true</tt>. This occurs because the program calls the 
+<tt>_exit()</tt> system call when it is finished, but you have not implemented
+the system call yet. You will revisit this system call in assignment 3. For now,
+write some placeholder code for this system call to suppress the warning.
+</p>
+</li>
+<li> <h5>write</h5>
+
+<p>When you run some of the test programs, you will notice that <tt>printf()</tt> and
+other console-printing libc calls 
+do not work. You will need to implement a system call to make <tt>printf()</tt>
+and other console-printing calls work. You should first figure out which
+system call is eventually used to perform the printing, and implement this system call. (Hint: how does the kernel itself print messages?)
+The implementation of this system call should be straightforward. However, its correctness
+is critical: if it does not work properly, many tests will fail in very confusing ways.
+Therefore we strongly suggest that you test it in isolation and only move on after you're
+confident about its correctness.</p>
+
+</li>
+
+<li> <h5>read</h5>
+<p>To get some of the testing programs to work, you will also need to implement
+a read system call that reads one character at a time. The implementation of this system call should be straightforward. 
+However, similar to the printing system call, its correctness
+is critical. 
+Therefore we strongly suggest that you test it in isolation and only move on after you're
+confident about its correctness.
+</p>
+<p>You are only required to support reading in one character at a time. In other words,
+if the length of the buffer is not 1, then you may return the error code EUNIMP, 
+which means "not implemented".</p>
+</li>
+
+<li> <h5>sleep</h5>
+<p>This system call allows a thread go to sleep (i.e., not be scheduled).
+</li>
+<li> <h5>__time</h5>
+<p>This system call returns the current time down to the nanoseconds. It is later
+used by the tester to measure performance of your implementation.
+</li>
+</ul>
+
+<p>To successfully implement system calls, you will need to modify machine-specific code which handles switching from userspace to the kernel. You should study the function <tt>mips_syscall</tt> under <tt>os161/kern/arch/mips/mips</tt>. As a starter, look at how it implements the <tt>reboot</tt> system call and first try to implement the <tt>_exit</tt> system call. The function prototype of each system call is explained in their respective manual page under <tt>os161/man/syscall</tt>. For most of these system calls, you should be able to find very similar functions that have already been implemented in the kernel (e.g. check out <tt>os161/kern/include/lib.h</tt>). All you need to do is to call these respective functions to implement the system calls.</p>
+
+<p>For system calls that have pointer arguments (e.g., <tt>write</tt>, <tt>read</tt>, <tt>__time</tt>), you need to be very careful with handling them. A userspace program must not be allowed to crash the kernel by passing invalid pointer arguments. Study the use of <tt>copyin</tt> and <tt>copyout</tt> in the <tt>uiomove</tt> function under <tt>os161/kern/userprog</tt>. Also read the comments at the top of <tt>os161/kern/lib/copyinout.c</tt>.</p>
+
+<h3>Assignment Submission</h3>
+
+<p>Finally, you need to submit your code for this assignment.</p>
+
+<ol>
+<li>Once you are confident that your assignment is done,
+run <tt>make clean</tt> from the <tt>os161</tt> directory. This will clean all
+generated files. Then use <tt>git status</tt> in the <tt>os161</tt> directory to
+find out the status of all files. Make sure to commit and push all files before continuing with the submission process. Also make sure that your partner's changes are also
+committed.</li>
+
+<li>To submit your assignment, tag your repository for the end of assignment 1 and push the tags to the remote repository:
+
+<pre>
+% git tag asst1-end
+% git push --tags
+</pre>
+</li>
+
+<li>If you need to re-submit (before the deadline), delete the existing tag and push a new version of the tag <em>after</em> you committed your new changes:
+
+<pre>
+% git push  # push your new changes to remote repository first
+
+% git tag -d asst1-end      # delete old tag
+% git tag asst1-end         # create new tag
+% git push --tags --force   # force remote repository to update to new tag
+</pre>
+</li>
+
+</ol>
+
+<h3>Testing your assignment with the autotester</h3>
+
+<p>Please read the <a href="testing.html">instructions for testing your code</a>. We will run identical tests to mark your assignment, so make sure to use the tester to check your progress. After submission, you are suggested to run the tester in marker mode to verify that your submission has been received correctly.
+</p>
+
+<p>Note that because deliverable 3 is optional, you may end up with more marks than the total (e.g. 50/12). Please make sure you complete <b>name</b> and <b>dbflags</b> as they are mandatory for deliverable 1 and 2. Failure to do so will result in loss of marks, even if you completed deliverable 3.</p>
+<br>
+<br>
+</div>
+</td>
+</tr>
+</table>
+</body>
+</html>
+
