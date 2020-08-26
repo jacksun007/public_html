@@ -95,7 +95,7 @@
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Assignment 1: EasyDB Database Driver</h1>
       </div>
-      <p><strong>Due Date: Sunday, September 27, 11:59pm</strong></p>
+      <p><strong>Due Date: Thursday, October 1st, 11:59pm</strong></p>
       <p><strong>Lab TA: Wendy Qiu</strong></p>
       <p>In this assignment, you will develop the driver code for communicating with EasyDB&trade; in Python3.</p>
       
@@ -117,7 +117,9 @@
 		A row is a set of related data that is given meaning through the table it exists in. 
 		To insert a row into a table, each value of the row must have the same type as what is defined in the table, 
 		in the same order. Also, the number of values in a row must be exactly equal to the number of columns defined in the table. 
-		For example, a User table may have the columns: <tt>firstName</tt>, <tt>lastName</tt>, <tt>height</tt> and <tt>age</tt>. A row in a User table may be ("John", "Smith", 5.5, 31), which correctly represents a single user in this table. A table, of course, can have many rows, allowing you to store multiple users in a User table. </p>
+		For example, a User table may have the columns: <tt>firstName</tt>, <tt>lastName</tt>, <tt>height</tt> and <tt>age</tt>. 
+		A row in a User table may be ("John", "Smith", 5.5, 31), which correctly represents a single user in this table. 
+		A table, of course, can have many rows, allowing you to store multiple users in a User table. </p>
       
       <h4 id="schema">Database Schema</h4>
       
@@ -133,7 +135,7 @@
       <p>In EasyDB, each column in a table can be one of four types: <tt>integer</tt>, <tt>float</tt>, <tt>string</tt>,
 	  or foreign key (i.e. a "pointer" to a record in another table). To specify a foreign key type, use the name of the referenced table. 
 	  The names of a table or column must start with a letter, followed by letters (either case), numbers, or underscore. 
-	  For example, 888pkr and _private is not allowed, but a5_ is. 
+	  For example, 888pkr and _private is not allowed, but a5_ is. In addition, "<tt>id</tt>" is a reserved word and cannot be used as a column name.
 	  Here is an example of a complete database schema:</p>
       
 <pre>
@@ -445,8 +447,9 @@ enum Operator {
 	    based on the order it appears in the table definition, starting with 1. Column 0 corresponds to the internal <tt>id</tt> field. 
 		The column type of the <tt>id</tt> field is <tt>FOREIGN</tt>. The <tt>operator</tt> field specifies how to compare against the value stored in <tt>struct value</tt>.</p>
       
-      <p>When the operator is <tt>OP_AL</tt>, the server will return valid ids of every row in a table. In this case, the <em>column</em> field of the packet is ignored (suggestion: set it to 0).
-	    The <em>type</em> field of <em>struct value</em> should be <em>NULL</em>, and the <em>size</em> should be set to zero.</p>
+      <p>When the operator is <tt>OP_AL</tt>, the server will return valid ids of every row in a table. In this case, the <em>column</em> field of
+  	    the packet is ignored (suggestion: set it to 0).
+	    The <em>type</em> field of <em>struct value</em> should be <tt>NULL</tt>, and the <em>size</em> should be set to zero.</p>
       
       <div class="table-responsive">
       <table class="packet">
@@ -476,7 +479,7 @@ enum Operator {
       <h4 id="setup">Setup</h4> 
 <pre>
 cd ~/ece326
-tar -xf /cad2/ece326f/src/easyorm.tar
+tar -xf /cad2/ece326f/src/easydb.tar
 git status # should say that "asst1/" directory is untracked
 git add asst1
 git commit -m "Initial code for Assignment 1"
@@ -486,17 +489,14 @@ git push --tags
 cd asst1
 </pre>
 
-      <p>The starter code include the following files. Note that we will only test the files that are part of the orm package.</p>
+      <p>The starter code include the following files. Note that we will only test the files that are part of the easydb package.</p>
       <ul>
-        <li><em>schema.py</em>: For assignment 2. Do not change.</li>
         <li><em>main.py</em>: contains the <tt>main</tt> function which allows you to run in interactive mode for testing purposes.</li>
-        <li><em>orm/__init__.py</em>: For assignment 2. Do not change.</li>
-        <li><em>orm/easydb.py</em>: includes a database client which is needed to communicate with an EasyDB server. 
-		  You will implement a Database class to send and receive packets to and from the server.</li>
-		<li><em>orm/operator.py</em>: Constants for the EasyDB query command. Do not change.</li>  
-        <li><em>orm/table.py</em>: For assignment 2. Do not change.</li>
-        <li><em>orm/fields.py</em>: For assignment 2. Do not change.</li>
-        <li><em>orm/exceptions.py</em>: contains all the exception classes used by the database implementation or the ORM layer. You should not need to change this file.</li>
+        <li><em>easydb/__init__.py</em>: Enables the folder <tt>easydb</tt> to be imported. Do not change.</li>
+        <li><em>easydb/easydb.py</em>: includes a database client which is needed to communicate with an EasyDB server. 
+		  You will implement the Database class to send and receive packets to and from the server.</li>
+		<li><em>easydb/packet.py</em>: has constants for the EasyDB commands, codes, and operator.</li>  
+        <li><em>easydb/exceptions.py</em>: contains all the exception classes used by the database implementation. You should not need to change this file.</li>
       </ul>
 
       <h4 id="specification">Solution Requirements</h4>
@@ -532,7 +532,7 @@ db = easydb.Database(tb)
       
       <ul>
         <li><tt>TypeError</tt>: thrown when either table name or column name is not a string, or <em>tb</em> is not iterable.</li>
-        <li><tt>ValueError</tt>: thrown when type is not one of str, float, int, or a string referencing another table name.</li>
+        <li><tt>ValueError</tt>: thrown when type is not one of str, float, int, a string referencing another table name, duplicate table or column names, or illegal table or column names.</li>
 		<li><tt>IndexError</tt>: thrown when <em>tb</em> is malformed (hint: let Python do its thing and access elements of sequence without error checking).</li>
         <li><tt>IntegrityError</tt>: thrown when foreign keys causes a cycle or if foreign field references a nonexistent table.</li>
       </ul>
@@ -543,9 +543,9 @@ success = db.connect("127.0.0.1", 8080)
 </pre>
       <p><tt>connect</tt> takes two arguments, the host name and the port number. You should use Python's <a href="https://docs.python.org/3.5/library/socket.html">socket</a> 
 	    library to implement this function. The function should throw whatever error <tt>socket.connect</tt> throws (Hint: don't error check on any of <tt>socket</tt>'s methods).
-        The server will return a <em>struct response</em> immediately after connecting. You are required to disconnect immediately if the error code is <em>SERVER_BUSY</em> and the
-		function should return <em>False</em> after proper clean up. If there is no error (i.e. error code is <em>OK</em>), the function should return <em>True</em>.
-		
+        The server will return a <tt>struct response</tt> immediately after connecting. You are required to disconnect immediately if the error code is <tt>SERVER_BUSY</tt> and the
+		function should return <tt>False</tt> after proper clean up. If there is no error (i.e. error code is <tt>OK</tt>), the function should return <tt>True</tt>.
+	  <p>When reading from sockets, you may assume the maximum packet size will not exceed 4096 bytes.</p>	
       <p>Now, implement the <tt>close</tt> method to disconnect from the server and clean up the socket. You should send the Exit command before closing the connection to inform the server that you are shutting down the connection gracefully.</p>
 <pre>
 db.close()
@@ -559,54 +559,82 @@ db.close()
         <li><tt>InvalidReference</tt>: corresponds to the error code <tt>BAD_FOREIGN</tt>.</li>
         <li><tt>TransactionAbort</tt>: corresponds to the error code <tt>TXN_ABORT</tt>.</li>
         <li><tt>PacketError</tt>: corresponds to the error code <tt>BAD_TABLE</tt>, <tt>BAD_VALUE</tt>,
-          <tt>BAD_ROW</tt>, and <tt>BAD_REQUEST</tt>. They all fall under the same category because either the ORM layer or the database client is supposed to have caught these mistakes before sending off the request.</li>
+          <tt>BAD_ROW</tt>, and <tt>BAD_REQUEST</tt>. They all fall under the same category because the database client is supposed to have caught these mistakes before sending off the request.</li>
       </ul>
       
       <p>Now, here is the specification for each command:</p>
       
       <h5>Insert Command</h5>
       <pre>insert(table_name, values)</pre>
-      <p><em>table_name</em> is the name of the table, and values should be a sequence (e.g., list, tuple) of <tt>N</tt> elements where <tt>N</tt> is the number of columns in the table. You should throw a <tt>ValueError</tt> if any of the arguments have problems, such as the table name does not exist, the number of elements in <tt>values</tt> is incorrect, or one of the columns have an invalid type (i.e., must be one of the native types that EasyDB supports). If the response is OK, return a tuple of <em>pk</em>, <em>version</em>, where <em>pk</em> is the id only the newly created object. For example:</p>
+      <p><em>table_name</em> is the name of the table, and <em>values</em> should be a sequence (e.g., list, tuple) of <em>N</em> elements 
+	    where <em>N</em> is the number of columns in the table. You should throw a <tt>PacketError</tt> if any of the arguments have problems, 
+		such as the table name does not exist, the number of elements in <tt>values</tt> is incorrect, or one of the columns have an invalid type 
+		(i.e., must be one of the native types that EasyDB supports). If the response is <tt>OK</tt>, return a tuple of <em>pk</em>, <em>version</em>, where <em>pk</em> is the id only the newly created object. For example:</p>
       
 <pre>
 &gt;&gt;&gt; pk, version = db.insert("User", ["Jane", "Doe", 5.2, 22])
-&gt;&gt;&gt; print(pk)
-1
+&gt;&gt;&gt; print(pk, version)
+1 1
 </pre>
+
+	  <p>You will need to encode strings into bytes objects before they can be sent across network. Use the <tt>encode</tt> string method to do this. You may assume
+	    EasyDB only supports ASCII strings.</p>
       
       <h5>Update Command</h5>
-      <pre>insert(table_name, pk, values, version=0)</pre>
+      <pre>update(table_name, pk, values, version=0)</pre>
       <p>Same as insert, with two more arguments, <em>pk</em> and <em>version</em>. <em>pk</em> is the id of the row to update, and <em>version</em> is optional, and if specified, 
-		will enable atomic update. If the response is <em>OK</em>, return the new <em>version</em>, regardless of whether atomic update was enabled or not.</p>
-      
+		will enable atomic update. If the response is <tt>OK</tt>, returns the new <em>version</em>, regardless of whether atomic update was enabled or not.
+		This is an example where atomic update is not activated:</p>
+
+<pre>
+&gt;&gt;&gt; version = db.update("User", 1, ["Jane", "Doe", 5.1, 31])
+&gt;&gt;&gt; print(version)
+2
+</pre>
+      <p>If either <tt>pk</tt> or <tt>version</tt> is not an integer, you should raise <tt>PacketError</tt>. </p>
       <h5>Drop Command</h5>
       <pre>drop(table_name, pk)</pre>
-      <p><em>table_name</em> is the name of the table, and <em>pk</em> is the id of the row to be deleted. This method does not return a value, but <tt>orm.ObjectDoesNotExist</tt> is raised if the id does not exist in the specified table. Throw <tt>ValueError</tt> if table name does not exist.</p>
+      <p><em>table_name</em> is the name of the table, and <em>pk</em> is the id of the row to be deleted. This method does not return a value, 
+	    but <tt>ObjectDoesNotExist</tt> is raised if the id does not exist in the specified table. For example:</p>
+
+<pre>
+&gt;&gt;&gt; db.drop("User", 2)
+Traceback (most recent call last):
+...
+easydb.exception.ObjectDoesNotExist: User object 2 is not found
+&gt;&gt;&gt;
+</pre>
       
+	  <p>You should raise <tt>PacketError</tt> if <tt>pk</tt> is not an integer.</p>
       <h5>Get Command</h5>
       <pre>get(table_name, pk)</pre>
-      <p><em>table_name</em> is the name of the table, and <em>pk</em> is the id of the row to be retrieved. Throw <tt>ValueError</tt> if table name does not exist. 
-	    If the response is <em>OK</em>, return a list of the values and the version. For example:</p>
+      <p><em>table_name</em> is the name of the table, and <em>pk</em> is the id of the row to be retrieved.  
+	    <tt>ObjectDoesNotExist</tt> is raised if the object cannot be found. If the response is <tt>OK</tt>, return a list of the values and the version. 
+		For example:</p>
 
 <pre>
 &gt;&gt;&gt; values, version = db.get("User", 1)
 &gt;&gt;&gt; print(values)
-['Jane', 'Doe', 5.2, 22]
+['Jane', 'Doe', 5.1, 31]
 </pre>
       
+	  <p>For string, remember to decode it from the bytes object you receive from network. Raise <tt>PacketError</tt> if <tt>pk</tt> is not an integer.</p> 
+	  
       <h5>Scan Command</h5>
-      <pre>scan(table_name, query)</pre>
-      <p><em>table_name</em> is the name of the table, and <em>query</em> is a tuple of 3 elements: name of column, the operator, and the right operand, in that order. 
-	    Similar to insert, <tt>ValueError</tt> should be thrown if the column name does not exist, operator is not supported, the right operand is the wrong data type, 
-		or table name does not exist. If the response is <em>OK</em>, return a list of all matching ids (may be empty). For example:</p>
+      <pre>scan(table_name, op, column_name=None, value=None)</pre>
+      <p><em>table_name</em> is the name of the table, <em>op</em> is the operator, <em>column_name</em> is the name of the column and also the left operand,
+	    and <em>value</em> is a constant value and also the right operand. 
+	    <tt>PacketError</tt> should be thrown if the column name does not exist, operator is not supported, the right operand is the wrong data type, 
+		or table name does not exist. If the response is <tt>OK</tt>, return a list of all matching ids (may be empty). For example:</p>
 
 <pre>
-&gt;&gt;&gt; import orm.operator as op
-&gt;&gt;&gt; results = db.scan("Account", ("balance", op.OP_GT, 10000))
+&gt;&gt;&gt; from easydb import operator
+&gt;&gt;&gt; results = db.scan("Account", operator.GT, "balance", 10000.0)
 &gt;&gt;&gt; print(results)
 [1, 3, 7]
 </pre>
 
+	  <p>Note: Do not forget about the internal <tt>id</tt> field. Also, when the operator is <tt>OP_AL</tt>, you should ignore the column name.</p>
       <h4 id="testing">Testing Your Code</h4>
       <p>To test your database client, you will need to run the server. You can start the server by running <tt>easydb -g PORT</tt> on one terminal while running the client on a different terminal, 
 	    where the <tt>-g</tt> option will print everything the database is doing, and <tt>PORT</tt> is the port number. 
@@ -626,11 +654,11 @@ Type "help", "copyright", "credits" or "license" for more information.
 &gt;&gt;&gt; db
 &lt;EasyDB Database object&gt;
 &gt;&gt;&gt; db.get("User", 1)
-['Greg', 'Russell', 0.0, 27]
+['Greg', 'Russell', 6.1, 27]
 &gt;&gt;&gt;
 </pre>      
     
-	<p>Note that you will need to change the <em>setup</em> function in <em>schema.py</em> if you load the database server with a different schema!</p>
+	<p>Note that you will need to change the <tt>tb</tt> variable in <tt>main.py</tt> if you load the database server with a different schema!</p>
 	
       <h4 id="submission">Code Submission</h4>
       <p>To submit your code with the current commit, use the <tt>Asst1-end</tt> tag. Remember to push the new tag to the remote repository.</p>

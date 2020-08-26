@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Assignment 1a | ECE326 | Programming Languages | Fall 2020</title>
+    <title>Assignment 2 | ECE326 | Programming Languages | Fall 2020</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="Kuei (Jack) Sun">
@@ -52,23 +52,6 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#easydb">
-              EasyDB
-            </a>
-            <ul class="nav flex-column">
-              <li class="nav-item">
-                <a class="nav-link" href="#schema">
-                Database Schema
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#protocol">
-                Access Protocol
-                </a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item">
             <a class="nav-link" href="#setup">
               Setup
             </a>
@@ -78,11 +61,6 @@
               Solution Requirements
             </a>
             <ul class="nav flex-column">
-              <li class="nav-item">
-                <a class="nav-link" href="#client">
-                Database Client
-                </a>
-              </li>
               <li class="nav-item">
                 <a class="nav-link" href="#orm_schema">
                 Database Model
@@ -115,15 +93,16 @@
 
     <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Assignment 1b: Object-Relational Mapping</h1>
+        <h1 class="h2">Assignment 2: Object-Relational Mapping</h1>
       </div>
-      <p><strong>Due Date: Sunday, October 11th, 11:59pm</strong></p>
+      <p><strong>Due Date: Thursday, October 22nd, 11:59pm</strong></p>
       <p><strong>Lab TA: Wendy Qiu</strong></p>
       <p>In this assignment, you will develop an object relational mapping (ORM) framework for EasyDB&trade; in Python.</p>
       
       <h4 id="background">Background</h4>
       
-      <p>Object-relational mapping is a technique for converting database records to and from in-memory objects. Therefore, instead of writing code that extract values from a database query such as this:</p>
+      <p>Object-relational mapping is a technique for converting database records to and from in-memory objects. 
+	  Therefore, instead of writing code that extract values from a database query such as this:</p>
       
 <pre>
 # returns a Record object
@@ -135,452 +114,57 @@ if rec.valid():
       <p>into this:</p>
 
 <pre>
+from schema import User
+import orm
+
 # returns a User object
 try:
-    user = User.get(db, id=2)
+    user = User.get(db, pk=2)
     name = user.firstName
-except ObjectDoesNotExist:
+except orm.ObjectDoesNotExist:
     pass
 </pre>    
 
       <p>The main advantage of an ORM layer is that it abstracts away the underlying database implementation, allowing you possible freedom to switch your database solution to another (e.g. from EasyDB to MySQL &#x1f622;).</p>
       
-      <p>Another important advantage is that ORM can help you convert to and from in-memory types to storage types seamlessly. For example, some relational databases, such as EasyDB, do not natively support an IP Address type. Therefore, to store an IP address in these databases, it must first be converted to a string (e.g. "127.0.0.1"). Unmarshalling code is required to read it back from the database and convert it back to an IP Address object. These tedious tasks can be automated with ORM.</p>
+      <p>Another important advantage is that ORM can help you convert to and from in-memory types to storage types seamlessly. 
+	  For example, some relational databases, such as EasyDB, do not natively support an IP Address type. 
+	  Therefore, to store an IP address in these databases, it must first be converted to a string (e.g. "127.0.0.1"). 
+	  Unmarshalling code is required to read it back from the database and convert it back to an IP Address object. 
+	  These tedious tasks can be automated with ORM.</p>
       
-      <p>Your first task in this assignment is to build a database client which connects to an EasyDB server. The client is in charge of sending and receiving data to and from the server. Then, you will develop an ORM framework which is used by other programmers to build their web applications. This ORM layer allows web developers to specify the layout of their database directly in Python, and be able to work with Python objects in their program, rather than having to use the low level database client. The ORM layer can also support complex data types not generally available natively in database solutions, which improves the robustness of the web applications built on top of the ORM layer.</p>
-      
-      <h4 id="easydb">EasyDB</h4>
-      
-      <p>EasyDB is a toy relational database that provides minimalistic features for managing structured data. In a relational database, data is organized into tables of columns and rows. A column in a database table is a set of data of a primitive type (that is supported by the database). A table is defined with a list of one or more named columns before any data can be inserted. A row is a set of related data that is given meaning through the table it exists in. To insert a row into a table, each value of the row must have the same type as what is defined in the table, in the same order. Also, the number of values in a row must be exactly equal to the number of columns defined in the table. For example, a User table may have the columns: <tt>firstName</tt>, <tt>lastName</tt>, <tt>height</tt> and <tt>age</tt>. A row in a User table may be ("Jay", "Sung", 5.5, 31), which correctly represents a single user in this table. A table, of course, can have many rows, allowing you to store multiple users in a User table. </p>
-      
-      <h4 id="schema">Database Schema</h4>
-      
-      <p>There can also be multiple tables in a relational database, allowing tables to reference others. To specify the database schema (i.e. list of table definitions) in EasyDB, use the following syntax:</p>
-      
-      <p><var>table-name</var> {<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;<var>column-name-1</var> : <var>type | table-specifier</var>;<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;<var>column-name-2</var> : <var>type | table-specifier</var>;<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;...</br>
-      }
-      </p>
-      
-      <p>In EasyDB, each column in a table can be one of four types: <tt>integer</tt>, <tt>float</tt>, <tt>string</tt>, or foreign key (i.e. a "pointer" to a record in another table). To specify a foreign key type, use the name of the referenced table. The names of a table or column must start with a letter, followed by letters (either case), numbers, or underscore. However, only the ORM layer may use the underscore character for column names (see <a href="#custom_types">Custom Type</a> section for more information). In addition, the ORM layer reserves a couple of words for its object interface: <tt>pk</tt>, <tt>id</tt>, <tt>version</tt>, <tt>save</tt> and <tt>delete</tt>. Therefore, you should disallow those words to be used for column names. Here is an example of a complete database schema:</p>
-      
-<pre>
-User {
-  firstName: string;
-  lastName: string;
-  height: float;
-  age: integer;
-}
-
-Account {
-  user: User;
-  type: string;
-  balance: float;
-}
-</pre>      
-      
-      <p>In the definitions above, we have two tables: User and Account. For every user, we track his/her names, height, and age. For an account, we store the account type and its balance. But most importantly, an account references the User table. <tt>user</tt> stores the <em>id</em> of a row in the User table. Every row in EasyDB has an automatically generated unique integer id value which allows the row to be unambiguously referenced. In this manner, a user can have zero or more associated accounts.</p>
-      
-      <p>EasyDB currently disallows cycles in foreign keys. Here are two examples where a cycle occurs:</p>
-
-<pre>
-# not allowed in EasyDB
-User {
-  firstName: string;
-  lastName: string;
-  father: User;
-  mother: User;
-}
-</pre>
-
-<pre>
-# also not allowed in EasyDB
-User {
-  firstName: string;
-  lastName: string;
-  pet: Animal;
-}
-
-Animal {
-  species: string;
-  owner: User;
-}
-</pre>  
-      <p>You can guarantee that there's no cycle if a foreign field can only reference already defined table (except for the current one). This is how the instructor's version of the server works. You should disallow references to future tables, even if no cycle would occur.</p>
-      <h4 id="protocol">Access Protocol</h4>
-      
-      <p>To access a running EasyDB server, you must know the host name and its port number. Once you are connected, you can make one of five EasyDB queries that is available. Note that EasyDB assumes that the client (the program that is connected to the server) is aware of the current schema and does not provide an API for introspection. EasyDB uses binary format as its mean of communication. Therefore, we describe common structures in the network packets that are used in EasyDB. All structures are defined using C syntax and assumed to be 4-byte aligned, with <tt>int</tt> being 32-bit signed integer, and <tt>long</tt> being 64-bit signed integer. All integers are in <a href="https://en.wikipedia.org/wiki/Endianness">network byte order</a>.</p>
-      
-<pre>
-enum Command {
-    INSERT = 1,
-    UPDATE = 2,
-    DROP = 3,
-    GET = 4,    
-    SCAN = 5,
-    EXIT = 6,
-};
-</pre>
-
-<pre>
-struct request {
-    int command;  /* one of Command */
-    int table;    /* table number */
-};
-</pre>
-
-<pre>
-enum Code {
-    OK = 1,
-    NOT_FOUND = 2,       /* id not found */
-    BAD_TABLE = 3,       /* table not found */
-    BAD_QUERY = 4,       /* error during scan */ 
-    TXN_ABORT = 5,       /* update aborted */
-    BAD_VALUE = 6,       /* column value type mismatch */
-    BAD_ROW = 7,         /* number of values is incorrect */
-    BAD_REQUEST = 8,     /* malformed packet */
-    BAD_FOREIGN = 9,     /* foreign key not found */
-    UNIMPLEMENTED = 10,  /* you can ignore this (you will return this for asst4) */
-};
-</pre>
-
-<pre>
-struct response {
-    int code;      /* one of Code */
-};
-</pre>
-
-      <p>All EasyDB requests begin with <tt>request</tt>. The <tt>command</tt> field is one of the five commands listed above, and the <tt>table</tt> field is the table number. A table's number is the order in which it appears in the schema, starting at 1 (in earlier example, User's table number would be 1, and Account's would be 2). All responses begin with <tt>response</tt>, which contains a code for success (i.e. OK), or error. <tt>BAD_TABLE, BAD_ROW, BAD_VALUE</tt>, and <tt>BAD_REQUEST</tt> are possible for all EasyDB commands except for the Exit command (only <tt>BAD_REQUEST</tt> is possible).</p>
- 
-<pre>
-enum Column {
-    INTEGER = 1,
-    FLOAT = 2,
-    STRING = 3,
-    FOREIGN = 4,
-};
-</pre>
-
-<pre>
-struct value {
-    int type;     /* one of Column */
-    int size;     /* size of buf */
-    char buf[];   /* data stored within */
-};
-</pre>
-
-<pre>
-struct row {
-    int count;    /* number of elements in values */
-    struct value values[];
-};
-</pre>
-
-      <p>In some packets, we need to send a generic value, or a row of values. In these packets, <tt>struct value</tt> and <tt>struct row</tt> would be used. <tt>struct value</tt> contains the column type (<tt>type</tt>), the size of the buffer that is needed to store the value (<tt>size</tt>), and the buffer itself (<tt>buf</tt>). For all column types, size is equal to 8 (i.e. 8 bytes) except for <tt>string</tt>, which is stored in multiples of 4 bytes. Therefore, the size of the buffer for "bad" would be 4 bytes (3 bytes rounded up to 4), but 8 bytes for "hello" (5 bytes rounded up to 8). For <tt>struct row</tt>, <tt>count</tt> specifies how many values are stored.</p>
-
-      <h5>Atomic Update</h5>
-
-<pre>
-struct key {
-    long id;      /* id of the row */
-    long version; /* version of the row */
-};
-</pre>
-
-      <p>EasyDB supports a primitive version of <em>atomic update</em>. In a concurrent environment, atomic update ensures that changes made to a row will not conflict with changes made by others. In EasyDB, updating a piece of data requires retrieving the initial data followed by modifying it in some ways. For example, to withdraw $100 from an account, one needs to first know the current balance, and then deduct $100 from it. However, there is a window of time between two EasyDB commands where it is possible that someone else makes some changes to the same row. For example, the following problem may occur:</p>
-      
-<pre>
-      You            Your Mom     EasyDB
-  GET balance ----------------------&gt;
-                   GET balance -----&gt;
-                       1000    &lt;-----
-     1000     &lt;----------------------
-                  (deposit $500)
-                SET balance 1500 ---&gt;
-(withdraw $100)            
-SET balance 900 --------------------&gt;           
-</pre>
-
-      <p>As you can see above, your final balance is supposed to be $1400. However, due to problematic interleaving of the commands, the deposit made by your mother was lost. EasyDB protects from this situation by having a version number associated with every row. When you make an update, you pass the version number of the row that you were modifying to the database. If the version number mismatches with what is in the database, a conflict is detected and <tt>TXN_ABORT</tt> is returned, notifying you that your update was aborted, as seen in the figure below.</p>
-
-<pre>
-      You            Your Mom       EasyDB
-  GET balance ----------------------&gt;
-                   GET balance -----&gt;
-                       1000  &lt;------- v1
-     1000   &lt;------------------------ v1
-                  (deposit $500)
-                SET balance 1500 ---&gt; v2
-(withdraw $100)            
-SET balance 900 --------------------&gt; NO
-   TXN_ABORT  &lt;----------------------           
-</pre>
-      <p>As the programmer, it is likely that you would put an atomic update in a loop so that you can retry if abort occurs.</p>      
-      
-      <p>We will now describe the format of each EasyDB query.</p>
-      
-      <h5>Insert Command</h5>
-      
-      <div class="table-responsive">
-      <table class="packet">
-        <tr>
-          <td>struct request</td><td>struct row</td>
-        </tr>
-      </table>
-      </div>
-      
-      <p>The insert command adds a new row to a database table. Its request packet starts with a <tt>request</tt> structure, followed by a <tt>row</tt> structure, which contains one or more rows. For the User table example, the following is an illustration of the packet that is sent to the server:</p>
-      
-      <div class="table-responsive">
-      <table class="packet">
-        <tr>
-          <td>command: INSERT<br>table: 1</td>
-          <td>count: 4</td>
-          <td>type: string<br>size: 4<br>buf: "Joe"</td>
-          <td>type: string<br>size: 4<br>buf: "Sung"</td>
-          <td>type: float<br>size: 8<br>buf: 5.5</td>
-          <td>type: integer<br>size: 8<br>buf: 31</td>
-        </tr>
-      </table>
-      </div>
- 
-      <p>Next, the response packet is formatted as shown below:</p>
- 
-      <div class="table-responsive">
-      <table class="packet">
-        <tr>
-          <td>struct response</td><td>struct key</td>
-        </tr>
-      </table>
-      </div>
-
-      <p>Note that <tt>struct key</tt> only appears if the response code is <tt>OK</tt>. The insert command can fail if foreign key reference is not found (<tt>BAD_FOREIGN</tt>). A foreign field is a 64-bit integer that refers to the id of a row in another table. If this field is set to zero, then it does not reference anything and it would not be possible to receive <tt>BAD_FOREIGN</tt>.</p>
- 
-      <h5>Update Command</h5>
- 
-      <p>The update command is used to update an existing row in a table. It is similar to insert, with the addition that <tt>struct key</tt> of the row needs to be specified. If you don't care about atomic update, set <tt>version</tt> of <tt>struct key</tt> to 0.</p>
-      
-      <div class="table-responsive">
-      <table class="packet">
-        <tr>
-          <td>struct request</td><td>struct key</td><td>struct row</td>
-        </tr>
-      </table>
-      </div>
-
-      <div class="table-responsive">
-      <table class="packet">
-        <tr>
-          <td>struct response</td><td>long version</td>
-        </tr>
-      </table>
-      </div>
-
-      <p>The response for the update command is similar to insert, except only the new version number is returned. <tt>NOT_FOUND</tt> is returned if the row is not found. <tt>TXN_ABORT</tt> is returned if atomic update failed. <tt>BAD_FOREIGN</tt> is returned if a foreign field reference does not exist.</p>
- 
-      <h5>Drop command</h5>
-      
-      <p>The drop command deletes a row in table. Therefore, it needs to specify the id of the row to be dropped. In EasyDB, the drop command performs <em>cascade delete</em>, which means that if a row is referenced by rows in other tables, those rows will also be deleted. For example, if a user has three associated accounts, upon deleting the user, all associated accounts will be deleted as well. This design ensures that there will be no dangling pointers in the database.</p>
-      
-      <div class="table-responsive">
-      <table class="packet">
-        <tr>
-          <td>struct request</td><td>long id</td>
-        </tr>
-      </table>
-      </div>
-      
-      <p>The response packet for drop is just <tt>struct response</tt>. <tt>NOT_FOUND</tt> is returned if the row is not found.</p>
-      
-      <h5>Get Command</h5>
-      
-      <p>The get command retrieves a row from a table, which requires specifying the id of the row.</p>
-      
-      <div class="table-responsive">
-      <table class="packet">
-        <tr>
-          <td>struct request</td><td>long id</td>
-        </tr>
-      </table>
-      </div>
-      
-      <p>The response packet, on success, will include the row and its associated version number. <tt>NOT_FOUND</tt> is returned if the row is not found.</p>
-      
-      <div class="table-responsive">
-      <table class="packet">
-        <tr>
-          <td>struct response</td><td>long version</td><td>struct row</td>
-        </tr>
-      </table>
-      </div>
-      
-      <h5>Scan Command</h5>
-
-<pre>
-enum Operator {
-    OP_AL = 0,  /* everything */
-    OP_EQ = 1,  /* equal */
-    OP_NE = 2,  /* not equal */
-    OP_LT = 3,  /* less than */
-    OP_GT = 4,  /* greater than */
-};
-</pre>
-      
-      <div class="table-responsive">
-      <table class="packet">
-        <tr>
-          <td>struct request</td><td>int column<br>int operator<br></td><td>struct value</td>
-        </tr>
-      </table>
-      </div>
-      
-      <p>The scan command compares a column of every row in a table against a value and returns the id of all rows that matched. The <tt>column</tt> field is the column number to be matched, based on the order it appears in the table definition, starting with 1. Column 0 corresponds to the internal <tt>id</tt> field. The column type of the <tt>id</tt> field is <tt>FOREIGN</tt> The <tt>operator</tt> field specifies how to compare against the value stored in <tt>struct value</tt>.</p>
-      
-      <p>When the operator is <tt>OP_AL</tt>, the server will return valid ids of every row in a table. In this case, the column type of struct value should be NULL, and the size should be zero. Note that this operator does not need to be implemented for assignment 3. It is only for assignment 4.</p>
-      
-      <div class="table-responsive">
-      <table class="packet">
-        <tr>
-          <td>struct response</td><td>int count<br>long ids[]<br></td>
-        </tr>
-      </table>
-      </div>
-
-      <p>On success, the response will contain zero or more ids (zero is possible if there were no matches). <tt>BAD_QUERY</tt> is returned if one of the following errors occurred: 1) column type and value type mismatched, or 2) operator for the given type is not supported. In EasyDB, id and foreign field only support <tt>OP_EQ</tt> and <tt>OP_NE</tt>. For <tt>string</tt>, <a href="https://en.cppreference.com/w/c/string/byte/strcmp">lexicographical comparison</a> is performed (e.g., "A" is less than "B" and "5" is less than "-2").</p>
-      
-      <h5>Exit Command</h5>
-      
-      <div class="table-responsive">
-      <table class="packet">
-        <tr>
-          <td>struct request</td>
-        </tr>
-      </table>
-      </div>
-      
-      <p>The exit command shuts down the connection gracefully. There is no server response for this command. The server will disconnect once it receives this command. You may set any value for the <tt>table</tt> field, but 1 is preferred.</p>
+      <p>Your task in this assignment is to will develop an ORM framework which is used by other programmers to build their web applications. 
+	  This ORM layer allows web developers to specify the layout of their database directly in Python, 
+	  and be able to work with Python objects in their program, rather than having to use the low level database client. 
+	  Your ORM layer will also support complex data types not generally available natively in database solutions, 
+	  which will improves the robustness of the web applications built on top of the ORM layer.</p>
       
       <h4 id="setup">Setup</h4> 
 <pre>
 cd ~/ece326
-tar -xf /cad2/ece326f/src/easyorm.tar
-git status # should say that "asst3/" directory is untracked
-git add asst3
-git commit -m "Initial code for Assignment 3"
-git tag Asst3-start
+tar -xf /cad2/ece326f/src/orm.tar
+git status # should say that "asst2/" directory is untracked
+git add asst2
+git commit -m "Initial code for Assignment 2"
+git tag Asst2-start
 git push
 git push --tags
-cd asst3
+cd asst2
 </pre>
 
       <p>The starter code include the following files. Note that we will only test the files that are part of the orm package.</p>
       <ul>
         <li><em>schema.py</em>: includes user-defined tables. You are encouraged to change this file to help you with testing your ORM layer.</li>
         <li><em>main.py</em>: contains the <tt>main</tt> function which allows you to either run in interactive mode for testing purposes, or export the currently loaded schema.</li>
-        <li><em>orm/__init__.py</em>: you will change this file to implement the <tt>setup</tt> and <tt>export</tt> functions.</li>
-        <li><em>orm/easydb.py</em>: includes a database client which is needed to communicate with an EasyDB server. You will implement a Database class to send and receive packets to and from the server.</li>
+        <li><em>orm/__init__.py</em>: package-level export of classes and functions. Do not change.</li>
+		<li><em>orm/orm.py</em>: you will change this file to implement the <tt>setup</tt> and <tt>export</tt> functions.</li>
+        <li><em>orm/easydb/</em>: symbolic link to your assignment 1 EasyDB driver package.</li>
         <li><em>orm/table.py</em>: definition for a database table. You will implement the <tt>Table</tt> class and its associated metaclass (you do not have to use a metaclass if you prefer other implementation).</li>
         <li><em>orm/fields.py</em>: You will change this file to implement all the fields supported by the ORM layer, including custom fields not natively supported by the underlying database.</li>
-        <li><em>orm/exceptions.py</em>: contains all the exception classes used by the database implementation or the ORM layer. You should not need to change this file.</li>
       </ul>
 
       <h4 id="specification">Solution Requirements</h4>
       <p>This assignment has a couple of milestones, each of which can work independently and thus are worth partial marks. You and your partner should take on one of each part of the assignment.</p>
-      
-      <h4 id="client">Database Client</h4>
-      <p>In order to communicate with the database server, we need to write a client library that will send requests to an EasyDB server as well as parsing responses received from the server. We will describe the interface here.</p>
-      
-      <h5>Database Schema</h5>
-      <p>As said earlier, the server assumes the client knows the schema, so we must supply the schema to the client to instantiate it. Here is how an ORM developer would use your EasyDB library:</p>
-<pre>
-import easydb
-
-tb = (
-    ("User", (                  # table_name
-        ("firstName", str),     # (column_name, type)
-        ("lastName", str),
-        ("height", float),
-        ("age", int),
-    )),
-    
-    ("Account", (
-        ("user", "User"),       # (column_name, table_reference)
-        ("type", str),
-        ("balance", float),
-    ))
-)
-
-db = easydb.Database(tb)
-</pre>
-      <p>The above code creates a Database object. If there is an issue with the provided schema, then it should throw the following errors:</p>
-      
-      <ul>
-        <li><tt>TypeError</tt>: thrown when either table name or column name is not a string.</li>
-        <li><tt>ValueError</tt>: thrown when type is not one of str, float, int, or a string referencing another table name.</li>
-        <li><tt>orm.IntegrityError</tt>: thrown when foreign keys causes a cycle or if foreign field references a nonexistent table.</li>
-      </ul>
-      
-      <p>Next, we connect to the server via the <tt>connect</tt> member function.</p>
-<pre>
-db.connect("127.0.0.1", 8080)
-</pre>
-      <p><tt>connect</tt> takes two arguments, the host name and the port number. You should use Python's <a href="https://docs.python.org/3.5/library/socket.html">socket</a> library to implement this function. The function should throw whatever error <tt>socket.connect</tt> throws (Hint: don't error check on any of <tt>socket</tt>'s methods).</p>
-      
-      <p>Next, implement the <tt>close</tt> method to disconnect from the server and clean up the socket. You should send the Exit command before closing the connection to inform the server that you are shutting down the connection gracefully.</p>
-<pre>
-db.close()
-</pre> 
-      
-      <p>The main part of this milestone is implementing all of EasyDB commands. You are suggested to use Python's <tt>struct</tt> library to help build packets and read responses from the server. <tt>io.BytesIO</tt> is another great option. When the server responds in error, you should throw objects of the corresponding error classes.</p>
-      
-      <ul>
-        <li><tt>orm.ObjectDoesNotExist</tt>: corresponds to the error code <tt>NOT_FOUND</tt>.</li>
-        <li><tt>orm.InvalidReference</tt>: corresponds to the error code <tt>BAD_FOREIGN</tt>.</li>
-        <li><tt>orm.TransactionAbort</tt>: corresponds to the error code <tt>TXN_ABORT</tt>.</li>
-        <li><tt>orm.PacketError</tt>: corresponds to the error code <tt>BAD_TABLE</tt>, <tt>BAD_VALUE</tt>,
-          <tt>BAD_ROW</tt>, and <tt>BAD_REQUEST</tt>. They all fall under the same category because either the ORM layer or the database client is supposed to have caught these mistakes before sending off the request.</li>
-      </ul>
-      
-      <p>Now, here is the specification for each command:</p>
-      
-      <h5>Insert Command</h5>
-      <pre>insert(table_name, values)</pre>
-      <p><em>table_name</em> is the name of the table, and values should be a sequence (e.g., list, tuple) of <tt>N</tt> elements where <tt>N</tt> is the number of columns in the table. You should throw a <tt>ValueError</tt> if any of the arguments have problems, such as the table name does not exist, the number of elements in <tt>values</tt> is incorrect, or one of the columns have an invalid type (i.e., must be one of the native types that EasyDB supports). If the response is OK, return a tuple of <em>pk</em>, <em>version</em>, where <em>pk</em> is the id only the newly created object. For example:</p>
-      
-<pre>
-pk, version = db.insert("User", ["Jay", "Sung", 5.5, 31])
-</pre>
-      
-      <h5>Update Command</h5>
-      <pre>insert(table_name, pk, values, version=0)</pre>
-      <p>Same as insert, with two more arguments, <em>pk</em> and <em>version</em>. <em>pk</em> is the id of the row to update, and <em>version</em> is optional, and if specified, will enable atomic update. If the response is OK, return the new <em>version</em>, regardless of whether atomic update was enabled or not.</p>
-      
-      <h5>Drop Command</h5>
-      <pre>drop(table_name, pk)</pre>
-      <p><em>table_name</em> is the name of the table, and <em>pk</em> is the id of the row to be deleted. This method does not return a value, but <tt>orm.ObjectDoesNotExist</tt> is raised if the id does not exist in the specified table. Throw <tt>ValueError</tt> if table name does not exist.</p>
-      
-      <h5>Get Command</h5>
-      <pre>get(table_name, pk)</pre>
-      <p><em>table_name</em> is the name of the table, and <em>pk</em> is the id of the row to be retrieved. Throw <tt>ValueError</tt> if table name does not exist. If the response is OK, return a list of the values and the version. For example:</p>
-
-<pre>
-values, version = db.insert("User", 1)
-print(values)
-# ['Jay', 'Sung', 5.5, 31]
-</pre>
-      
-      <h5>Scan Command</h5>
-      <pre>scan(table_name, query)</pre>
-      <p><em>table_name</em> is the name of the table, and <em>query</em> is a tuple of 3 elements: name of column, the operator, and the right operand, in that order. Similar to insert, <tt>ValueError</tt> should be thrown if the column name does not exist, operator is not supported, the right operand is the wrong data type, or table name does not exist. If the response is OK, return a list of all matching ids (may be empty). For example:</p>
-
-<pre>
-import orm.easydb
-results = db.scan("Account", ("balance", orm.easydb.OP_GT, 10000))
-print(results)
-# [1, 3, 7]
-</pre>
 
       <h4 id="orm_schema">Database Model</h4>
       <p>In an object-relational mapping software, the programmer would write their database schema in a database-neutral language (i.e., in a way that the underlying database could be swapped out without affecting the program). For our ORM, the programmer will write the schema in Python (inspired by <a href="https://www.djangoproject.com/">Django</a>). Let's first look at an example schema:</p>
@@ -605,28 +189,38 @@ class Account(orm.Table):
     balance = orm.Float()
 </pre> 
      
-      <p>For all database tables, the client will inherit <tt>orm.Table</tt>. Column names must start with a letter, followed by letters of either case, or numbers, but underscore is <em>not</em> allowed (the ORM layer uses it for special purposes). For each column in the table, it is presented by an instance of one of the following <tt>Field</tt> subclasses: <tt>String</tt>, <tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. For the first three classes, there are no positional parameters. For <tt>Foreign</tt>, it takes one positional parameter: the class of the referenced table. Notice that it is not possibe to reference a class that has yet to be defined. For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
+      <p>For all database tables, the client will inherit <tt>orm.Table</tt>. Column names must start with a letter, followed by letters of either case, 
+	  or numbers, but underscore is <em>not</em> allowed (the ORM layer will use it for a special purpose). Also, the word <em>pk</em>, <em>id</em>,
+	  <em>version</em>,
+	  <em>save</em> and <em>delete</em> are reserved by the ORM layer (see next section for what each of these attributes do). 
+	  Raise <tt>AttributeError</tt> (not <tt>ValueError</tt>) if either of two rules 
+	  is violated. Do not change the original EasyDB naming rules.</p>
+	  
+	  <p>For each column in the table, it is presented by an instance of one of the following <tt>Field</tt> subclasses: <tt>String</tt>, <tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. For the first three classes, there are no positional parameters. For <tt>Foreign</tt>, it takes one positional parameter: the class of the referenced table. Notice that it is not possibe to reference a class that has yet to be defined. For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
       
       <p>Every field types, except for Foreign, support the following options:</p>
       
       <ul>
         <li><b>blank</b>: this field is allowed to be left unspecified when creating new objects. When this option is set to False (which is the default), <tt>AttributeError</tt> will be raised when attempting to create a new object if the field is not specified. Otherwise, default value of the type (e.g. 0 for int, "" for string) will automatically be used for objects with the field missing.</li>
-        <li><b>default</b>: the default value for this field if it is unspecified in the constructor. Unlike <tt>blank</tt>, <tt>default</tt> will automatically set the missing attribute to the default value.</li>
-        <li><b>choices</b>: a list of allowed values for this field. <tt>ValueError</tt> will be raised if the field has value not in <tt>choices</tt> when insert or update is attempted.</li>
+        <li><b>default</b>: the default value for this field if it is unspecified in the constructor. Unlike <tt>blank</tt>, <tt>default</tt> will 
+		  automatically set the missing attribute to the default value. If the default value is a function (i.e. a callable), you should 
+		  support calling the function to retrieve the default value. See <a href="#custom_types">Custom Type</a> for an example.</li>
+        <li><b>choices</b>: a list of allowed values for this field. <tt>ValueError</tt> will be raised if the field has value not in <tt>choices</tt> when insert or update is attempted.
+		  <tt>ValueError</tt> will also be raised if <tt>choices</tt> is not iterable.
+		</li>
       </ul>
       <p>Foreign, on the other hand, only supports <i>blank</i>. If blank is true, the field can reference nothing (i.e. set to None).</p>
       
-      <p>The Field subclasses must raise <tt>TypeError</tt> during initialization (i.e., while the class is being created) if either one or more of the choices or default value is the wrong type. For example:</p>
+      <p>The Field subclasses must raise <tt>TypeError</tt> during initialization (i.e., while the class is being created) if 
+		either one or more of the choices or default value is the wrong type. For example:</p>
 
 <pre>      
 class User(orm.Table):
     firstName = orm.String()
     lastName = orm.String(default=123)
     height = orm.Float(choices=["wrong", "type"])    
-</pre>    
-  
-      <p>Similarly, <tt>AttributeError</tt> should be raised when field or class name contains and underscore, or if field name uses one of the reserved attribute names: <tt>pk</tt>, <tt>id</tt>, <tt>version</tt>, <tt>save</tt>, or <tt>delete</tt> (see next section for what each of these attributes do).</p>
-  
+</pre>
+
       <p>Lastly, you should ensure that the order of the fields are preserved. Otherwise they may
       end up scrambled and you will wonder why the insert command complains
       about mismatching types. Hint: your metaclass should overload the <tt>__prepare__</tt> method and return an <a href="https://docs.python.org/3.5/library/collections.html">OrderedDict</a>.</p>
@@ -712,24 +306,27 @@ joe.age = "55"    # NO - assigning string to integer field
 joe.height = 3    # OK - assigning integer to float field
 joe.age = 3.5     # NO - assigning float to integer field
 </pre>      
-      <p>All foreign key references are converted automatically to their objects. Hint: you can implement this lazily (only retrieve from database when field is accessed), or eagerly (retrieve foreign keys during the get ORM operation). You should raise <tt>InvalidReference</tt> if the referenced object is not in the database (you will know this when the server returns <tt>BAD_FOREIGN</tt>).</p>
+      <p>All foreign key references are converted automatically to their objects. Hint: you can implement this lazily 
+	  (only retrieve from database when field is accessed), or eagerly (retrieve foreign keys during the ORM <em>get</em> operation).</p>
       
 <pre>
 account = Account.get(db, pk=2)
 account.user  # &lt;User: Joe Smith&gt;
 </pre>
 
-      <p>When calling save(), if referenced object is already in the database (i.e. pk field is set and not None), then you should only save the current object. However, if it is not in the database when you save another object, the referenced object will be saved first before the object is saved. For example:</p>
+      <p>When calling <tt>save</tt>(), if referenced object is already in the database (i.e. <tt>pk</tt> field is set and not <tt>None</tt>), 
+	  then you should only save the current object. However, if it is not in the database when you save another object, 
+	  the referenced object will be saved first before the object is saved. For example:</p>
       
 <pre>
 greg = User(db, firstName="Greg", lastName="Russell", age=27)
 account = Account(db, user=greg, type="Chequing", balance=100.0)
 account.save()  # will save 'greg' first before saving 'account'
 saving = Account(db, user=greg, type="Saving", balance=200.0)
-saving.save()   # will not save 'greg' first since it already exists in database
+saving.save()   # will not save 'greg' at all since it already exists in database
 </pre>
 
-      <p>The above scenario can be recursive for multiple levels of references. Note that for a foreign field, you must set it with an object of the expected type, or None is the field is allowed to be blank.</p>
+      <p>The above scenario can be recursive for multiple levels of references. Note that for a foreign field, you must set it with an object of the expected type, or <tt>None</tt> if the field is allowed to be blank.</p>
       
 <pre>
 account.user = greg             # OK
@@ -751,7 +348,7 @@ object = Table.get(db, pk)
 <pre>
 [object...] = Table.filter(db, ...)
 </pre>
-      <p>Returns a list of objects that matches the query. If no argument is given, returns all objects in the table. The query arguments uses the following format: <em>columnname__op</em>=<em>value</em> where <em>columnname</em> is the column name of the object, <em>op</em> is the operator, and <em>value</em> is the right operand. For the equality operator, <em>__eq</em> is not needed. For example:</p>
+      <p>Returns a list of objects that matches the query. If no argument is given, returns all objects in the table. The query arguments use the following format: <em>columnname__op</em>=<em>value</em> where <em>columnname</em> is the column name of the object, <em>op</em> is the operator, and <em>value</em> is the right operand. For the equality operator, <em>__eq</em> is not needed. For example:</p>
       
 <pre>
 results = User.filter(db, age__gt=33)
@@ -767,19 +364,22 @@ results = Account.filter(db, user=joe)
 # or
 results = Account.filter(db, user=2)
 </pre>  
-      
+       <p>You are only required to support at most one query argument, though you may try supporting multiple arguments by calculating the set intersection
+	      between multiple query results.</p>
 <h5>Count Method</h5>
 <pre>
 number = Table.count(db, ...)
 </pre>  
-      <p>Returns the number of matches given the query. If no argument is given, returns the number of rows in the table. The query format is the same as above. You can use this method to check if an object exists without fetching the entire object.</p>
+      <p>Returns the number of matches given the query. If no argument is given, returns the number of rows in the table. 
+	  The query format is the same as above. You can use this method to check if an object exists without fetching the entire object.</p>
 <pre>
-if Table.count(db, pk=2) == 1:
+if Table.count(db, id=2) == 1:
     # id exists
 else:
     # id does not exist
 </pre>  
-      <p>Note that object id only supports equality and inequality and no other operators.</p>
+      <p>Note that the EasyDB internal column <tt>id</tt> only supports equality and inequality and no other operators. Same as the filter method, you are only responsible for 
+	    at most one query argument.</p>
       <h4 id="custom_types">Custom Types</h4>
       
       <p>In this section, you will build custom field types that is not natively supported by the underlying database. Your ORM layer will seamlessly convert to and from the database's storage type, and perform type safety checks as is required.</p>
@@ -794,7 +394,7 @@ from datetime import datetime
 
 class Lecture(orm.Table):
     location = orm.String()
-    start = orm.DateTime(default=datetime.now)
+    start = orm.DateTime(default=datetime.now)	# datetime.now is a callable!
     end = orm.DateTime()
 
 # main.py
@@ -802,12 +402,13 @@ ece326 = Lecture(db, location="BA1190", end=datetime(2019, 10, 15, 13))
 ece326.start = datetime(2019, 10, 15, 12)
 ece326.save()
 </pre>       
-      <p>For the default value, you must support calling a function if <tt>default</tt> is assigned a function. For the datetime instance, you can ignore time zone related settings.</p>
-      
-      <p>Hint: store it in <a href="https://docs.python.org/3.3/library/datetime.html#datetime.datetime.timestamp">POSIX timestamp</a> format.</p>
+      <p>As a reminder, you must support calling a function if <tt>default</tt> is assigned a function. For the datetime instance, 
+	  you can ignore time zone related settings. 
+	  Hint: store it in <a href="https://docs.python.org/3.3/library/datetime.html#datetime.datetime.timestamp">POSIX timestamp</a> format.</p>
       
       <h5>Coordinate Field</h5>
-      <p>Create a new field, <tt>Coordinate</tt>, which is represented in Python by a 2-tuple, and must be a valid <a href="https://en.wikipedia.org/wiki/Geographic_coordinate_system">geographic coordinate</a> in latitude and longitude. For example:</p>
+      <p>Create a new field, <tt>Coordinate</tt>, which is represented in Python by a 2-tuple, and must be a valid 
+	  <a href="https://en.wikipedia.org/wiki/Geographic_coordinate_system">geographic coordinate</a> in latitude and longitude. For example:</p>
 
 <pre>      
 class Capital(orm.Table):
@@ -820,13 +421,14 @@ ottawa.location   #(45.4215, 75.6972)
 </pre>
       <p>If the coordinate is invalid, you must raise <tt>ValueError</tt> when <em>the value is being set</em>. For example:</p>
 <pre>      
->>> ottawa.location  = (-20, 999.99)
+&gt;&gt;&gt; ottawa.location  = (-20, 999.99)
 Traceback (most recent call last):
   File "&lt;stdin&gt;", line 1, in &lt;module&gt;
 ValueError: invalid coordinate
 </pre>
 
-	  <p>You only need to support equality and inequality operator when this field is queried. You may assume that you will always read back a valid coordinate from the database.</p>
+	  <p>You only need to support equality and inequality operator when this field is queried. 
+	  You may assume that you will always read back a valid coordinate from the database.</p>
       
       <p>Hint: store it using two native EasyDB fields, and use the underscore character so that there is no conflict with user-defined column names. For example:</p>
 <pre>
@@ -842,7 +444,7 @@ Capital {
       <p>To test the database client or the ORM layer, you can either write a custom script that imports <tt>schema.py</tt>, or you can run in interactive mode using the <tt>main.py run</tt> command. It will start interactive mode with all the classes and functions defined in <tt>schema.py</tt> loaded, as well as automatically connecting to the database, and storing the database object as <tt>db</tt>. For example:</p>
       
 <pre>
-student:~/asst3$ ./main.py run
+student:~/asst2$ ./main.py run
 Python 3.5.2 (default, Oct  8 2019, 13:06:37) 
 [GCC 5.4.0 20160609] on linux
 Type "help", "copyright", "credits" or "license" for more information.
@@ -857,10 +459,10 @@ Type "help", "copyright", "credits" or "license" for more information.
 </pre>      
     
       <h4 id="submission">Code Submission</h4>
-      <p>To submit your code with the current commit, use the <tt>Asst3-end</tt> tag. Remember to push the new tag to the remote repository.</p>
+      <p>To submit your code with the current commit, use the <tt>Asst2-end</tt> tag. Remember to push the new tag to the remote repository.</p>
  
 <pre>
-git tag Asst3-end    // Creates tag for current submission for Assignment 3
+git tag Asst2-end    // Creates tag for current submission for Assignment 2
 git push --tags
 </pre>
       
