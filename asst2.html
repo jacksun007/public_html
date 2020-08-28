@@ -150,18 +150,20 @@ git tag Asst2-start
 git push
 git push --tags
 cd asst2
+make # this will create a symbolic link to your EasyDB driver package
 </pre>
 
       <p>The starter code include the following files. Note that we will only test the files that are part of the orm package.</p>
       <ul>
         <li><em>schema.py</em>: includes user-defined tables. You are encouraged to change this file to help you with testing your ORM layer.</li>
         <li><em>main.py</em>: contains the <tt>main</tt> function which allows you to either run in interactive mode for testing purposes, or export the currently loaded schema.</li>
-        <li><em>orm/__init__.py</em>: package-level export of classes and functions. Do not change.</li>
+        <li><em>Makefile</em>: this will create a symbolic link to your assignment 1 EasyDB driver package.</li>
+		<li><em>orm/__init__.py</em>: package-level export of classes and functions. Do not change.</li>
 		<li><em>orm/orm.py</em>: you will change this file to implement the <tt>setup</tt> and <tt>export</tt> functions.</li>
-        <li><em>orm/easydb/</em>: symbolic link to your assignment 1 EasyDB driver package.</li>
         <li><em>orm/table.py</em>: definition for a database table. You will implement the <tt>Table</tt> class and its associated metaclass (you do not have to use a metaclass if you prefer other implementation).</li>
         <li><em>orm/fields.py</em>: You will change this file to implement all the fields supported by the ORM layer, including custom fields not natively supported by the underlying database.</li>
-      </ul>
+        <li><em>orm/.gitignore</em>: ignores the easydb symbolic link.</li>
+	  </ul>
 
       <h4 id="specification">Solution Requirements</h4>
       <p>This assignment has a couple of milestones, each of which can work independently and thus are worth partial marks. You and your partner should take on one of each part of the assignment.</p>
@@ -190,29 +192,36 @@ class Account(orm.Table):
 </pre> 
      
       <p>For all database tables, the client will inherit <tt>orm.Table</tt>. Column names must start with a letter, followed by letters of either case, 
-	  or numbers, but underscore is <em>not</em> allowed (the ORM layer will use it for a special purpose). Also, the word <em>pk</em>, <em>id</em>,
-	  <em>version</em>,
-	  <em>save</em> and <em>delete</em> are reserved by the ORM layer (see next section for what each of these attributes do). 
-	  Raise <tt>AttributeError</tt> (not <tt>ValueError</tt>) if either of two rules 
+	  or numbers, but underscore is <em>not</em> allowed (the ORM layer will use it for a special purpose). Also, the word <em>pk</em>, <em>version</em>,
+	  <em>save</em> and <em>delete</em> are reserved by the ORM layer (see next section for what each of these attributes do) and cannot be used as
+	  column names (they are fine as table names). Lastly, you may not re-define a table (e.g. define User class, and define User class again later), 
+	  even though it is legal in Python to do so. This rule applies to tables defined across multiple schema (e.g. define a User class in both <em>a.py</em> 
+	  and <em>b.py</em>, and importing them into <em>main.py</em>).
+	  Raise <tt>AttributeError</tt> (not <tt>ValueError</tt>) if any of the three rules 
 	  is violated. Do not change the original EasyDB naming rules.</p>
 	  
-	  <p>For each column in the table, it is presented by an instance of one of the following <tt>Field</tt> subclasses: <tt>String</tt>, <tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. For the first three classes, there are no positional parameters. For <tt>Foreign</tt>, it takes one positional parameter: the class of the referenced table. Notice that it is not possibe to reference a class that has yet to be defined. For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
+	  <p>For each column in the table, it is represented by an instance of one of the following <tt>Field</tt> subclasses: <tt>String</tt>, <tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. For the first three classes, there are no positional parameters. For <tt>Foreign</tt>, it takes one positional parameter: the class of the referenced table. Notice that it is not possibe to reference a class that has yet to be defined. For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
       
       <p>Every field types, except for Foreign, support the following options:</p>
       
       <ul>
-        <li><b>blank</b>: this field is allowed to be left unspecified when creating new objects. When this option is set to False (which is the default), <tt>AttributeError</tt> will be raised when attempting to create a new object if the field is not specified. Otherwise, default value of the type (e.g. 0 for int, "" for string) will automatically be used for objects with the field missing.</li>
-        <li><b>default</b>: the default value for this field if it is unspecified in the constructor. Unlike <tt>blank</tt>, <tt>default</tt> will 
-		  automatically set the missing attribute to the default value. If the default value is a function (i.e. a callable), you should 
-		  support calling the function to retrieve the default value. See <a href="#custom_types">Custom Type</a> for an example.</li>
+        <li><b>blank</b>: this field is allowed to be left unspecified when creating new objects. When this option is set to <tt>False</tt>, 
+		  <tt>AttributeError</tt> will be raised when attempting to create a new object if the field is not specified. 
+		  Otherwise, default value of the type (e.g. 0 for int, "" for string) will automatically be used for objects with the field missing.</li>
+        <li><b>default</b>: the default value for this field if it is unspecified in the constructor. <tt>blank</tt> will automatically be set
+			to <tt>True</tt> in order for the default value to be used.
+		  If the default value is a function (i.e. a callable), you should 
+		  support calling the function to retrieve the default value. See <a href="#custom_types">Custom Type</a> for an example. Note that every
+		  field type should have a base default value if it is not specified.</li>
         <li><b>choices</b>: a list of allowed values for this field. <tt>ValueError</tt> will be raised if the field has value not in <tt>choices</tt> when insert or update is attempted.
 		  <tt>ValueError</tt> will also be raised if <tt>choices</tt> is not iterable.
 		</li>
       </ul>
-      <p>Foreign, on the other hand, only supports <i>blank</i>. If blank is true, the field can reference nothing (i.e. set to None).</p>
+      <p>Foreign, on the other hand, only supports <i>blank</i>. If <em>blank</em> is true, the field can reference nothing (i.e. set to <tt>None</tt>).</p>
       
       <p>The Field subclasses must raise <tt>TypeError</tt> during initialization (i.e., while the class is being created) if 
-		either one or more of the choices or default value is the wrong type. For example:</p>
+		either one or more of the choices or default value is the wrong type, or if the specified default value is not in the list
+		of choices (only check this when <em>blank</em> is <tt>True</tt>). For example:</p>
 
 <pre>      
 class User(orm.Table):
@@ -231,18 +240,26 @@ class User(orm.Table):
 <pre>
 orm.setup(database_name, module)
 </pre>
-      <p><em>setup</em> will return a database object that is initialized, but not yet connected. <em>database_name</em> is the name of the underlying database implementation. Currently, we only support one argument: "easydb". <em>module</em> is the module that contains the schema (e.g. schema.py). </p>
+      <p><em>setup</em> will return a database object that is initialized, but not yet connected. <em>database_name</em> 
+	  is the name of the underlying database implementation. Currently, we only support one argument: "easydb". <em>module</em> is the module that 
+	  contains the schema (e.g. schema.py). </p>
 <pre>
 import schema
 db = orm.setup("easydb", schema)  # this should create easydb.Database
 db.connect("127.0.0.1", 8080)
 </pre>
 
+	<p>Note that <tt>setup</tt> will only use tables defined at the global scope of <tt>module</tt>. For example, if User and Account are defined in
+	<em>a.py</em>, and Book and Author are defined in <em>b.py</em>, then calling <tt>setup</tt> with module <em>a</em> will return a Database object
+	with only User and Account defined. Same principle applies to the <tt>export</tt> function described next.</p>
+
 <h5>Export</h5>
 <pre>
 orm.export(database_name, module)
 </pre>
-      <p><em>export</em> will return a string which can be read by the underlying database to create the corresponding database tables, each with the specified columns, similar to the example shown in the <a href="#schema">Database Schema</a> section. This feature is helpful so that you do not have to write the database schema manually in EasyDB format on top of writing the Python ORM format. For example: the following Python schema:</p>
+      <p><em>export</em> will return a string which can be read by the underlying database to create the corresponding database tables, 
+	  each with the specified columns, similar to the example shown in the <a href="asst1.html#schema">Database Schema</a> section of assignment 1. 
+	  This feature is helpful so that you do not have to write the database schema manually in EasyDB format on top of writing the Python ORM format. For example: the following Python schema:</p>
       
 <pre>
 class Course(orm.Table):
@@ -348,7 +365,9 @@ object = Table.get(db, pk)
 <pre>
 [object...] = Table.filter(db, ...)
 </pre>
-      <p>Returns a list of objects that matches the query. If no argument is given, returns all objects in the table. The query arguments use the following format: <em>columnname__op</em>=<em>value</em> where <em>columnname</em> is the column name of the object, <em>op</em> is the operator, and <em>value</em> is the right operand. For the equality operator, <em>__eq</em> is not needed. For example:</p>
+      <p>Returns a list of objects that matches the query. If no argument is given, returns all objects in the table. 
+	  The query arguments use the following format: <em>columnname__op</em>=<em>value</em> where <em>columnname</em> is the column name of the object, 
+	  <em>op</em> is the operator, and <em>value</em> is the right operand. For the equality operator, <em>__eq</em> is not needed. For example:</p>
       
 <pre>
 results = User.filter(db, age__gt=33)
@@ -357,7 +376,9 @@ results = User.filter(db, firstName="Joe")
 results # [&lt;User: Joe Smith&gt;]
 </pre>      
       
-      <p>The supported operators are <tt>ne</tt> (not equal), <tt>gt</tt> (greater than), and <tt>lt</tt> (less than). When the field is a foreign key, you can use either the object itself or its id. For example:</p>
+      <p>The supported operators are <tt>ne</tt> (not equal), <tt>gt</tt> (greater than), and <tt>lt</tt> (less than). Raise <tt>AttributeError</tt> if
+	  either the field does not exist or the operator is not supported (e.g. <em>firstName__wut</em>).
+	  When the field is a foreign key, you can use either the object itself or its id. For example:</p>
 
 <pre>
 results = Account.filter(db, user=joe)
@@ -404,7 +425,8 @@ ece326.save()
 </pre>       
       <p>As a reminder, you must support calling a function if <tt>default</tt> is assigned a function. For the datetime instance, 
 	  you can ignore time zone related settings. 
-	  Hint: store it in <a href="https://docs.python.org/3.3/library/datetime.html#datetime.datetime.timestamp">POSIX timestamp</a> format.</p>
+	  Hint: store it in <a href="https://docs.python.org/3.3/library/datetime.html#datetime.datetime.timestamp">POSIX timestamp</a> format.
+	  The base default value for the datetime field should be <a href="https://en.wikipedia.org/wiki/Unix_time">POSIX time</a>.</p>
       
       <h5>Coordinate Field</h5>
       <p>Create a new field, <tt>Coordinate</tt>, which is represented in Python by a 2-tuple, and must be a valid 
@@ -419,7 +441,8 @@ class Capital(orm.Table):
 ottawa = Capital.filter(db, name="Ottawa")[0]
 ottawa.location   #(45.4215, 75.6972)      
 </pre>
-      <p>If the coordinate is invalid, you must raise <tt>ValueError</tt> when <em>the value is being set</em>. For example:</p>
+      <p>If the coordinate is invalid, you must raise <tt>ValueError</tt> when <em>the value is being set</em> (except if the value is not
+	  2-tuple, in which case you raise a <tt>TypeError</tt>). For example:</p>
 <pre>      
 &gt;&gt;&gt; ottawa.location  = (-20, 999.99)
 Traceback (most recent call last):
@@ -427,8 +450,11 @@ Traceback (most recent call last):
 ValueError: invalid coordinate
 </pre>
 
-	  <p>You only need to support equality and inequality operator when this field is queried. 
-	  You may assume that you will always read back a valid coordinate from the database.</p>
+	  <p>For the <em>filter</em> method on this field, you shall apply the operator to both the latitude and longitude and return objects
+	    that satisfy both conditions. e.g., if the value is (10, 20) and
+	     the operator is <tt>GT</tt>,
+  	     then return all Capital objects where latitude is greater than 10 and longitude is greater than 20.
+		 You may assume that you will always read back a valid coordinate from the database.</p>
       
       <p>Hint: store it using two native EasyDB fields, and use the underscore character so that there is no conflict with user-defined column names. For example:</p>
 <pre>
