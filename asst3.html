@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Assignment 3 | ECE326 | Programming Languages | Fall 2020</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Kuei (Jack) Sun">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/dashboard.css" rel="stylesheet">
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="../assets/js/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+<body data-spy="scroll" data-target=".sidebar"  data-offset="64">
+
+<nav class="navbar navbar-dark navbar-expand-md fixed-top bg-dark shadow">
+  <a class="navbar-brand pr-3" href="ece326.html">ECE326</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarCollapse">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="ece326.html">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="lectures.html">Lecture Notes</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="labs.html">Assignments</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="http://piazza.com/utoronto.ca/fall2019/ece326">Piazza Discussion</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://q.utoronto.ca/">Quercus Website</a>
+      </li>
+      
+    </ul>
+  </div>  
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <nav class="col-md-3 col-lg-2 d-none d-md-block bg-light sidebar">
+      <div class="sidebar-sticky">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="#background">
+              Background
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#setup">
+              Setup
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#specification">
+              Solution Requirements
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#commands">
+              Database Commands
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#concurrency">
+              Adding Concurrency
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#submission">Code Submission</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#advice">Hints and Advice</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Assignment 3: Concurrent In-Memory Database</h1>
+      </div>
+      <p><strong>Due Date: November 19th, 11:59pm</strong></p>
+      <p><strong>Lab TA: Kia Shakiba</strong></p>
+      <p>In this assignment, you will build the EasyDB&trade; server, a multithreaded, concurrent in-memory database, using the Rust programming language.</p>
+      
+
+      <h4 id="background">Background</h4>
+      
+      <p>A concurrent database supports connections with multiple clients. This requires care in the implementation such that the interaction between 
+	  multiple clients does not cause errors to occur with the database object. In this assignment, you will implement all the EasyDB commands 
+	  as described in <a href="asst1.html">assignment 1</a>. In addition, your implementation should allow multiple clients to connect to the same 
+	  EasyDB server. When one client makes changes to the database, all other clients should observe those changes. </p> 
+      
+      <h4 id="setup">Setup</h4>
+      <pre>
+cd ~/ece326
+tar -xf /cad2/ece326f/src/server.tar
+git status # should say that "asst3/" directory is untracked
+git add asst3
+git commit -m "Initial code for Assignment 3"
+git tag Asst3-start
+git push
+git push --tags
+cd asst3
+</pre>
+      <p>To setup the rust compiler, <tt>rustc</tt>, you need to set the environment variable <tt>RUSTUP_HOME</tt>. You can do so, similar to how you set up the tester.</p>
+      
+      <pre>% echo $0</pre>
+
+      <p>If the output shows <tt>sh</tt> or <tt>bash</tt>, then you are using <tt>bash</tt>. If the output shows <tt>csh</tt> or <tt>tcsh</tt>, then you are using <tt>csh</tt>.</p>
+      
+      <ol>
+        <li>
+          <p>For csh, add the following to the end of your ~/.cshrc:</p>
+          <pre>setenv RUSTUP_HOME /cad2/ece326f/rust</pre>
+        </li>
+        <li>
+          <p>For bash, add the following to the end of your ~/.bashrc:</p>
+          <pre>export RUSTUP_HOME=/cad2/ece326f/rust</pre>
+        </li>
+      </ol>
+
+      <p>The starter code is organized as follows:</p>
+      <ul>
+        <li><i>main.rs</i>: Contains the main function and parses command line arguments.</li>
+        <li><i>packet.rs</i>: Handles network packets by deserializing requests from the client and serializing responses from the server to the client.
+		  <b>You may need to modify this file</b> to handle concurrency.
+		</li>
+        <li><i>schema.rs</i>: Parses the database schema from a file into table definitions. </li>
+        <li><i>server.rs</i>: Handles connections and client requests. <b>You should modify this file </b>to initialize the database object and also to add support for multiple simultaneous connections.</li>
+        <li><i>database.rs</i>: Implements EasyDB database logic. <b>You should modify this file </b>to define your database object and to complete each of the EasyDB commands.</li>
+      </ul>
+      
+      <p>Recall you can start the server on the command line as such:</p>
+<pre>
+cd asst3
+make
+./server [-g] PORT [FILE=default.txt] [HOST=localhost]
+</pre>      
+
+      <h4 id="specification">Solution Requirements</h4>
+
+      <p>Please first familiarize yourself again with the <a href="asst1.html#protocol">features of EasyDB</a>. You will need to make sure that the behaviour of your solution matches what is described in that handout. You are highly suggested to use your ORM software, developed in assignment 3, to test the correctness of your EasyDB server.</p>
+
+      <p>Also take some time to read through the code that has been provided to you. <i>schema.rs</i> contains structure definition for tables and their columns, 
+	    which you can use directly as part of your Database object (e.g. make it a field in your Database structure). Schema parsing has already been completed for you,
+		as well as parsing of Request packets and serialization of Response packets. Familiarize yourself with <i>packet.rs</i> and the structures that is defined within. 
+		You should be able to reuse many definitions, especially <tt>Value</tt>, for the rows in your database table. 
+		You will also need to understand how to create Response objects to be sent back to the client.</p>
+      
+      <p>To recap the previous assignment, you are responsible for the 5 commands in EasyDB (<tt>INSERT, UPDATE, DROP, GET</tt>, and <tt>SCAN</tt>). <b>You should not use any external Rust libraries</b> (i.e. crates), aside from the standard Rust library. It is <b>solely your responsibility</b> to make sure your Rust code compiles on the lab machines.</p>
+      
+      <h4 id="commands">Database Commands</h4>
+	  <p>Initially, when the client connects to the server, the server should send a response code to indicate whether it will accept the connection. For single-threaded
+	     implementation, the server should always send <tt>Response::OK</tt>. This has already been done for you. For multi-threaded implementation, you will need to
+		 send <tt>Response::SERVER_BUSY</tt> when the number of connections exceeds 4 clients. See <a href="#concurrency">Adding Concurrency</a> for more information.</p>
+	  <p>Below is a rundown of the database functions you need to implement.</p>
+      <h5>Insert</h5>
+<pre>
+fn handle_insert(db: &amp; mut Database, table_id: i32, values: Vec&lt;Value&gt;) -&gt; Result&lt;Response, i32&gt; 
+</pre>
+      <p><tt>handle_insert</tt> adds a new row, consisting of <tt>values</tt>, to a database table with id <tt>table_id</tt>. Note that during packet parsing, the values have been sanitized. However, they have not been validated. You need to check that the type of each value corresponds to the type of their respective columns, and that foreign key references a valid row (i.e. the row in the other table actually exists). You also need to make sure the number of values supplied by the packet is the same as the number of columns expected for the table. Your response packet should return the following error codes:</p>
+      
+      <ul>
+        <li><tt>BAD_TABLE</tt>: if table id is not valid.</li>
+        <li><tt>BAD_VALUE</tt>: upon column type mismatch.</li>
+        <li><tt>BAD_ROW</tt>: if number of values does not match number of columns.</li>
+        <li><tt>BAD_FOREIGN</tt>: if foreign key reference does not exist.</li>
+      </ul>  
+      <p>Upon success, you should return a <tt>Response::Insert</tt> object. You are free to choose a unique row id and version number for the newly inserted row, but they both must be positive non-zero integers.</p>
+
+      <h5>Update</h5>
+<pre>
+fn handle_update(db: &amp; mut Database, table_id: i32, object_id: i64, version: i64, values: Vec&lt;Value&gt;) -&gt; Result&lt;Response, i32&gt; 
+</pre>
+      <p><tt>handle_update</tt> updates an existing row, specified by <tt>object_id</tt>. Similar to <tt>handle_insert</tt>, you will need to validate the input values before allowing the specified row to be update. In addition to the error codes that <tt>handle_insert</tt> can send back to the client, you will also need to handle the following errors:</p>
+      
+      <ul>
+        <li><tt>NOT_FOUND</tt>: if object_id is not found.</li>
+        <li><tt>TXN_ABORT</tt>: if input version number does not match version number of this row. However, if <tt>version</tt> is 0, you should always allow the update if the input values are valid.</li>
+      </ul> 
+
+      <p>Upon success, you should return a <tt>Response::Update</tt> object with a new version number for the row. The new version number must be strictly larger in value than the previous version number. You do not need to handle the case when the version number overflows 64-bit integer.</p>
+
+      <h5>Drop</h5>
+<pre>
+fn handle_drop(db: &amp; mut Database, table_id: i32, object_id: i64) -&gt; Result&lt;Response, i32&gt; 
+</pre>
+      <p><tt>handle_drop</tt> deletes an existing row, specified by <tt>object_id</tt>. It can respond with the following error codes:</p>
+
+      <ul>
+        <li><tt>BAD_TABLE</tt>: if table id is not valid.</li>
+        <li><tt>NOT_FOUND</tt>: if object_id is not found.</li>
+      </ul>  
+
+      <p>Remember that you must implement cascading drop, which will delete all rows in other tables that have a foreign key reference to the row being deleted. This may start a chain reaction where rows deleted as a result of cascading delete causes more rows on other tables to be deleted. For example, if there are three tables, Country, Province, and City, deleting a country will cause all its provinces to be deleted, along with every city in those provinces.</p>
+      
+      <p>Upon success, you should return a <tt>Response::Drop</tt> object.</p>
+      
+      <h5>Get</h5>
+<pre>
+fn handle_get(db: &amp; Database, table_id: i32, object_id: i64) -&gt; Result&lt;Response, i32&gt; 
+</pre>
+      <p><tt>handle_get</tt> retrieves an existing row, specified by <tt>object_id</tt>. It can respond with the following error codes:</p>
+      
+      <ul>
+        <li><tt>BAD_TABLE</tt>: if table id is not valid.</li>
+        <li><tt>NOT_FOUND</tt>: if object_id is not found.</li>
+      </ul>  
+      
+      <p>Upon success, you should return a <tt>Response::Get</tt> object, with the values of the row and the current version of the row.</p>
+      
+      <h5>Scan</h5>
+<pre>
+fn handle_scan(db: &amp; Database, table_id: i32, column_id: i32, operator: i32, other: Value) -&gt; Result&lt;Response, i32&gt; 
+</pre>
+      <p><tt>handle_scan</tt> compares a column of every row in a table against a value and returns the id of all rows that matched the query. It can respond with the following error codes:</p>
+      
+      <ul>
+        <li><tt>BAD_TABLE</tt>: if table id is not valid.</li>
+        <li><tt>BAD_QUERY</tt>: if any of <tt>column_id</tt> or <tt>operator</tt> is invalid (e.g. column_id out of bound, operator not supported for the column type, or invalid operator number).</li>
+      </ul>  
+      
+      <p>You are responsible for implementing the following operators:</p>
+      
+      <ul>
+        <li><tt>OP_AL</tt>: Return all valid rows in the table. If column_id is not zero, return <tt>BAD_QUERY</tt>. <tt>other</tt> should be a Value::Null object, but you can ignore it.</li>
+        <li><tt>OP_EQ</tt>: equal to operator.</li>
+        <li><tt>OP_NE</tt>: not equal to operator.</li>
+        <li><tt>OP_LT</tt>: less than operator.</li>
+        <li><tt>OP_GT</tt>: greater than operator.</li>
+        <li><tt>OP_LE</tt>: less than or equal to operator.</li>
+        <li><tt>OP_GE</tt>: greater than or equal to operator.</li> 
+      </ul>
+      
+      <p>Recall that it is possible to scan a table for id of a row, using <tt>column_id</tt> 0. Also recall that for id field or foreign field, only equal and not equal operators are supported.</p>
+      
+      <p>Upon success, you should return a <tt>Response::Query</tt> object, with the ids of all the rows that matched the query. You are not required to sort the ids in the response. </p>      
+      
+      <h4 id="concurrency">Adding Concurrency</h4>
+
+      <p>You should only work on this part once you have completed all of the database commands. You will need to make <em>small</em> changes to <i>server.rs</i>
+     	to enable multithreading. First, you should <b>spawn a new thread</b> via <tt>thread::spawn</tt> for every incoming connection. 
+		You can create a thread pool as well, but just remember that EasyDB connections are persistent. 
+		The HTTP protocol, on the other hand, its connection only lasts for the duration of one command and one response. 
+		In EasyDB, the connection remains open until the client sends the Exit command.</p>
+
+      <p>The argument to <tt>spawn</tt> should be a function (or closure) that calls <tt>handle_connection</tt>. You will require use of mutex and a referenced counted smart pointer to be able to share your database object among multiple threads safely.</p>
+      
+      <p>To prevent overloading the server, you MUST restrict the number of threads to at most 4. After 4 threads have been created, 
+		 you should refuse any additional connections until some existing connections have ended. Do so by sending the response code <tt>SERVER_BUSY</tt> to
+		 the client after accepting the request, followed by shutting down the connection stream immediately.</p>
+      
+      <p>In order to get full marks on the assignment, you will need to support parallelism between independent table accesses. This means that if one thread is working on one table, another thread can simultaneously work on a different table without contention. This will require you to change your database design so that each table can be independently shared, and you will have to deal with the potential issue of deadlocks due to multiple mutexes. You should ensure that all other parts of your database is working before attempting this feat. This last part may require you to change packet.rs.</p> 
+
+      <h4 id="submission">Code Submission</h4>
+      <p>To submit your code with the current commit, use the <tt>Asst3-end</tt> tag. Remember to push the new tag to the remote repository.</p>
+
+<pre>
+git tag Asst3-end    // Creates tag for current submission for Assignment 3
+git push --tags
+</pre>
+
+      <h4 id="advice">Tips and Advice</h4>
+
+      <p><b>General</b></p>
+      <ul>
+        <li>Make sure you start early - Rust is not as forgiving as Python or even C++.</li>    
+        <li>Plan how you will store the data using structs and data structures in the standard library. Try to think about how you will handle more complicated features such as cascade delete (if a row is referenced by rows in other tables, those rows will also be deleted).</li>
+        <li>When running the tester. Use the <tt>-v</tt> option to turn on the <tt>-g</tt> option on your server. Your server's output will be saved to <tt>server.log</tt>.</li>
+      </ul>
+
+      <p><b>Rust</b></p>
+      <ul>
+        <li>The Rust compiler is very explicit in pinpointing where an error occurs, and often suggests hints to fix the problem. Try to read the error message carefully: it is often helpful!</li>    
+        <li>By default, <a href="https://doc.rust-lang.org/book/ch03-01-variables-and-mutability.html">Rust variables are immutable</a>. Make sure you add <tt>mut</tt> in front of the variable to make it mutable.</li>
+        <li>Rust has <a href="https://doc.rust-lang.org/book/ch08-02-strings.html">two commonly used string types</a>: <tt>str</tt> and <tt>String</tt>. <tt>str</tt> is a string slice or an immutable reference to data (e.g. string literals stored in program binary), while the <tt>String</tt> type is growable, mutable and owned (stored in heap). Don't try to change <tt>str</tt> type strings!</li>
+        <li>Get familiar with <a href="https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html">ownership and borrowing in Rust</a>, especially when you pass around data between functions. </li>
+        <li><a href="https://doc.rust-lang.org/book/ch06-02-match.html">Rust matches are exhaustive</a>. If you don't match for a <tt>None</tt> case, the Rust compiler will throw an error.</li>
+      </ul>
+      
+
+      
+      <hr>
+      <footer class="container text-center">
+        <p>&copy; 2020 Kuei (Jack) Sun, University of Toronto</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    /* nothing for now */
+  });
+</script>
+</body>
+</html>
