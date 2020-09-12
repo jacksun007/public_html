@@ -496,7 +496,7 @@ cd asst1
         <li><em>easydb/easydb.py</em>: includes a database client which is needed to communicate with an EasyDB server. 
 		  You will implement the Database class to send and receive packets to and from the server.</li>
 		<li><em>easydb/packet.py</em>: has constants for the EasyDB commands, codes, and operator.</li>  
-        <li><em>easydb/exceptions.py</em>: contains all the exception classes used by the database implementation. You should not need to change this file.</li>
+        <li><em>easydb/exception.py</em>: contains all the exception classes used by the database implementation. You should not need to change this file.</li>
       </ul>
 
       <h4 id="specification">Solution Requirements</h4>
@@ -636,7 +636,10 @@ easydb.exception.ObjectDoesNotExist: User object 2 is not found
 
 	  <p>Note: Do not forget about the internal <tt>id</tt> field. Also, when the operator is <tt>OP_AL</tt>, you should ignore the column name.</p>
       <h4 id="testing">Testing Your Code</h4>
-      <p>To test your database client, you will need to run the server. You can start the server by running <tt>easydb -g PORT</tt> on one terminal while running the client on a different terminal, 
+      <p>To test your database client, you will need to run the server. 
+		Remember to go through <a href="labs.html#testing">Tester Setup</a> first, otherwise you will not find the executable for the server, which
+		is placed in the folder <tt>/cad2/ece326f/tester/bin</tt>.
+	    You can start the server by running <tt>easydb -g PORT</tt> on one terminal while running the client on a different terminal, 
 	    where the <tt>-g</tt> option will print everything the database is doing, and <tt>PORT</tt> is the port number. 
 		You should choose a unique port number so that other people also working on your machine would not accidentally connect to your database. 
 		By default, the server will load <tt>default.txt</tt> for the database schema, but you should probably test with different schema to make sure your code is truly working. 
