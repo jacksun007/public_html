@@ -495,8 +495,8 @@ cd asst1
         <li><em>easydb/__init__.py</em>: Enables the folder <tt>easydb</tt> to be imported. Do not change.</li>
         <li><em>easydb/easydb.py</em>: includes a database client which is needed to communicate with an EasyDB server. 
 		  You will implement the Database class to send and receive packets to and from the server.</li>
-		<li><em>easydb/packet.py</em>: has constants for the EasyDB commands, codes, and operator.</li>  
-        <li><em>easydb/exception.py</em>: contains all the exception classes used by the database implementation. You should not need to change this file.</li>
+		<li><em>easydb/packet.py</em>: has constants for the EasyDB commands, codes, and operator. Do not change.</li>  
+        <li><em>easydb/exception.py</em>: contains all the exception classes used by the database implementation. Do not change.</li>
       </ul>
 
       <h4 id="specification">Solution Requirements</h4>
@@ -678,6 +678,9 @@ git push --tags
         <li><b>table</b>: a group of data with the same user-defined format, similar to a class in object-oriented programming.</li>
         <li><b>row</b>: a record in a database table, similar to an instance of a class.</li>
         <li><b>column</b>: a "field" in a database row, with an associated name.</li>
+		<li><b>broken pipe</b>: this error happens when the other side of the connection ended without calling <tt>close</tt>(). For example,
+		  if you kill the server process (e.g. <kbd>Ctrl + C</kbd>), you will get a broken pipe on the client side. Similarly, if you forgot
+		  to call <tt>close</tt>() in your client code before ending your program, the server will get a broken pipe error.</li>
       </ul>
       
       <hr>
