@@ -269,7 +269,9 @@ struct row {
 		<li>For <tt>NULL</tt>, <tt>size</tt> is equal to 0.</li>
 		<li>For <tt>INTEGER</tt> and <tt>FLOAT</tt>, <tt>size</tt> is equal to 8 (i.e. 8 bytes).</li> 
 		<li>For <tt>STRING</tt>, <tt>size</tt> is the size required to store the string in ASCII encoding, but <em>rounded up to the nearest multiples of 4 bytes</em>. 
-		  Therefore, the size of the buffer for "bad" would be 4 bytes (3 bytes rounded up to 4), but 8 bytes for "hello" (5 bytes rounded up to 8). </li>
+		  Therefore, the size of the buffer for "bad" would be 4 bytes (3 bytes rounded up to 4), but 8 bytes for "hello" (5 bytes rounded up to 8).
+		  If you need to round up the size, then you must pad your buffer with the NUL character (<tt>\x00</tt>). For example, for the string "hello",
+		  your buffer should look like <tt>b"hello\x00\x00\x00"</tt>.</li>
       </ul>	 
 			 
 	  <p>For <tt>struct row</tt>, <tt>count</tt> specifies how many values are stored, and <tt>values</tt> is the array of values specified above.</p>
