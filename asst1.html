@@ -68,6 +68,11 @@
               </li>
             </ul>
           </li>
+		  <li class="nav-item">
+            <a class="nav-link" href="#binary">
+              Binary Format
+            </a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="#setup">
               Setup
@@ -477,7 +482,80 @@ enum Operator {
       
       <p>The exit command shuts down the connection gracefully. There is no server response for this command. The server will disconnect once it receives this command. 
 	    You may set any value for the <tt>table</tt> field, but 1 is preferred.</p>
+
+	  <h4 id="binary">Binary Format</h4>
+	  <p>Since you will be working extensively on converting between Python basic types and binary data (the format of network packets), 
+	  this section serves as a primer for the Python's <a href="https://docs.python.org/3/library/struct.html"><tt>struct</tt> library</a>.
+	  You should reference the documentation for any detail not described here.</p>
+	  
+	  <p>In Python, binary data is represented by the <tt>bytearray</tt> type, which, in C++, is similar to a char array (note that in C++,
+	    char array can be used either as a string or as a buffer. We will assume the latter for this assignment). A bytearray is similar
+		to a Python string. However, a string may contain unicode characters (such as the plus-minus sign ±), whereas a bytearray contains 
+		only uninterpreted bytes. In Python,
+		you can create a bytearray literal by prefixing a string with the character <tt>b</tt>:</p>
+		
+<pre>
+&gt;&gt; packet = b'abc123'
+&gt;&gt; type(packet)
+&lt;class 'bytes'&gt;
+</pre>		
+		<p>
+		Note that the content of a bytearray is identical to a string <em>if</em> the string contains only ASCII characters. This is because
+		ASCII characters can fit inside a byte, whereas unicode characters require at least two bytes. When the byte cannot be represented
+		as an ASCII character, then it will show up as <tt>\xNN</tt> where NN is the hex value of the byte, for example, <tt>b'\x00\x0f'</tt>
+		is a bytearray with two bytes, the first byte has the value 0, and the second byte has the value 15 (<tt>f</tt> in hex is 15 in decimal).
+		</p>
+		
+		<p>To create a packet, you must convert a Python basic type into binary data. You will need to use the <tt>struct.pack</tt> 
+		function to do so (alternatively, you can use
+		<tt>pack_into</tt> and the <tt>pack</tt> method of the class <tt>Struct</tt>, which we will not discuss here). Before you pack,
+		you need to know four pieces of information about the binary data format that you wish to convert to:</p>
+		
+		<ol>
+		  <li><em>Data type</em>: integer, float, or byte(s).</li>
+		  <li><em>Signedness</em>: signed (negative values allowed) or unsigned.</li>
+		  <li><em>Size</em>: determines the maximum range of values the binary type can handle.</li>
+		  <li><em>Endianness</em>: little-endian or big-endian.</li>
+		</ol>
       
+		<p>You should refer to the <a href="https://docs.python.org/3/library/struct.html#format-strings">Format Strings</a> section of
+		the <tt>struct</tt> library documentation for a full list of supported binary format.</p>
+		
+		<p>For example, if we want to create a packet that contains a single 4-byte big-endian signed integer, we would use the
+		<tt>"&gt;i"</tt> format string to create the packet, like this:</p>
+
+<pre>
+&gt;&gt; struct.pack("&gt;i", 42)
+b'\x00\x00\x00*'
+</pre>		
+
+		<p>In the output, we see a weird asterisks at the end. Do not worry, that is because the ASCII value of the asterisks character is the decimal 
+		value 42.</p>
+		<p>You can also pack multiple values with a single <tt>struct.pack</tt> call. For example, if we want to pack a 4-byte signed integer,
+		followed by an 8-byte floating point number, we can do this:</p>
+		
+<pre>
+&gt;&gt; packet = struct.pack("&gt;id", 1, 1.0)
+&gt;&gt; packet
+b'\x00\x00\x00\x01?\xf0\x00\x00\x00\x00\x00\x00'
+</pre>		
+	  <p>Here, the first 4 bytes (<tt>b'\x00\x00\x00\x01'</tt>) belongs to the integer 1, and the rest of the bytearray belongs to the floating
+	    point number 1.0.</p>
+		
+      <p>To convert binary data back to Python basic types, use <tt>struct.unpack</tt> with the same format string. For example, to get 
+	  back the two values that we packed, we can do this:</p>
+	  
+<pre>
+&gt;&gt; struct.unpack("&gt;id", packet)
+(1, 1.0)
+</pre>		  
+	  <p>Note that struct.unpack will always return a tuple, even if you only unpacked one value.</p>
+
+	  <p>Lastly, you are likely going to need to make multiple calls to <tt>struct.pack</tt> to create various pieces of the packet, such
+	  as <tt>struct request</tt> and <tt>struct value</tt>. At the end, you must send a single bytearray over the network. Therefore, you
+	  will need to concatenate the bytearrays. Please refer the the lectures on how to concatenate strings; the same methods and operators
+	  work for bytearrays as well.</p>
+	  
       <h4 id="setup">Setup</h4> 
 <pre>
 cd ~/ece326
@@ -553,8 +631,10 @@ success = db.connect("127.0.0.1", 8080)
 db.close()
 </pre> 
       
-      <p>The main part of this assignment is implementing all of EasyDB commands. You are suggested to use Python's <tt>struct</tt> library to help build packets and read responses from the server. 
-	  <tt>io.BytesIO</tt> is another great option. When the server responds in error, you should throw objects of the corresponding error classes.</p>
+      <p>The main part of this assignment is implementing all of EasyDB commands. You will be using Python's <a href="#binary">
+	    <tt>struct</tt> library</a> to help construct the individual pieces of an EasyDB packet and also to parse responses from the server. 
+	    <a href="https://docs.python.org/3/library/io.html"><tt>io.BytesIO</tt></a> is a great option for packing multiple <tt>bytearray</tt>
+		together to form a single packet. When the server responds in error, you should throw objects of the corresponding error classes.</p>
       
       <ul>
         <li><tt>ObjectDoesNotExist</tt>: corresponds to the error code <tt>NOT_FOUND</tt>.</li>
