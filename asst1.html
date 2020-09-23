@@ -237,8 +237,8 @@ struct response {
 };
 </pre>
 
-      <p>All EasyDB requests begin with <tt>request</tt>. The <tt>command</tt> field is one of the five commands listed above, and the <tt>table</tt> field is the table number. 
-	    A table's number is the order in which it appears in the schema, starting at 1 (in earlier example, User's table number would be 1, and Account's would be 2). 
+      <p>All EasyDB requests begin with <tt>struct request</tt>. The <tt>command</tt> field is one of the six commands listed above, and the <tt>table</tt> field is the table number. 
+	    A table's number is the order in which it appears in the schema, starting from 1 (in earlier example, User's table number would be 1, and Account's would be 2). 
 		All responses begin with <tt>response</tt>, which contains a code for success (i.e. OK), or error. <tt>BAD_TABLE, BAD_ROW, BAD_VALUE</tt>, and <tt>BAD_REQUEST</tt> are possible 
 		for all EasyDB commands except for the Exit command (only <tt>BAD_REQUEST</tt> is possible).</p>
  
@@ -549,7 +549,7 @@ b'\x00\x00\x00\x01?\xf0\x00\x00\x00\x00\x00\x00'
 &gt;&gt; struct.unpack("&gt;id", packet)
 (1, 1.0)
 </pre>		  
-	  <p>Note that struct.unpack will always return a tuple, even if you only unpacked one value.</p>
+	  <p>Note that <tt>struct.unpack</tt> will always return a tuple, even if you only unpacked one value.</p>
 
 	  <p>Lastly, you are likely going to need to make multiple calls to <tt>struct.pack</tt> to create various pieces of the packet, such
 	  as <tt>struct request</tt> and <tt>struct value</tt>. At the end, you must send a single bytearray over the network. Therefore, you
