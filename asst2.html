@@ -124,16 +124,17 @@ try:
 except orm.ObjectDoesNotExist:
     pass
 </pre>    
-
-      <p>The main advantage of an ORM layer is that it abstracts away the underlying database implementation, allowing you possible freedom to switch your database solution to another (e.g. from EasyDB to MySQL &#x1f622;).</p>
+	  <p>In other words, with ORM, you can treat database tables as classes and database rows as objects, allowing the end user to 
+	    write object-oriented code. Another advantage of an ORM layer is that it abstracts away the underlying database implementation, 
+		allowing the end user possible freedom to switch from one database solution to another (e.g. from EasyDB to MySQL).</p>
       
-      <p>Another important advantage is that ORM can help you convert to and from in-memory types to storage types seamlessly. 
+      <p>Another important advantage is that ORM can help with converting in-memory types to and from storage types seamlessly. 
 	  For example, some relational databases, such as EasyDB, do not natively support an IP Address type. 
 	  Therefore, to store an IP address in these databases, it must first be converted to a string (e.g. "127.0.0.1"). 
 	  Unmarshalling code is required to read it back from the database and convert it back to an IP Address object. 
 	  These tedious tasks can be automated with ORM.</p>
       
-      <p>Your task in this assignment is to will develop an ORM framework which is used by other programmers to build their web applications. 
+      <p>Your task in this assignment is to develop an ORM framework which is used by other programmers to build their web applications. 
 	  This ORM layer allows web developers to specify the layout of their database directly in Python, 
 	  and be able to work with Python objects in their program, rather than having to use the low level database client. 
 	  Your ORM layer will also support complex data types not generally available natively in database solutions, 
