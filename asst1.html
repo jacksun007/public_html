@@ -188,7 +188,9 @@ Animal {
   owner: User;
 }
 </pre>  
-      <p>Hint: you can guarantee that there's no cycle if a foreign field only references already defined table (except for the current one). </p>
+      <p>You can guarantee that there's no cycle if a foreign field only references already defined table (except for the current one). Therefore,
+	    to keep this assignment simple, you will disallow forward references, even in cases where cycles would not be formed (e.g., 
+		switching the position between User and Account in the first example).</p>
       <h4 id="protocol">Access Protocol</h4>
       
       <p>To access a running EasyDB server, you must know the host name and its port number. Once you are connected, you can make one of five EasyDB queries that are available. 
