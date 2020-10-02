@@ -138,7 +138,7 @@ except orm.ObjectDoesNotExist:
 	  This ORM layer allows web developers to specify the layout of their database directly in Python, 
 	  and be able to work with Python objects in their program, rather than having to use the low level database client. 
 	  Your ORM layer will also support complex data types not generally available natively in database solutions, 
-	  which will improves the robustness of the web applications built on top of the ORM layer.</p>
+	  which will improve the robustness of the web applications built on top of the ORM layer.</p>
       
       <h4 id="setup">Setup</h4> 
 <pre>
@@ -169,8 +169,8 @@ make # this will create a symbolic link to your EasyDB driver package
       <h4 id="specification">Solution Requirements</h4>
       <p>This assignment has a couple of milestones, each of which can work independently and thus are worth partial marks. 
 	  You and your partner should take on one of each part of the assignment. Please note that this assignment depends on full completion
-	  of assignment 1. So if you did not get 100% in assignment 1, please go back and make sure you finish it otherwise assignment 2
-	  will not work properly. You may also need to fix hidden bugs in assignment 1 if the assignment 1 tester failed to uncover them (Let
+	  of assignment 1. So if you did not get 100% in assignment 1, please go back and make sure you finish it, otherwise assignment 2
+	  will not work properly. You may also need to fix hidden bugs in assignment 1 if the assignment 1 tester failed to uncover them (let
 	  the instructor know about the bug in this case, so that a new check can be added to the tester for next year).</p>
 
       <h4 id="orm_schema">Database Model</h4>
@@ -196,7 +196,7 @@ class Account(orm.Table):
     balance = orm.Float()
 </pre> 
      
-      <p>For all database tables, the client will inherit <tt>orm.Table</tt>. Column names must start with a letter, followed by letters of either case, 
+      <p>All database tables defined in the Python schema file will need to inherit <tt>orm.Table</tt>. Column names must start with a letter, followed by letters of either case, 
 	  or numbers, but underscore is <em>not</em> allowed (the ORM layer will use it for a special purpose). Also, the word <em>pk</em>, <em>version</em>,
 	  <em>save</em> and <em>delete</em> are reserved by the ORM layer (see next section for what each of these attributes do) and cannot be used as
 	  column names (they are fine as table names). Lastly, you may not re-define a table (e.g. define User class, and define User class again later), 
