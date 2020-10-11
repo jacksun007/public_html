@@ -103,7 +103,9 @@
       
       <p>Object-relational mapping is a technique for converting database records to and from in-memory objects. 
 	  Therefore, instead of writing code that extract values from a database query such as this:</p>
-      
+
+<div class="row">
+<div class="col-md-9">
 <pre>
 # returns a Record object
 rec = db.execute("GET 2 FROM User")
@@ -123,15 +125,21 @@ try:
     name = user.firstName
 except orm.ObjectDoesNotExist:
     pass
-</pre>    
+</pre>
+</div>
+<div class="col-md-3">
+<img src="img/webstack.svg" alt="Web Stack" height="300px" style="margin-bottom:1rem;">
+</div>
+</div>
 	  <p>In other words, with ORM, you can treat database tables as classes and database rows as objects, allowing the end user to 
-	    write object-oriented code. Another advantage of an ORM layer is that it abstracts away the underlying database implementation, 
-		allowing the end user possible freedom to switch from one database solution to another (e.g. from EasyDB to MySQL).</p>
+	    write object-oriented code. More importantly, ORM layer abstracts away the underlying database implementation, 
+		allowing the end users possible freedom to switch from one database solution to another (e.g. from EasyDB to MySQL)
+		without having to rewrite their entire application to use the new database solution.</p>
       
-      <p>Another important advantage is that ORM can help with converting in-memory types to and from storage types seamlessly. 
+      <p>Another advantage is that an ORM framework can help with converting in-memory types to and from storage types seamlessly. 
 	  For example, some relational databases, such as EasyDB, do not natively support an IP Address type. 
 	  Therefore, to store an IP address in these databases, it must first be converted to a string (e.g. "127.0.0.1"). 
-	  Unmarshalling code is required to read it back from the database and convert it back to an IP Address object. 
+	  Then, more code is required to read it back from the database and convert it back to an IP Address object. 
 	  These tedious tasks can be automated with ORM.</p>
       
       <p>Your task in this assignment is to develop an ORM framework which is used by other programmers to build their web applications. 
@@ -172,6 +180,9 @@ make # this will create a symbolic link to your EasyDB driver package
 	  of assignment 1. So if you did not get 100% in assignment 1, please go back and make sure you finish it, otherwise assignment 2
 	  will not work properly. You may also need to fix hidden bugs in assignment 1 if the assignment 1 tester failed to uncover them (let
 	  the instructor know about the bug in this case, so that a new check can be added to the tester for next year).</p>
+	  
+	  <p>Keep in mind that once you have completed your assignment 1 code, it should not need to be changed for assignment 2. All the 
+	    new code you write for assignment 2 should interact with the interface provided by assignment 1.</p>
 
       <h4 id="orm_schema">Database Model</h4>
       <p>In an object-relational mapping software, the programmer would write their database schema in a database-neutral language (i.e., in a way that the underlying database could be swapped out without affecting the program). For our ORM, the programmer will write the schema in Python (inspired by <a href="https://www.djangoproject.com/">Django</a>). Let's first look at an example schema:</p>
@@ -205,19 +216,25 @@ class Account(orm.Table):
 	  Raise <tt>AttributeError</tt> (not <tt>ValueError</tt>) if any of the three rules 
 	  is violated. Do not change the original EasyDB naming rules.</p>
 	  
-	  <p>For each column in the table, it is represented by an instance of one of the following <tt>Field</tt> subclasses: <tt>String</tt>, <tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. For the first three classes, there are no positional parameters. For <tt>Foreign</tt>, it takes one positional parameter: the class of the referenced table. Notice that it is not possibe to reference a class that has yet to be defined. For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
+	  <p>For each column in the table, it is represented by an instance of one of the following <tt>Field</tt> subclasses: <tt>String</tt>, 
+		<tt>Integer</tt>, <tt>Float</tt>, and <tt>Foreign</tt>. Each of these classes corresponds to a primitive type that EasyDB supports. 
+		For the first three classes, there are no positional parameters. For <tt>Foreign</tt>, it takes one positional parameter: 
+		the class of the referenced table. Notice that it is not possibe to reference a class that has yet to be defined. 
+		For later part of this assignment, you will be adding new field types and building them on top of the primitive types.</p>
       
       <p>Every field types, except for Foreign, support the following options:</p>
       
       <ul>
-        <li><b>blank</b>: this field is allowed to be left unspecified when creating new objects. When this option is set to <tt>False</tt>, 
-		  <tt>AttributeError</tt> will be raised when attempting to create a new object if the field is not specified. 
-		  Otherwise, default value of the type (e.g. 0 for int, "" for string) will automatically be used for objects with the field missing.</li>
-        <li><b>default</b>: the default value for this field if it is unspecified in the constructor. <tt>blank</tt> will automatically be set
-			to <tt>True</tt> in order for the default value to be used.
+        <li><b>blank</b>: this field is allowed to be left unspecified in the constructor of database table objects. When this option is set 
+		to <tt>False</tt>, 
+		  <tt>AttributeError</tt> will be raised when attempting to create a new object with the field is not specified. 
+		  If blank is <tt>True</tt>, default value will be used (see next point on default option) when the field is not specified in the constructor.
+        </li>
+        <li><b>default</b>: the default value for this field if it is unspecified in the constructor. When the default option is specified,
+		    <tt>blank</tt> will forced to <tt>True</tt> in order for the default value to be used.
 		  If the default value is a function (i.e. a callable), you should 
 		  support calling the function to retrieve the default value. See <a href="#custom_types">Custom Type</a> for an example. Note that every
-		  field type should have a base default value if it is not specified.</li>
+		  field type should have a base default value if it is not specified (e.g. 0 for int, "" for string).</li>
         <li><b>choices</b>: a list of allowed values for this field. <tt>ValueError</tt> will be raised if the field has value not in <tt>choices</tt> when insert or update is attempted.
 		  <tt>ValueError</tt> will also be raised if <tt>choices</tt> is not iterable.
 		</li>
@@ -469,6 +486,7 @@ Capital {
     location_lon : float;
 }
 </pre>
+      <p>The base default value for the coordinate field should be <tt>(0, 0)</tt>.</p>
       <h4 id="testing">Testing Your Code</h4>
       <p>To test your database client, you will need to run the server. You can start the server by running <tt>easydb -g PORT</tt> on one terminal while running the client on a different terminal, where the <tt>-g</tt> option will print everything the database is doing, and <tt>PORT</tt> is the port number. You should choose a unique port number so that other people also working on your machine would not accidentally connect to your database. By default, the server will load <tt>default.txt</tt> for the database schema, but you will need to supply a different one if your ORM schema differs. Type <tt>easydb</tt> to see the usage on how to specify a different schema file.</p>
       
