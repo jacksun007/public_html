@@ -95,7 +95,7 @@
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Assignment 2: Object-Relational Mapping</h1>
       </div>
-      <p><strong>Due Date: Thursday, October 22nd, 11:59pm</strong></p>
+      <p><strong>Due Date: Sunday, October 25th, 11:59pm</strong></p>
       <p><strong>Lab TA: Martiya Zare Jahromi</strong></p>
       <p>In this assignment, you will develop an object relational mapping (ORM) framework for EasyDB&trade; in Python.</p>
       
@@ -490,10 +490,22 @@ Capital {
       <h4 id="testing">Testing Your Code</h4>
       <p>To test your database client, you will need to run the server. You can start the server by running <tt>easydb -g PORT</tt> on one terminal while running the client on a different terminal, where the <tt>-g</tt> option will print everything the database is doing, and <tt>PORT</tt> is the port number. You should choose a unique port number so that other people also working on your machine would not accidentally connect to your database. By default, the server will load <tt>default.txt</tt> for the database schema, but you will need to supply a different one if your ORM schema differs. Type <tt>easydb</tt> to see the usage on how to specify a different schema file.</p>
       
-      <p>To test the database client or the ORM layer, you can either write a custom script that imports <tt>schema.py</tt>, or you can run in interactive mode using the <tt>main.py run</tt> command. It will start interactive mode with all the classes and functions defined in <tt>schema.py</tt> loaded, as well as automatically connecting to the database, and storing the database object as <tt>db</tt>. For example:</p>
-      
+      <p>To test the database client or the ORM layer, you can either write a custom script that imports <tt>schema.py</tt>, or you can run 
+	  in interactive mode using the <tt>main.py run PORT</tt> command. It will start interactive mode with all the classes and functions 
+	  defined in <tt>schema.py</tt> loaded, as well as automatically connecting to the database, and storing the database object as 
+	  <tt>db</tt>. For example:</p>
+     
+<div class="frame">
 <pre>
-student:~/asst2$ ./main.py run
+# terminal 1 (8080 is the port number, pick another 4-digit number when you try this)
+student:~/asst2$ easydb -g 8080
+Listening: TcpListener { addr: V4(127.0.0.1:8080), fd: 3 }
+</pre>
+</div>
+<div class="frame">
+<pre>
+# terminal 2 (enter the port number you used to run the easydb server)
+student:~/asst2$ ./main.py run 8080
 Python 3.5.2 (default, Oct  8 2019, 13:06:37) 
 [GCC 5.4.0 20160609] on linux
 Type "help", "copyright", "credits" or "license" for more information.
@@ -506,7 +518,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 ['Greg', 'Russell', 0.0, 27]
 &gt;&gt;&gt;
 </pre>      
-    
+</div>    
       <h4 id="submission">Code Submission</h4>
       <p>To submit your code with the current commit, use the <tt>Asst2-end</tt> tag. Remember to push the new tag to the remote repository.</p>
  
