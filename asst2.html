@@ -317,7 +317,7 @@ joe = User(db, firstName="Joe", lastName="Harris", age=32)
       <p>Each instance has the following attributes on top of the column fields:</p>
       <ul>
         <li><b>save</b>: Saves the object to the database. For new objects in EasyDB, this will call <tt>insert</tt>. For existing objects, this will call <tt>update</tt>. For fields where <tt>blank</tt> is true, the field is set to the default type value. <tt>save</tt> takes an optional parameter, <tt>atomic</tt>, which is by default true. If set to false, disables atomic update for that save.</li>
-        <li><b>delete</b>: Deletes the object. In EasyDB, this will call the <tt>drop</tt> command.</li>
+        <li><b>delete</b>: Deletes the object. In EasyDB, this will call the <tt>drop</tt> command. After successful delete, set <tt>pk</tt> and <tt>version</tt> to None.</li>
         <li><b>pk</b>: the id of the object (i.e. primary key). This field is <tt>None</tt> before it is in the database.</li>
         <li><b>version</b>: the version of the object. This field is <tt>None</tt> before it is in the database.</li>
       </ul>
@@ -448,7 +448,7 @@ ece326.save()
       <p>As a reminder, you must support calling a function if <tt>default</tt> is assigned a function. For the datetime instance, 
 	  you can ignore time zone related settings. 
 	  Hint: store it in <a href="https://docs.python.org/3.3/library/datetime.html#datetime.datetime.timestamp">POSIX timestamp</a> format.
-	  The base default value for the datetime field should be <a href="https://en.wikipedia.org/wiki/Unix_time">POSIX time</a>.</p>
+	  The base default value for the datetime field should be the <a href="https://en.wikipedia.org/wiki/Unix_time">Unix epoch</a>.</p>
       
       <h5>Coordinate Field</h5>
       <p>Create a new field, <tt>Coordinate</tt>, which is represented in Python by a 2-tuple, and must be a valid 
