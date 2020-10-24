@@ -235,8 +235,8 @@ class Account(orm.Table):
 		  If the default value is a function (i.e. a callable), you should 
 		  support calling the function to retrieve the default value. See <a href="#custom_types">Custom Type</a> for an example. Note that every
 		  field type should have a base default value if it is not specified (e.g. 0 for int, "" for string).</li>
-        <li><b>choices</b>: a list of allowed values for this field. <tt>ValueError</tt> will be raised if the field has value not in <tt>choices</tt> when insert or update is attempted.
-		  <tt>ValueError</tt> will also be raised if <tt>choices</tt> is not iterable.
+        <li><b>choices</b>: a list of allowed values for this field. <tt>ValueError</tt> will be raised if the field is set to a value not in <tt>choices</tt>.
+		  You may assume that <tt>choices</tt> is iterable.
 		</li>
       </ul>
       <p>Foreign, on the other hand, only supports <i>blank</i>. If <em>blank</em> is true, the field can reference nothing (i.e. set to <tt>None</tt>).</p>
