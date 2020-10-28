@@ -155,6 +155,11 @@ make
 		You should be able to reuse many definitions, especially <tt>Value</tt>, for the rows in your database table. 
 		You will also need to understand how to create Response objects to be sent back to the client.</p>
       
+	  <p>One thing you need to consider when building your database server is how will you store the data, which is separately into
+	    tables of rows and columns. Spend some time to look at Rust's <a href="https://doc.rust-lang.org/std/collections/index.html">Standard
+		Collection Library</a> and see which one fits your need the most. Hint: remember that each table has a unique table id, and each 
+		row must have a unique primary key.</p>
+	  
       <p>To recap the previous assignment, you are responsible for the 5 commands in EasyDB (<tt>INSERT, UPDATE, DROP, GET</tt>, and <tt>SCAN</tt>). <b>You should not use any external Rust libraries</b> (i.e. crates), aside from the standard Rust library. It is <b>solely your responsibility</b> to make sure your Rust code compiles on the lab machines.</p>
       
       <h4 id="commands">Database Commands</h4>
