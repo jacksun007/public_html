@@ -140,10 +140,13 @@ cd asst3
       
       <p>Recall you can start the server on the command line as such:</p>
 <pre>
-cd asst3
-make
-./server [-g] PORT [FILE=default.txt] [HOST=localhost]
+% cd ~/ece326/asst3
+% make
+% ./server -g 8080
 </pre>      
+
+	<p>Note that 8080 is the port number, which you should change to avoid conflict with another server running on the same machine. Run
+		<tt>./server</tt> to see more usage options.</p>
 
       <h4 id="specification">Solution Requirements</h4>
 
@@ -224,9 +227,9 @@ fn handle_get(db: &amp; Database, table_id: i32, object_id: i64) -&gt; Result&lt
       
       <h5>Scan</h5>
 <pre>
-fn handle_scan(db: &amp; Database, table_id: i32, column_id: i32, operator: i32, other: Value) -&gt; Result&lt;Response, i32&gt; 
+fn handle_query(db: &amp; Database, table_id: i32, column_id: i32, operator: i32, other: Value) -&gt; Result&lt;Response, i32&gt; 
 </pre>
-      <p><tt>handle_scan</tt> compares a column of every row in a table against a value and returns the id of all rows that matched the query. It can respond with the following error codes:</p>
+      <p><tt>handle_query</tt> compares a column of every row in a table against a value and returns the id of all rows that matched the query. It can respond with the following error codes:</p>
       
       <ul>
         <li><tt>BAD_TABLE</tt>: if table id is not valid.</li>
