@@ -53,7 +53,7 @@
             </a>
           </li>
 		  <li class="nav-item">
-            <a class="nav-link" href="#remote-objects-and-functions">
+            <a class="nav-link" href="#remote-methods">
 			   Remote Methods
 		    </a>
           </li>
@@ -63,8 +63,18 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#specification">
+            <a class="nav-link" href="#solution-requirements">
               Solution Requirements
+            </a>
+          </li>
+		  <li class="nav-item">
+            <a class="nav-link" href="#task-1">
+              RPC Protocol
+            </a>
+          </li>
+		  <li class="nav-item">
+            <a class="nav-link" href="#task-2">
+              Type-Safe RPC API
             </a>
           </li>
           <li class="nav-item">
@@ -76,64 +86,48 @@
 
     <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Assignment 4: Remote Procedure Call (RPC) Framework</h1>
+        <h2>Assignment 4: Remote Procedure Call Framework</h2>
       </div>
       <p><strong>Due Date: December 10th, 11:59pm</strong></p>
       <p><strong>Lab TA: Mike Qin</strong></p>
-	  
-      <p>In this assignment, you will develop a type-safe remote procedure call framework in C++.</p>
-      
-      <h4 id="background">Background</h4>
-      
-	  <p>In a distributed environment, you often need to invoke a procedure on another machine. Consider a member function 
-	    <code>int Foo::Hash(int x)</code>, if you want to invoke it locally, you can write <code>foo.Hash(x)</code> where <code>foo</code> 
-		is an object of class <code>Foo</code> and <code>x</code> is an integer. In order to perform a remote procedure call, you would like 
-		to write in the following way:</p>
-		
+
+<p>In this assignment, you will develop a type-safe remote procedure call framework (RPC) in C++.</p>
+
+<h4 id="background">Background</h4>
+
+<p>In a distributed environment, you often need to invoke a procedure on another machine. Consider a member function <code>int Foo::Hash(int x)</code>, if you want to invoke it locally, you can write <code>foo.Hash(x)</code> where <code>foo</code> is an object of class <code>Foo</code> and <code>x</code> is an integer. In order to perform a remote procedure call, you would like to write in the following way:</p>
+
 <pre>auto result = client-&gt;Call(foo, &amp;Foo::Hash, x);
 client-&gt;Flush();
 result-&gt;data(); // This represents the return value
 </pre>
 
-	<p><code>client</code> represents a RPC client, which it's initialized before this snippet. <code>Call()</code> does not call the 
-	function immediately, instead, it encodes the function call as a network request and sends it to the RPC server. 
-	The <code>Call()</code> function is non-blocking and returns a <code>result</code> object to represent the result 
-	of the remote procedure call. The result is not available until the client calls <code>client-&gt;Flush()</code> to flush
-	the network buffer and waits for the server to respond. After this, the result can be accessed using <code>result-&gt;data()</code>.</p>
+<p><code>client</code> represents a RPC client, which it's initialized before this snippet. <code>Call()</code> does not call the function immediately, instead, it encodes the function call as a network request and sends it to the RPC server. The <code>Call()</code> function is non-blocking and returns a <code>result</code> object to represent the result of the remote procedure call. The result is not available until the client calls <code>client-&gt;Flush()</code> to flush the network buffer and waits for the server to respond. After this, the result can be accessed using <code>result-&gt;data()</code>.</p>
 
-    <h4 id="remote-objects-and-functions">Remote Objects and Functions</h4>
-	<p>Function and object pointers in a remote procedure call belong to two different address spaces. For example, 
-	addresses of <code>&amp;foo</code> and <code>&amp;Foo::Hash</code> are totally different on the client and on the server. 
-	So we need to introduce universal object and function IDs. To make this framework easier to use, objects need to inherit our 
-	<code>Service&lt;T&gt;</code> template class, where <code>T</code> is user's class name. For example, 
-	<code>class MyService : public Service&lt;MyServie&gt; ...</code>.</p>
-	
-    <p>On the client, users can call <code>set_instance_id()</code> on the service object. The instance id must be consistent with 
-	the RPC server. On the RPC server, users can call <code>AddService()</code> to export a service object.</p>
+<h4 id="remote-methods">Remote Objects and Functions</h4>
 
-<pre>
-server-&gt;AddService(new MyService(), the_instance_id);
-</pre>
+<p>Function and object pointers in a remote procedure call belong to two different address spaces. For example, addresses of <code>&amp;foo</code> and <code>&amp;Foo::Hash</code> are totally different on the client and on the server. So we need to introduce universal object and function IDs. To make this framework easier to use, objects need to inherit our <code>Service&lt;T&gt;</code> template class, where <code>T</code> is user's class name. For example, <code>class MyService : public Service&lt;MyServie&gt; ...</code>.</p>
 
-    <p><code>server</code> represents an RPC server and <code>the_instance_id</code> must be consistent with the id on the client side.</p>
-    <p>For a given service, function IDs must also be consistent between the server and the client. Notice that both the client and the 
-	server must call the service constructor, we can construct the mapping between member functions and their IDs in the constructor. 
-	We require users to call the <code>Export()</code> function for the member function they want to RPC. For example:</p>
-	
-<pre>MyService::MyService()
+<p>On the client, users can call <code>set_instance_id()</code> on the service object. The instance id must be consistent with the RPC server. On the RPC server, users can call <code>AddService()</code> to export a service object.</p>
+
+<pre><code>server-&gt;AddService(new MyService(), the_instance_id);
+</code></pre>
+
+<p><code>server</code> represents an RPC server and <code>the_instance_id</code> must be consistent with the id on the client side.</p>
+
+<p>For a given service, function IDs must also be consistent between the server and the client. Notice that both the client and the server must call the service constructor, we can construct the mapping between member functions and their IDs in the constructor. We require users to call the <code>Export()</code> function for the member function they want to RPC. For example:</p>
+
+<pre><code>MyService::MyService()
 {
     Export(&amp;MyService::Hash);
 }
-</pre>
+</code></pre>
 
-    <p>The <code>Export()</code> function keeps an internal, per-object counter to generate function IDs automatically and stores 
-	the mapping between function pointers and IDs. We require the constructor to be deterministic, and so the function IDs are consistent
-	between the client and the server.</p>
+<p>The <code>Export()</code> function keeps an internal, per-object counter to generate function IDs automatically and stores the mapping between function pointers and IDs. We require the constructor to be deterministic, and so the function IDs are consistent between the client and the server.</p>
 
-    <h4 id="setup">Setup</h4>
+<h4 id="setup">Setup</h4>
 
-<pre>
-cd ~/ece326
+<pre><code>cd ~/ece326
 tar -xf /cad2/ece326f/src/rpc.tar
 git status # should say that "asst4/" directory is untracked
 git add asst4
@@ -141,45 +135,89 @@ git commit -m "Initial code for Assignment 4"
 git tag Asst4-start
 git push
 git push --tags
-cd asst4
-</pre>
-      <h4 id="specification">Solution Requirements</h4>
-	  
-<p>We breakdown this lab into two tasks. Both of them must be implemented inside the <code>rpcxx.h</code> file. 
-An example <code>rpcxx-sample.h</code> file is given. You should <code>cp rpcxx-sample.h rpcxx.h</code> and start working on that file.</p>
+cd asst4/
+</code></pre>
 
-<p>To compile, simply type <code>make</code>. By default all unittests are generated under the <code>Debug/</code> directory. 
-For release build, you can <code>make BUILD=Release</code>.</p>
+<p>We use googletest as a unittest framework in this assignment. Let's acquire that via a git submodule (make sure you are inside the <code>asst4/</code> directory).</p>
+
+<pre><code>git submodule add https://github.com/google/googletest.git
+</code></pre>
+
+<p>The starter code contain the following files:</p>
+
+<ul>
+<li><code>Makefile</code> and <code>cc.mk</code>: The build system. Type <code>make</code> to build your project. Do not modify these files.</li>
+<li><code>rpc.cc</code> and <code>rpc.h</code>: Implement network infrastructure and basic RPC calling convention. Do not modify these files.</li>
+<li><code>test-rpc-common.h</code>: Common code for all unittests. Do not modify this file.</li>
+<li><code>test-proto.cc</code>: Unittest for task 1, which tests your implementation on how a certain type is encoded/decoded correctly. Do not modify this file.</li>
+<li><code>test-simple.cc</code> and <code>test-complex.cc</code>: Unittest for task 2, which tests your implementation of the type-safe RPC API. Do not modify these files.</li>
+<li><code>rpcxx.h</code>: This is an example implementation for you to start. <em>You should modify this file only.</em></li>
+</ul>
+
+<p>To compile, simply type <code>make</code>, i.e.:
+
+<pre>
+cd ~/ece326/asst4
+make
+</pre>
+
+<p>Note that <tt>test-proto.cc</tt> and <tt>test-complex.cc</tt> will not compile at the moment. By default all unittests are generated under the <code>Release/</code> directory. For debug build, you can <code>make BUILD=Debug</code>.</p>
+
+<!--It does not implement the protocol of how to encode/decode a certain type, which is task 1 of this assignment. -->
+
+<h4 id="solution-requirements">Solution Requirements</h4>
+
+<p>We breakdown this lab into two tasks. Both of them must be implemented inside the <code>rpcxx.h</code> file. An example implementation is given.</p>
 
 <p>With the example implementation, only <code>test-simple</code> compiles. Both tasks require your code to compile with all unittests. Upon a successful compilation, you can run test binaries under the output directory for test results, for example:</p>
 
-<pre>Debug/test-simple</pre>
+<pre><code>Release/test-simple
+</code></pre>
 
-<p>You may also use any other test-runners, as long as it supports GoogleTests. For example <a href="https://github.com/nholthaus/gtest-runner">https://github.com/nholthaus/gtest-runner</a> or <a href="https://github.com/matepek/vscode-catch2-test-adapter">https://github.com/matepek/vscode-catch2-test-adapter</a>.</p>
+<h5 id="task-1">Task 1: Protocol for Parameter and Result Types</h5>
 
-<h5 id="task-1">Task 1: Protocol for Parameter and Result Types</h3>
-<p>We support the following types: <code>int</code>, <code>unsigned int</code>, <code>uint32_t</code>, <code>int32_t</code>, <code>long</code>, <code>long long</code>, <code>unsigned long</code>, <code>unsigned long long</code>, <code>uint64_t</code>, <code>int64_t</code> and <code>std::string</code>.</p>
-<p>The current code provide a template class <code>Protocol</code>. Your task is to specialize the <code>Protocol</code> class for each supported type. Each specialization must support two functions: <code>Encode()</code> and <code>Decode()</code>. Both must check if the input/output buffer has enough allocated size for encoding or decoding. The example <code>rpcxx-sample.h</code> gives the implementation for <code>int</code> type specialization.</p>
-<p><code>test-proto</code> unittest contains all test cases you need to pass for this task. The example <code>rpcxx-sample.h</code> should pass some of them.</p>
+<p>The RPC library needs to encode/decode function parameters and function return values from the network. Currently, this implementation is missing, and your first task is to write a template class <code>Protocol</code> to implement this.</p>
 
-<h5 id="task-2">Task 2: Type-Safe RPC API</h3>
+<p>We need to support the following types: <code>int</code>, <code>bool</code>, <code>char</code>, <code>short</code>, <code>long</code>, 
+<code>long long</code>, <code>float</code>, <code>double</code>, 
+and <code>std::string</code>. You also need to support all the unsigned integer types (e.g., <code>unsigned int</code>, <code>unsigned char</code>, etc).
+</p>
+
+<p>The example code provide the <code>Protocol&lt;T&gt;</code> definition. Your task is to specialize the <code>Protocol</code> class for each supported type. Each specialization must support two functions: <code>Encode()</code> and <code>Decode()</code>. Both must check if the input/output buffer has enough allocated size for encoding or decoding. The example code contain a sample implementation for <code>int</code>.</p>
+
+<p><code>test-proto</code> unittest contains all test cases you need to pass for this task. The example <code>rpcxx.h</code> should pass some of them.</p>
+
+<h5 id="task-2">Task 2: Type-Safe RPC API</h5>
+
 <p>In this task, you will implement APIs needed for type-safe RPC. The basic RPC layer is given to you with several functions missing. Your task is to implement these missing parts.</p>
-<p>On the server side, the <code>Server</code> class is complete. The missing part is the <code>Service&lt;Svc&gt;::Export()</code> function. This function should take any member function of the class <code>Svc</code>, and register the member function as a possible RPC by calling <code>ExportRaw()</code>. The first parameter of <code>ExportRaw()</code> is the member function pointer, which need to be casted into <code>void *</code> type. The second parameter of <code>ExportRaw()</code> is a <code>BaseProcedure</code> object, which describes how to decode this member function from the network depending on its type. This is done by overriding the <code>DecodeAndExecute()</code> virtual function in a subclass.</p>
-<p>Currently, an incomplete solution is given to you. This solution only works for member functions that takes one integer and returns an integer. Thus the inherited <code>BaseProcedure</code> class is called <code>IntIntProcedure&lt;Svc&gt;</code>. For this specific type of member functions, <code>IntIntProcedure&lt;Svc&gt;::DecodeAndExecute()</code> decodes one integer from the input stream, converts the <code>void * func_ptr</code> to its original member function type and executes it. Finally, based on its return value type, it encodes one integer to the output stream.</p>
-<p>Notice that the <code>DecodeAndExecute()</code> has similar semantic with <code>Protocol&lt;T&gt;::Decode()</code>. This function returns false if the buffer <code>in_len</code> isn't large enough or any fatal error happens during parsing.</p>
-<p>On the client side, the networking part is complete. You need to implement the <code>Client::Call()</code> function, which converts the member function and its parameters into network data and then sends over the network. This function takes many parameters. The first parameter is the service pointer, the second is the member function you want to RPC. After these, depending on the type of the member function, <em>this function takes all parameters you need to pass into the member function</em>. The return type also depends on the type of the member function. It needs to inherit the <code>BaseResult</code> class and its <code>data()</code> function should return the result of the corresponding type type on the client-side when ready.</p>
-<p>The <code>BaseClient::Send()</code> function can help you implement this task. This function takes an instance ID, a function ID, a <code>BaseParams</code> that describes how to encode function parameters and a <code>BaseResult</code> that describes how to decode result. <code>BaseParams::Encode()</code> virtual function describes how to encode parameters into the network buffer and <code>BaseResult::HandleResponse()</code> describes how to decode result from the network buffer.</p>
-<p>In the incomplete implementation that's given to you, since it only supports member functions that takes one integer and returns an integer, both the <code>IntResult</code> (<code>BaseResult</code>) and <code>IntParam</code> (<code>BaseParams</code>) only support one integer.</p>
-<p>Please refer <code>rpcxx-sample.h</code> for further details.</p>
-<p>There are two unit-tests for this task. First, <code>test-simple</code> should compile and pass for <code>rpcxx-sample.h</code> that's given to you. You should use this as a regression test. Second, you need to pass <code>test-complex</code>, which is a more complicated test. The sample solution <strong>cannot</strong> compile with <code>test-complex</code> yet.</p>
-	  
-      <h4 id="submission">Code Submission</h4>
-      <p>To submit your code with the current commit, use the <tt>Asst4-end</tt> tag. Remember to push the new tag to the remote repository.</p>
 
-<pre>
-git tag Asst4-end    // Creates tag for current submission for Assignment 4
+<p>On the server side, the <code>Server</code> class is complete. The missing part is the <code>Service&lt;Svc&gt;::Export()</code> function. This function should take any member function of the class <code>Svc</code>, and register the member function as a possible RPC by calling <code>ExportRaw()</code>. The first parameter of <code>ExportRaw()</code> is the member function pointer, which need to be casted into <code>void *</code> type. The second parameter of <code>ExportRaw()</code> is a <code>BaseProcedure</code> object, which describes how to decode this member function from the network depending on its type. This is done by overriding the <code>DecodeAndExecute()</code> virtual function in a subclass.</p>
+
+<p>Currently, an incomplete solution is given to you. This solution only works for member functions that takes one integer and returns an integer. Thus the inherited <code>BaseProcedure</code> class is called <code>IntIntProcedure&lt;Svc&gt;</code>. For this specific type of member functions, <code>IntIntProcedure&lt;Svc&gt;::DecodeAndExecute()</code> decodes one integer from the input stream, converts the <code>void * func_ptr</code> to its original member function type and executes it. Finally, based on its return value type, it encodes one integer to the output stream.</p>
+
+<p>Notice that the <code>DecodeAndExecute()</code> has similar semantic with <code>Protocol&lt;T&gt;::Decode()</code>. This function returns false if the buffer <code>in_len</code> isn't large enough or any fatal error happens during parsing.</p>
+
+<p>On the client side, the networking part is complete. You need to implement the <code>Client::Call()</code> function, which converts the member function and its parameters into network data and then sends over the network. This function takes many parameters. The first parameter is the service pointer, the second is the member function you want to RPC. After these, depending on the type of the member function, <em>this function takes all parameters you need to pass into the member function</em>. The return type also depends on the type of the member function. It needs to inherit the <code>BaseResult</code> class and its <code>data()</code> function should return the result of the corresponding type type on the client-side when ready.</p>
+
+<p>The <code>BaseClient::Send()</code> function can help you implement this task. This function takes an instance ID, a function ID, a <code>BaseParams</code> that describes how to encode function parameters and a <code>BaseResult</code> that describes how to decode result. <code>BaseParams::Encode()</code> virtual function describes how to encode parameters into the network buffer and <code>BaseResult::HandleResponse()</code> describes how to decode result from the network buffer.</p>
+
+<p>In the incomplete implementation that's given to you, since it only supports member functions that takes one integer and returns an integer, both the <code>IntResult</code> (<code>BaseResult</code>) and <code>IntParam</code> (<code>BaseParams</code>) only support one integer.</p>
+
+<p>Please refer <code>rpcxx-sample.h</code> for further details.</p>
+
+<p>There are two unit-tests for this task. First, <code>test-simple</code> should compile and pass for <code>rpcxx-sample.h</code> that's given to you. You should use this as a regression test. Second, you need to pass <code>test-complex</code>, which is a more complicated test. The sample solution <strong>cannot</strong> compile with <code>test-complex</code> yet.</p>
+
+<h5>Recommended Coding Style</h5>
+
+<p>This project uses <a href="https://google.github.io/styleguide/cppguide.html">Google C++ Coding Style</a> extensively. I recommend following this style. Note that you will not be marked on your coding style; this is simply a suggestion.</p>
+
+<h4 id="submission">Submission</h4>
+
+<p>To submit your code with the current commit, use the <code>Asst4-end</code> tag. Remember to push the new tag to the remote repository.</p>
+
+<pre><code>git tag Asst4-end    // Creates tag for current submission for Assignment 4
 git push --tags
-</pre>
+</code></pre>
       
       <hr>
       <footer class="container text-center">
