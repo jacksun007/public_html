@@ -208,7 +208,23 @@ fn handle_drop(db: &amp; mut Database, table_id: i32, object_id: i64) -&gt; Resu
         <li><tt>NOT_FOUND</tt>: if object_id is not found.</li>
       </ul>  
 
-      <p>Remember that you must implement cascading drop, which will delete all rows in other tables that have a foreign key reference to the row being deleted. This may start a chain reaction where rows deleted as a result of cascading delete causes more rows on other tables to be deleted. For example, if there are three tables, Country, Province, and City, deleting a country will cause all its provinces to be deleted, along with every city in those provinces.</p>
+      <p>Remember that you must implement cascading drop, which will delete all rows in other tables that have a foreign key reference to the row being deleted. This may start a chain reaction where rows deleted as a result of cascading delete causes more rows on other tables to be deleted. For example, if there are three tables, Country, Province, and City, like this schema:</p>
+<pre>
+Country {
+    name: string;
+}
+
+Province {
+    name: string;
+    country: Country;
+}
+
+City {
+    name: string;
+    state: Province;
+}
+</pre>
+<p>Deleting a country will cause all its provinces to be deleted, along with every city in those provinces.</p>
       
       <p>Upon success, you should return a <tt>Response::Drop</tt> object.</p>
       
@@ -283,7 +299,8 @@ git push --tags
         <li>Make sure you start early - Rust is not as forgiving as Python or even C++.</li>    
         <li>Plan how you will store the data using structs and data structures in the standard library. Try to think about how you will handle more complicated features such as cascade delete (if a row is referenced by rows in other tables, those rows will also be deleted).</li>
         <li>When running the tester. Use the <tt>-v</tt> option to turn on the <tt>-g</tt> option on your server. Your server's output will be saved to <tt>server.log</tt>.</li>
-      </ul>
+		
+	  </ul>
 
       <p><b>Rust</b></p>
       <ul>
@@ -294,7 +311,11 @@ git push --tags
         <li><a href="https://doc.rust-lang.org/book/ch06-02-match.html">Rust matches are exhaustive</a>. If you don't match for a <tt>None</tt> case, the Rust compiler will throw an error.</li>
       </ul>
       
-
+	   <p><b>Speedup Test</b></p>
+      <ul>
+	   <li>One way to improve performance is removing all of the debug print statements. However, do this only after you have passed every other test.</li>
+	   <li>If the time it takes to do serial task is too long, it may be because your algorithm scales poorly (e.g. O(n) time complexity). Try to avoid linear search if possible.</li>
+	  </ul>
       
       <hr>
       <footer class="container text-center">
