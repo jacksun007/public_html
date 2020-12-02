@@ -218,7 +218,9 @@ you do not need to perform byte order conversion for the <code>char</code> and <
 <p><code>long</code> is an odd case because it can either be 4 or 8 bytes, depending on CPU architecture. You should use the <em>appropriate</em> conversion function
 based on the result of <code>sizeof(long)</code>, which will return 4 on 32-bit architectures, and 8 on 64-bit architectures. Similarly, <code>bool</code> is compiler-dependent, so it can
 be anywhere from 1 to 8 bytes. Note that the <code>sizeof</code> operator returns a <em>compile-time constant</em>. Hint: you can make 4 template specializations to handle each of the possible byte sizes, then each specialization of the <code>Protocol</code> class can just use one of the 
-4 specializations (except for <code>std::string</code>. To do so, you will need to know how to convert to a <a href="https://en.cppreference.com/w/cpp/language/pointer#Pointers_to_void">generic pointer type</a>: <code>void *</code>. </p> 
+4 specializations. To do so, you will need to know how to work with the <a href="https://en.cppreference.com/w/cpp/language/pointer#Pointers_to_void">generic pointer type</a>: <code>void *</code>. 
+The only exception is <code>std::string</code>, which is a variable-sized data type. You should refer back to assignment 1 to see how the EasyDB protocol deals with the string type.
+</p> 
 
 <h5 id="task-2">Task 2: Type-Safe RPC API</h5>
 
