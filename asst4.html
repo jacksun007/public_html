@@ -138,10 +138,20 @@ git push --tags
 cd asst4/
 </code></pre>
 
-<p>We use googletest as a unittest framework in this assignment. Let's acquire that via a git submodule (make sure you are inside the <code>asst4/</code> directory).</p>
+<p>We use googletest as a unittest framework in this assignment. Let's acquire that via a git submodule command (make sure you are inside the <code>asst4/</code> directory).</p>
 
-<pre><code>git submodule add https://github.com/google/googletest.git
-</code></pre>
+<pre>
+asst4% git submodule add https://github.com/google/googletest.git
+</pre>
+
+<p>For people whose partners have already checked in the starter code, do not run the above command. The submodule should have already been "added" internally. However, git requires
+every local repository to initialize the submodule. So do this instead:</p>
+
+<pre>
+asst4% git pull
+asst4% git submodule init
+asst4% git submodule update
+</pre>
 
 <p>The starter code contain the following files:</p>
 
@@ -186,6 +196,29 @@ and <code>std::string</code>. You also need to support all the unsigned integer 
 <p>The example code provide the <code>Protocol&lt;T&gt;</code> definition. Your task is to specialize the <code>Protocol</code> class for each supported type. Each specialization must support two functions: <code>Encode()</code> and <code>Decode()</code>. Both must check if the input/output buffer has enough allocated size for encoding or decoding. The example code contain a sample implementation for <code>int</code>.</p>
 
 <p><code>test-proto</code> unittest contains all test cases you need to pass for this task. The example <code>rpcxx.h</code> should pass some of them.</p>
+
+<p>Similar to assignment 1, you need to convert multi-byte native data types to <em>network byte order</em> (which is big-endian). On Linux systems, you may use following functions to convert between
+host byte order (the byte order on the current CPU) and big-endian byte order.</p>
+
+<ul>
+<li><code>short</code>: use <a href="https://linux.die.net/man/3/htobe16">htobe16</a> or <a href="https://linux.die.net/man/3/htons">htons</a> to convert <em>to</em> a 16-bit big-endian byte-order, and 
+    <a href="https://linux.die.net/man/3/be16toh">be16toh</a> or <a href="https://linux.die.net/man/3/ntohs">ntohs</a> to convert <em>from</em> a 16-bit big-endian byte-order to host byte order.</li>
+<li><code>int, float</code>: use <a href="https://linux.die.net/man/3/htobe32">htobe32</a> or <a href="https://linux.die.net/man/3/htonl">htonl</a> to convert <em>to</em> a 32-bit big-endian byte-order, and 
+    <a href="https://linux.die.net/man/3/be32toh">be32toh</a> or <a href="https://linux.die.net/man/3/ntohl">ntohl</a> to convert <em>from</em> a 32-bit big-endian byte-order to host byte order.</li>
+<li><code>long long, double</code>: use <a href="https://linux.die.net/man/3/htobe64">htobe64</a> to convert <em>to</em> a 64-bit big-endian byte-order, and 
+    <a href="https://linux.die.net/man/3/be64toh">be64toh</a> to convert <em>from</em> a 64-bit big-endian byte-order to host byte order.</li>
+</ul>
+
+<p>For the unsigned integer types, use the same functions as the signed integer types of the same size. e.g. <code>htobe16</code> for <code>unsigned short</code> and <code>htobe64</code> for 
+<code>unsigned long long</code>.</p>
+
+<p>Note that <code>sizeof(char)</code> is 1, so it is not a multi-byte data type. Also, strings are byte arrays, and thus have no associated byte order either. In short, 
+you do not need to perform byte order conversion for the <code>char</code> and <code>std::string</code> types.</p>
+
+<p><code>long</code> is an odd case because it can either be 4 or 8 bytes, depending on CPU architecture. You should use the <em>appropriate</em> conversion function
+based on the result of <code>sizeof(long)</code>, which will return 4 on 32-bit architectures, and 8 on 64-bit architectures. Similarly, <code>bool</code> is compiler-dependent, so it can
+be anywhere from 1 to 8 bytes. Note that the <code>sizeof</code> operator returns a <em>compile-time constant</em>. Hint: you can make 4 template specializations to handle each of the possible byte sizes, then each specialization of the <code>Protocol</code> class can just use one of the 
+4 specializations (except for <code>std::string</code>. To do so, you will need to know how to convert to a <a href="https://en.cppreference.com/w/cpp/language/pointer#Pointers_to_void">generic pointer type</a>: <code>void *</code>. </p> 
 
 <h5 id="task-2">Task 2: Type-Safe RPC API</h5>
 
