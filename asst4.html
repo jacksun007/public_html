@@ -95,14 +95,17 @@
 
 <h4 id="background">Background</h4>
 
-<p>In a distributed environment, you often need to invoke a procedure on another machine. Consider a member function <code>int Foo::Hash(int x)</code>, if you want to invoke it locally, you can write <code>foo.Hash(x)</code> where <code>foo</code> is an object of class <code>Foo</code> and <code>x</code> is an integer. In order to perform a remote procedure call, you would like to write in the following way:</p>
+<p>In a distributed environment, you often need to invoke a procedure on another machine. Consider a member function <code>int Foo::Hash(int x)</code>,
+ if you want to invoke it locally, you can write <code>foo.Hash(x)</code> where <code>foo</code> is an object of class <code>Foo</code> and <code>x</code> is an integer.
+ In order to perform a remote procedure call, you would like to write in the following way:</p>
 
 <pre>auto result = client-&gt;Call(foo, &amp;Foo::Hash, x);
 client-&gt;Flush();
 result-&gt;data(); // This represents the return value
 </pre>
 
-<p><code>client</code> represents a RPC client, which it's initialized before this snippet. <code>Call()</code> does not call the function immediately, instead, it encodes the function call as a network request and sends it to the RPC server. The <code>Call()</code> function is non-blocking and returns a <code>result</code> object to represent the result of the remote procedure call. The result is not available until the client calls <code>client-&gt;Flush()</code> to flush the network buffer and waits for the server to respond. After this, the result can be accessed using <code>result-&gt;data()</code>.</p>
+<p><code>client</code> represents a RPC client, which it's initialized before this snippet. <code>Call()</code> does not call the function immediately,
+ instead, it encodes the function call as a network request and sends it to the RPC server. The <code>Call()</code> function is non-blocking and returns a <code>result</code> object to represent the result of the remote procedure call. The result is not available until the client calls <code>client-&gt;Flush()</code> to flush the network buffer and waits for the server to respond. After this, the result can be accessed using <code>result-&gt;data()</code>.</p>
 
 <h4 id="remote-methods">Remote Objects and Functions</h4>
 
@@ -179,25 +182,32 @@ make
 
 <p>We breakdown this lab into two tasks. Both of them must be implemented inside the <code>rpcxx.h</code> file. An example implementation is given.</p>
 
-<p>With the example implementation, only <code>test-simple</code> compiles. Both tasks require your code to compile with all unittests. Upon a successful compilation, you can run test binaries under the output directory for test results, for example:</p>
+<p>With the example implementation, only <code>test-simple</code> compiles. Both tasks require your code to compile with all unittests. 
+Upon a successful compilation, you can run test binaries under the output directory for test results, for example:</p>
 
 <pre><code>Release/test-simple
 </code></pre>
 
 <h5 id="task-1">Task 1: Protocol for Parameter and Result Types</h5>
 
-<p>The RPC library needs to encode/decode function parameters and function return values from the network. Currently, this implementation is missing, and your first task is to write a template class <code>Protocol</code> to implement this.</p>
+<p>The RPC library needs to encode/decode function parameters and function return values from the network. Currently, this implementation is missing. 
+Your first task is to specialize the template class <code>Protocol</code> to implement this.</p>
 
 <p>We need to support the following types: <code>int</code>, <code>bool</code>, <code>char</code>, <code>short</code>, <code>long</code>, 
 <code>long long</code>, <code>float</code>, <code>double</code>, 
 and <code>std::string</code>. You also need to support all the unsigned integer types (e.g., <code>unsigned int</code>, <code>unsigned char</code>, etc).
 </p>
 
-<p>The example code provide the <code>Protocol&lt;T&gt;</code> definition. Your task is to specialize the <code>Protocol</code> class for each supported type. Each specialization must support two functions: <code>Encode()</code> and <code>Decode()</code>. Both must check if the input/output buffer has enough allocated size for encoding or decoding. The example code contain a sample implementation for <code>int</code>.</p>
+<p>The example code provides the <code>Protocol&lt;T&gt;</code> definition. You need to specialize the <code>Protocol</code> class for each supported type. 
+Each specialization must support two static member functions: <code>Encode()</code> and <code>Decode()</code>. 
+Both must check if the input/output buffer has enough allocated size for encoding or decoding. The example code contain a samples implementation for <code>int</code>.</p>
 
-<p><code>test-proto</code> unittest contains all test cases you need to pass for this task. The example <code>rpcxx.h</code> should pass some of them.</p>
+<p><code>test-proto</code> unittest contains all test cases you need to pass for this task. The starter code in <code>rpcxx.h</code> should already pass some of them.</p>
 
-<p>Similar to assignment 1, you need to convert multi-byte native data types to <em>network byte order</em> (which is big-endian). On Linux systems, you may use following functions to convert between
+<p>Unlike in assignment 1, <b>you may choose to implement your own RPC protocol if you wish</b>. However, if you want to follow the implementation in the starter code, 
+you will need to convert multi-byte native data types to <em>network byte order</em> (which is big-endian), 
+similar to how the <a href="asst1.html#protocol">EasyDB access protocol</a> from assignment 1 works. 
+On Linux systems, you may use following functions to convert between
 host byte order (the byte order on the current CPU) and big-endian byte order.</p>
 
 <ul>
