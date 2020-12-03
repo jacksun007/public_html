@@ -99,7 +99,7 @@
       <p><strong>Lab TA: Martiya Zare Jahromi</strong></p>
       <p>In this assignment, you will develop an object relational mapping (ORM) framework for EasyDB&trade; in Python.</p>
       
-      <h4 id="background">Background</h4>
+      <h3 id="background">Background</h3>
       
       <p>Object-relational mapping is a technique for converting database records to and from in-memory objects. 
 	  Therefore, instead of writing code that extract values from a database query such as this:</p>
@@ -148,7 +148,7 @@ except orm.ObjectDoesNotExist:
 	  Your ORM layer will also support complex data types not generally available natively in database solutions, 
 	  which will improve the robustness of the web applications built on top of the ORM layer.</p>
       
-      <h4 id="setup">Setup</h4> 
+      <h3 id="setup">Setup</h3> 
 <pre>
 cd ~/ece326
 tar -xf /cad2/ece326f/src/orm.tar
@@ -174,7 +174,7 @@ make # this will create a symbolic link to your EasyDB driver package
         <li><em>orm/.gitignore</em>: ignores the easydb symbolic link.</li>
 	  </ul>
 
-      <h4 id="specification">Solution Requirements</h4>
+      <h3 id="specification">Solution Requirements</h3>
       <p>This assignment has a couple of milestones, each of which can work independently and thus are worth partial marks. 
 	  You and your partner should take on one of each part of the assignment. Please note that this assignment depends on full completion
 	  of assignment 1. So if you did not get 100% in assignment 1, please go back and make sure you finish it, otherwise assignment 2
@@ -184,7 +184,7 @@ make # this will create a symbolic link to your EasyDB driver package
 	  <p>Keep in mind that once you have completed your assignment 1 code, it should not need to be changed for assignment 2. All the 
 	    new code you write for assignment 2 should interact with the interface provided by assignment 1.</p>
 
-      <h4 id="orm_schema">Database Model</h4>
+      <h3 id="orm_schema">Database Model</h3>
       <p>In an object-relational mapping software, the programmer would write their database schema in a database-neutral language (i.e., in a way that the underlying database could be swapped out without affecting the program). For our ORM, the programmer will write the schema in Python (inspired by <a href="https://www.djangoproject.com/">Django</a>). Let's first look at an example schema:</p>
       
 <pre>
@@ -258,7 +258,7 @@ class User(orm.Table):
       
       <p>Our ORM provides two interfaces to initialize the underlying database client.</p>
 
-<h5>Setup</h5>
+<h4>Setup</h4>
 <pre>
 orm.setup(database_name, module)
 </pre>
@@ -275,7 +275,7 @@ db.connect("127.0.0.1", 8080)
 	<em>a.py</em>, and Book and Author are defined in <em>b.py</em>, then calling <tt>setup</tt> with module <em>a</em> will return a Database object
 	with only User and Account defined. Same principle applies to the <tt>export</tt> function described next.</p>
 
-<h5>Export</h5>
+<h4>Export</h4>
 <pre>
 orm.export(database_name, module)
 </pre>
@@ -300,11 +300,11 @@ Course {
 }
 </pre>      
       <p>Note that if there are multiple tables in the schema, then there will be multiple tables in the exported format. Also, all field options are ignored because they are only enforced by the ORM layer. The user of the export function will likely save the output to a file to be used to initiate the database server.</p>
-      <h4 id="methods">Table Methods</h4>
+      <h3 id="methods">Table Methods</h3>
       
       <p>For each table in the schema, the following class methods are defined. For each of these methods, Table should be replaced by the actual Table in the schema (e.g., User, Account).</p>
       
-      <h5>Object Interface</h5>
+      <h4>Object Interface</h4>
 <pre>
 object = Table(db, ...)
 </pre>      
@@ -377,13 +377,13 @@ account.user = account2         # NO - incorrect object type (only instance of U
 
       <p>You are suggested to use descriptors to implement fields. However, other implementations are possible, such as using __getattr__, __getattribute__, or property. You may not defer type checking until save(), so using an ordinary data field is not a viable option.</p>
       
-<h5>Get Method</h5>  
+<h4>Get Method</h4>  
 <pre>
 object = Table.get(db, pk)
 </pre>
       <p>Returns an existing object from the table, if it exists. The returned object has the same interface as above, with pk and version already set.</p>
 
-<h5>Filter Method</h5>
+<h4>Filter Method</h4>
 <pre>
 [object...] = Table.filter(db, ...)
 </pre>
@@ -409,7 +409,7 @@ results = Account.filter(db, user=2)
 </pre>  
        <p>You are only required to support at most one query argument, though you may try supporting multiple arguments by calculating the set intersection
 	      between multiple query results.</p>
-<h5>Count Method</h5>
+<h4>Count Method</h4>
 <pre>
 number = Table.count(db, ...)
 </pre>  
@@ -423,11 +423,11 @@ else:
 </pre>  
       <p>Note that the EasyDB internal column <tt>id</tt> only supports equality and inequality and no other operators. Same as the filter method, you are only responsible for 
 	    at most one query argument.</p>
-      <h4 id="custom_types">Custom Types</h4>
+      <h3 id="custom_types">Custom Types</h3>
       
       <p>In this section, you will build custom field types that is not natively supported by the underlying database. Your ORM layer will seamlessly convert to and from the database's storage type, and perform type safety checks as is required.</p>
       
-      <h5>Datetime Field</h5>
+      <h4>Datetime Field</h4>
       <p>Create a new field, <tt>DateTime</tt>, which is represented in Python by a datetime.datetime instance. For example:</p>
       
 <pre>
@@ -450,7 +450,7 @@ ece326.save()
 	  Hint: store it in <a href="https://docs.python.org/3.3/library/datetime.html#datetime.datetime.timestamp">POSIX timestamp</a> format.
 	  The base default value for the datetime field should be the <a href="https://en.wikipedia.org/wiki/Unix_time">Unix epoch</a>.</p>
       
-      <h5>Coordinate Field</h5>
+      <h4>Coordinate Field</h4>
       <p>Create a new field, <tt>Coordinate</tt>, which is represented in Python by a 2-tuple, and must be a valid 
 	  <a href="https://en.wikipedia.org/wiki/Geographic_coordinate_system">geographic coordinate</a> in latitude and longitude. For example:</p>
 
@@ -487,7 +487,7 @@ Capital {
 }
 </pre>
       <p>The base default value for the coordinate field should be <tt>(0, 0)</tt>.</p>
-      <h4 id="testing">Testing Your Code</h4>
+      <h3 id="testing">Testing Your Code</h3>
       <p>To test your database client, you will need to run the server. You can start the server by running <tt>easydb -g PORT</tt> on one terminal while running the client on a different terminal, where the <tt>-g</tt> option will print everything the database is doing, and <tt>PORT</tt> is the port number. You should choose a unique port number so that other people also working on your machine would not accidentally connect to your database. By default, the server will load <tt>default.txt</tt> for the database schema, but you will need to supply a different one if your ORM schema differs. Type <tt>easydb</tt> to see the usage on how to specify a different schema file.</p>
       
       <p>To test the database client or the ORM layer, you can either write a custom script that imports <tt>schema.py</tt>, or you can run 
@@ -519,7 +519,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 &gt;&gt;&gt;
 </pre>      
 </div>    
-      <h4 id="submission">Code Submission</h4>
+      <h3 id="submission">Code Submission</h3>
       <p>To submit your code with the current commit, use the <tt>Asst2-end</tt> tag. Remember to push the new tag to the remote repository.</p>
  
 <pre>
@@ -527,7 +527,7 @@ git tag Asst2-end    // Creates tag for current submission for Assignment 2
 git push --tags
 </pre>
       
-      <h4 id="glossary">Glossary of Terms</h4>
+      <h3 id="glossary">Glossary of Terms</h3>
       <p>Here, you can find the definition of commonly seen terms that are used in the assignment. More will be added as people ask questions about the assignment.</p>
       
       <ul>

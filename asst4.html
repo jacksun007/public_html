@@ -93,7 +93,7 @@
 
 <p>In this assignment, you will develop a type-safe remote procedure call framework (RPC) in C++.</p>
 
-<h4 id="background">Background</h4>
+<h3 id="background">Background</h3>
 
 <p>In a distributed environment, you often need to invoke a procedure on another machine. Consider a member function <code>int Foo::Hash(int x)</code>,
  if you want to invoke it locally, you can write <code>foo.Hash(x)</code> where <code>foo</code> is an object of class <code>Foo</code> and <code>x</code> is an integer.
@@ -107,7 +107,7 @@ result-&gt;data(); // This represents the return value
 <p><code>client</code> represents a RPC client, which it's initialized before this snippet. <code>Call()</code> does not call the function immediately,
  instead, it encodes the function call as a network request and sends it to the RPC server. The <code>Call()</code> function is non-blocking and returns a <code>result</code> object to represent the result of the remote procedure call. The result is not available until the client calls <code>client-&gt;Flush()</code> to flush the network buffer and waits for the server to respond. After this, the result can be accessed using <code>result-&gt;data()</code>.</p>
 
-<h4 id="remote-methods">Remote Objects and Functions</h4>
+<h3 id="remote-methods">Remote Objects and Functions</h3>
 
 <p>Function and object pointers in a remote procedure call belong to two different address spaces. For example, addresses of <code>&amp;foo</code> and <code>&amp;Foo::Hash</code> are totally different on the client and on the server. So we need to introduce universal object and function IDs. To make this framework easier to use, objects need to inherit our <code>Service&lt;T&gt;</code> template class, where <code>T</code> is user's class name. For example, <code>class MyService : public Service&lt;MyServie&gt; ...</code>.</p>
 
@@ -128,7 +128,7 @@ result-&gt;data(); // This represents the return value
 
 <p>The <code>Export()</code> function keeps an internal, per-object counter to generate function IDs automatically and stores the mapping between function pointers and IDs. We require the constructor to be deterministic, and so the function IDs are consistent between the client and the server.</p>
 
-<h4 id="setup">Setup</h4>
+<h3 id="setup">Setup</h3>
 
 <pre><code>cd ~/ece326
 tar -xf /cad2/ece326f/src/rpc.tar
@@ -178,7 +178,7 @@ make
 
 <!--It does not implement the protocol of how to encode/decode a certain type, which is task 1 of this assignment. -->
 
-<h4 id="solution-requirements">Solution Requirements</h4>
+<h3 id="solution-requirements">Solution Requirements</h3>
 
 <p>We breakdown this lab into two tasks. Both of them must be implemented inside the <code>rpcxx.h</code> file. An example implementation is given.</p>
 
@@ -188,7 +188,7 @@ Upon a successful compilation, you can run test binaries under the output direct
 <pre><code>Release/test-simple
 </code></pre>
 
-<h5 id="task-1">Task 1: Protocol for Parameter and Result Types</h5>
+<h4 id="task-1">Task 1: Protocol for Parameter and Result Types</h4>
 
 <p>The RPC library needs to encode/decode function parameters and function return values from the network. Currently, this implementation is missing. 
 Your first task is to specialize the template class <code>Protocol</code> to implement this.</p>
@@ -200,39 +200,33 @@ and <code>std::string</code>. You also need to support all the unsigned integer 
 
 <p>The example code provides the <code>Protocol&lt;T&gt;</code> definition. You need to specialize the <code>Protocol</code> class for each supported type. 
 Each specialization must support two static member functions: <code>Encode()</code> and <code>Decode()</code>. 
-Both must check if the input/output buffer has enough allocated size for encoding or decoding. The example code contain a samples implementation for <code>int</code>.</p>
+Both must check if the input/output buffer has enough allocated size for encoding or decoding. 
+The example code contain a samples implementation for <code>int</code>. The <code>test-basic</code> and <code>test-proto</code> 
+unittests contain all test cases you need to pass for this task. The starter code in <code>rpcxx.h</code> should pass for 
+<code>BasicTest.IntTest</code>.</p>
 
-<p><code>test-proto</code> unittest contains all test cases you need to pass for this task. The starter code in <code>rpcxx.h</code> should already pass some of them.</p>
+<p>It is up to you to decide how to implement the RPC protocol. However, to simplify the assignment,
+we <b>do not</b> require or suggest that you convert multi-byte native data types to network byte (big-endian) order,
+even though it is good engineering practice to do so. Note that we will not test your code on different architectures.</p>
 
-<p>Unlike in assignment 1, <b>you may choose to implement your own RPC protocol if you wish</b>. However, if you want to follow the implementation in the starter code, 
-you will need to convert multi-byte native data types to <em>network byte order</em> (which is big-endian), 
-similar to how the <a href="asst1.html#protocol">EasyDB access protocol</a> from assignment 1 works. 
-On Linux systems, you may use following functions to convert between
-host byte order (the byte order on the current CPU) and big-endian byte order.</p>
+<p>Here are some hints to help you get started:</p>
 
 <ul>
-<li><code>short</code>: use <a href="https://linux.die.net/man/3/htobe16">htobe16</a> or <a href="https://linux.die.net/man/3/htons">htons</a> to convert <em>to</em> a 16-bit big-endian byte-order, and 
-    <a href="https://linux.die.net/man/3/be16toh">be16toh</a> or <a href="https://linux.die.net/man/3/ntohs">ntohs</a> to convert <em>from</em> a 16-bit big-endian byte-order to host byte order.</li>
-<li><code>int, float</code>: use <a href="https://linux.die.net/man/3/htobe32">htobe32</a> or <a href="https://linux.die.net/man/3/htonl">htonl</a> to convert <em>to</em> a 32-bit big-endian byte-order, and 
-    <a href="https://linux.die.net/man/3/be32toh">be32toh</a> or <a href="https://linux.die.net/man/3/ntohl">ntohl</a> to convert <em>from</em> a 32-bit big-endian byte-order to host byte order.</li>
-<li><code>long long, double</code>: use <a href="https://linux.die.net/man/3/htobe64">htobe64</a> to convert <em>to</em> a 64-bit big-endian byte-order, and 
-    <a href="https://linux.die.net/man/3/be64toh">be64toh</a> to convert <em>from</em> a 64-bit big-endian byte-order to host byte order.</li>
+<li>You can use the <code>sizeof</code> operator to return the number of bytes used by a type. 
+The <code>sizeof</code> operator returns a <em>compile-time constant</em>. As such, you may be able to use it to write
+templates that will implement encoding and decoding of all the supported data types <em>except for</em> <code>std::string</code>.</li>
+<li><code>std::string</code> is a variable-sized data type. Therefore, your <code>Encode</code> function needs to somehow let 
+the <code>Decode</code> function know the length of the string. The two most common solutions are 
+<a href="https://en.wikipedia.org/wiki/Null-terminated_string">null-terminated strings</a> (C strings)
+and length-prefixed strings (Pascal strings). Note that EasyDB access protocol from assignment 1 and 3 uses Pascal strings because
+null-terminated strings do not support byte arrays, which may contain null characters. The tester will not check if your solution
+supports byte arrays.
+You are strongly encourage to read through the <a href="http://www.cplusplus.com/reference/string/string/">reference manual</a> for 
+<code>std::string</code>. 
+Pay attention the the <code>front</code> and <code>assign</code> member functions and the different constructors.</li>
 </ul>
 
-<p>For the unsigned integer types, use the same functions as the signed integer types of the same size. e.g. <code>htobe16</code> for <code>unsigned short</code> and <code>htobe64</code> for 
-<code>unsigned long long</code>.</p>
-
-<p>Note that <code>sizeof(char)</code> is 1, so it is not a multi-byte data type. Also, strings are byte arrays, and thus have no associated byte order either. In short, 
-you do not need to perform byte order conversion for the <code>char</code> and <code>std::string</code> types.</p>
-
-<p><code>long</code> is an odd case because it can either be 4 or 8 bytes, depending on CPU architecture. You should use the <em>appropriate</em> conversion function
-based on the result of <code>sizeof(long)</code>, which will return 4 on 32-bit architectures, and 8 on 64-bit architectures. Similarly, <code>bool</code> is compiler-dependent, so it can
-be anywhere from 1 to 8 bytes. Note that the <code>sizeof</code> operator returns a <em>compile-time constant</em>. Hint: you can make 4 template specializations to handle each of the possible byte sizes, then each specialization of the <code>Protocol</code> class can just use one of the 
-4 specializations. To do so, you will need to know how to work with the <a href="https://en.cppreference.com/w/cpp/language/pointer#Pointers_to_void">generic pointer type</a>: <code>void *</code>. 
-The only exception is <code>std::string</code>, which is a variable-sized data type. You should refer back to assignment 1 to see how the EasyDB protocol deals with the string type.
-</p> 
-
-<h5 id="task-2">Task 2: Type-Safe RPC API</h5>
+<h4 id="task-2">Task 2: Type-Safe RPC API</h4>
 
 <p>In this task, you will implement APIs needed for type-safe RPC. The basic RPC layer is given to you with several functions missing. Your task is to implement these missing parts.</p>
 
@@ -246,17 +240,49 @@ The only exception is <code>std::string</code>, which is a variable-sized data t
 
 <p>The <code>BaseClient::Send()</code> function can help you implement this task. This function takes an instance ID, a function ID, a <code>BaseParams</code> that describes how to encode function parameters and a <code>BaseResult</code> that describes how to decode result. <code>BaseParams::Encode()</code> virtual function describes how to encode parameters into the network buffer and <code>BaseResult::HandleResponse()</code> describes how to decode result from the network buffer.</p>
 
-<p>In the incomplete implementation that's given to you, since it only supports member functions that takes one integer and returns an integer, both the <code>IntResult</code> (<code>BaseResult</code>) and <code>IntParam</code> (<code>BaseParams</code>) only support one integer.</p>
+<p>In the incomplete implementation that's given to you, since it only supports member functions that takes one integer and returns an 
+integer, both the <code>IntResult</code> (<code>BaseResult</code>) and <code>IntParam</code> (<code>BaseParams</code>) only support one 
+integer. Please refer to the starter code, <code>rpcxx.h</code>, for further details.</p>
 
-<p>Please refer <code>rpcxx-sample.h</code> for further details.</p>
+<p>There are two unit-tests for this task. First, <code>test-simple</code> should compile and pass for the starter code that's given to you. 
+You should use this as a regression test. Second, you need to pass <code>test-complex</code>, which is a more complicated test. 
+Lastly, <code>test-exhaustive</code> will create random member functions and a random number of parameters and types.
+The sample solution <strong>cannot</strong> compile with <code>test-complex</code> or <code>test-exhaustive</code> yet.</p>
 
-<p>There are two unit-tests for this task. First, <code>test-simple</code> should compile and pass for <code>rpcxx-sample.h</code> that's given to you. You should use this as a regression test. Second, you need to pass <code>test-complex</code>, which is a more complicated test. The sample solution <strong>cannot</strong> compile with <code>test-complex</code> yet.</p>
+<p>You are suggested to first try to replicate the starter code for task 2 to gain a deeper understanding of the client/server communication.
+You are suggested to read through <a href="https://isocpp.org/wiki/faq/pointers-to-members">this wiki page</a> if you are not familiar with
+how member function pointers work. <code>test-complex</code> requires you to support the following types of member functions:</p>
 
-<h5>Recommended Coding Style</h5>
+<ol>
+  <li><code>void (Svc::*)()</code>: a function whose return type is <code>void</code> (i.e., nothing) and takes no parameters.</li>
+  <li><code>bool (Svc::*)()</code>: a function whose return type is <code>bool</code> and takes no parameters.</li>
+  <li><code>std::string (Svc::*)(unsigned int)</code>: a function whose return type is <code>std::string</code> and takes one parameter of type 
+  <code>unsigned int</code>.</li>
+  <li><code>std::string (Svc::*)(std::string)</code>: a function whose return type is <code>std::string</code> and takes one parameter of type 
+  <code>std::string</code>.</li> 
+  <li><code>std::string (Svc::*)(std::string, int)</code>: a function whose return type is <code>std::string</code> and takes <em>two</em> parameters 
+	of types <code>std::string</code> and <code>int</code>.</li>
+  <li><code>unsigned (Svc::*)(std::string, int)</code>: a function whose return type is <code>unsigned int</code> and takes two parameters 
+	of types <code>std::string</code> and <code>int</code>.</li>
+  <li><code>void (Svc::*)(std::string, int)</code>: a function whose return type is <code>void</code> and takes two parameters 
+	of types <code>std::string</code> and <code>int</code>.</li> 
+</ol>
+
+<p>You should be able to get (1) working easily because no parameters or return value are exchanged between the client and the server. 
+(2-4) should be similarly easy because you can follow the example in sample code on how to send a single argument to the server and then
+transmit the return value back to the client. For (5-7) you will need to understand how to chain calls to <code>Protocol::Encode</code> and 
+<code>Protocol::Decode</code>. This involves keeping track of the buffer's <em>current position</em> and <em>remaining length</em>, similar
+to what you have done in assignment 1, but this time in C++.</p>
+
+<p>While working on passing <code>test-complex</code> you should think deeply about how to generalize the code so that you can
+support any number of parameters of any types. You will need to use many variadic templates to do this. However, make sure you are able to
+fully pass <code>test-complex</code> before trying to take on <code>test-exhaustive</code>.</p>
+
+<h4>Recommended Coding Style</h4>
 
 <p>This project uses <a href="https://google.github.io/styleguide/cppguide.html">Google C++ Coding Style</a> extensively. I recommend following this style. Note that you will not be marked on your coding style; this is simply a suggestion.</p>
 
-<h4 id="submission">Submission</h4>
+<h3 id="submission">Submission</h3>
 
 <p>To submit your code with the current commit, use the <code>Asst4-end</code> tag. Remember to push the new tag to the remote repository.</p>
 

@@ -104,7 +104,7 @@
       <p><strong>Lab TA: Kia Shakiba</strong></p>
       <p>In this assignment, you will develop the driver code for communicating with EasyDB&trade; in Python3.</p>
       
-      <h4 id="background">Background</h4>
+      <h3 id="background">Background</h3>
       <p>A database management system (DBMS) is a piece of software that stores, analyzes, and administers data. Typically, a DBMS is broken into two components: the
          server, which does most of the work; and one or more clients, which send commands to the server and receive responses. For this assignment, we will work with 
 		 relational databases (e.g. MySQL, PostgreSQL).</p>
@@ -113,7 +113,7 @@
 	  server, typically through TCP/IP. The data sent across the network are known as <em>packets</em>. In this part of the assignment, you will implement the EasyDB driver
 	  in Python3 according to the packet format specification described in the next section.</p>
  
-      <h4 id="easydb">EasyDB</h4>
+      <h3 id="easydb">EasyDB</h3>
       
       <p>EasyDB is a toy relational database that provides minimalistic features for managing structured data. 
 	    In a relational database, data is organized into tables of columns and rows. 
@@ -126,7 +126,7 @@
 		A row in a User table may be ("John", "Smith", 5.5, 31), which correctly represents a single user in this table. 
 		A table, of course, can have many rows, allowing you to store multiple users in a User table. </p>
       
-      <h4 id="schema">Database Schema</h4>
+      <h3 id="schema">Database Schema</h3>
       
       <p>There can also be multiple tables in a relational database, allowing tables to reference others. To specify the database schema (i.e. list of table definitions) in EasyDB, use the following syntax:</p>
       
@@ -191,7 +191,7 @@ Animal {
       <p>You can guarantee that there's no cycle if a foreign field only references already defined table (except for the current one). Therefore,
 	    to keep this assignment simple, you will disallow forward references, even in cases where cycles would not be formed (e.g., 
 		switching the position between User and Account in the first example).</p>
-      <h4 id="protocol">Access Protocol</h4>
+      <h3 id="protocol">Access Protocol</h3>
       
       <p>To access a running EasyDB server, you must know the host name and its port number. Once you are connected, you can make one of five EasyDB queries that are available. 
 	    Note that EasyDB assumes that the client is aware of the current schema and does not provide an API for introspection. 
@@ -283,7 +283,7 @@ struct row {
 			 
 	  <p>For <tt>struct row</tt>, <tt>count</tt> specifies how many values are stored, and <tt>values</tt> is the array of values specified above.</p>
 
-      <h5>Atomic Update</h5>
+      <h4>Atomic Update</h4>
 
 <pre>
 struct key {
@@ -330,7 +330,7 @@ SET balance 900 --------------------&gt; NO
       
       <p>We will now describe the format of each EasyDB query.</p>
       
-      <h5>Insert Command</h5>
+      <h4>Insert Command</h4>
       
       <div class="table-responsive">
       <table class="packet">
@@ -370,7 +370,7 @@ SET balance 900 --------------------&gt; NO
 	    A foreign field is a 64-bit integer that refers to the id of a row in another table. If this field is set to zero, then it does not reference anything
 		and it would not be possible to receive <tt>BAD_FOREIGN</tt>.</p>
  
-      <h5>Update Command</h5>
+      <h4>Update Command</h4>
  
       <p>The update command is used to update an existing row in a table. It is similar to insert, with the addition that <tt>struct key</tt> of the row needs to be specified. 
 	    If you don't care about atomic update, set <tt>version</tt> of <tt>struct key</tt> to 0.</p>
@@ -394,7 +394,7 @@ SET balance 900 --------------------&gt; NO
       <p>The response for the update command is similar to insert, except only the new version number is returned. <tt>NOT_FOUND</tt> is returned if the row is not found. 
 	    <tt>TXN_ABORT</tt> is returned if atomic update failed. <tt>BAD_FOREIGN</tt> is returned if a foreign field reference does not exist.</p>
  
-      <h5>Drop command</h5>
+      <h4>Drop command</h4>
       
       <p>The drop command deletes a row in table. Therefore, it needs to specify the id of the row to be dropped. In EasyDB, the drop command performs <em>cascade delete</em>, 
 	    which means that if a row is referenced by rows in other tables, those rows will also be deleted. For example, if a user has three associated accounts, upon deleting the user, 
@@ -410,7 +410,7 @@ SET balance 900 --------------------&gt; NO
       
       <p>The response packet for drop is just <tt>struct response</tt>. <tt>NOT_FOUND</tt> is returned if the row is not found.</p>
       
-      <h5>Get Command</h5>
+      <h4>Get Command</h4>
       
       <p>The get command retrieves a row from a table, which requires specifying the id of the row.</p>
       
@@ -432,7 +432,7 @@ SET balance 900 --------------------&gt; NO
       </table>
       </div>
       
-      <h5>Scan Command</h5>
+      <h4>Scan Command</h4>
 
 <pre>
 enum Operator {
@@ -472,7 +472,7 @@ enum Operator {
 	    1) column type and value type mismatched, or 2) operator for the given type is not supported. In EasyDB, id and foreign field only support <tt>OP_EQ</tt> and <tt>OP_NE</tt>. 
 		For <tt>string</tt>, <a href="https://en.cppreference.com/w/c/string/byte/strcmp">lexicographical comparison</a> is performed (e.g., "A" is less than "B" and "5" is less than "-2").</p>
       
-      <h5>Exit Command</h5>
+      <h4>Exit Command</h4>
       
       <div class="table-responsive">
       <table class="packet">
@@ -485,7 +485,7 @@ enum Operator {
       <p>The exit command shuts down the connection gracefully. There is no server response for this command. The server will disconnect once it receives this command. 
 	    You may set any value for the <tt>table</tt> field, but 1 is preferred.</p>
 
-	  <h4 id="binary">Binary Format</h4>
+	  <h3 id="binary">Binary Format</h3>
 	  <p>Since you will be working extensively on converting between Python basic types and binary data (the format of network packets), 
 	  this section serves as a primer for the Python's <a href="https://docs.python.org/3/library/struct.html"><tt>struct</tt> library</a>.
 	  You should reference the documentation for any detail not described here.</p>
@@ -558,7 +558,7 @@ b'\x00\x00\x00\x01?\xf0\x00\x00\x00\x00\x00\x00'
 	  will need to concatenate the bytearrays. Please refer the the lectures on how to concatenate strings; the same methods and operators
 	  work for bytearrays as well.</p>
 	  
-      <h4 id="setup">Setup</h4> 
+      <h3 id="setup">Setup</h3> 
 <pre>
 cd ~/ece326
 tar -xf /cad2/ece326f/src/driver.tar
@@ -581,13 +581,13 @@ cd asst1
         <li><em>easydb/exception.py</em>: contains all the exception classes used by the database implementation. Do not change.</li>
       </ul>
 
-      <h4 id="specification">Solution Requirements</h4>
+      <h3 id="specification">Solution Requirements</h3>
       <p>This assignment has a couple of milestones, each of which can work independently and thus are worth partial marks. 
 	    You and your partner should take on one of each part of the assignment.
         In order to communicate with the database server, you need to write a client library in Python3 that will send requests to an EasyDB server 
 		as well as parsing responses received from the server. The interface is described here.</p>
       
-      <h5>Database Schema</h5>
+      <h4>Database Schema</h4>
       <p>As said earlier, the server assumes the client knows the schema, so the user of your library must supply the schema to the client to instantiate it. 
 	    Here is an example of how your EasyDB library will be initialized.</p>
 <pre>
@@ -648,7 +648,7 @@ db.close()
       
       <p>Now, here is the specification for each command:</p>
       
-      <h5>Insert Command</h5>
+      <h4>Insert Command</h4>
       <pre>insert(table_name, values)</pre>
       <p><em>table_name</em> is the name of the table, and <em>values</em> should be a sequence (e.g., list, tuple) of <em>N</em> elements 
 	    where <em>N</em> is the number of columns in the table. You should throw a <tt>PacketError</tt> if any of the arguments have problems, 
@@ -664,7 +664,7 @@ db.close()
 	  <p>You will need to encode strings into bytes objects before they can be sent across network. Use the <tt>encode</tt> string method to do this. You may assume
 	    EasyDB only supports ASCII strings.</p>
       
-      <h5>Update Command</h5>
+      <h4>Update Command</h4>
       <pre>update(table_name, pk, values, version=0)</pre>
       <p>Same as insert, with two more arguments, <em>pk</em> and <em>version</em>. <em>pk</em> is the id of the row to update, and <em>version</em> is optional, and if specified, 
 		will enable atomic update. If the response is <tt>OK</tt>, returns the new <em>version</em>, regardless of whether atomic update was enabled or not.
@@ -676,7 +676,7 @@ db.close()
 2
 </pre>
       <p>If either <tt>pk</tt> or <tt>version</tt> is not an integer, you should raise <tt>PacketError</tt>. </p>
-      <h5>Drop Command</h5>
+      <h4>Drop Command</h4>
       <pre>drop(table_name, pk)</pre>
       <p><em>table_name</em> is the name of the table, and <em>pk</em> is the id of the row to be deleted. This method does not return a value, 
 	    but <tt>ObjectDoesNotExist</tt> is raised if the id does not exist in the specified table. For example:</p>
@@ -690,7 +690,7 @@ easydb.exception.ObjectDoesNotExist: User object 2 is not found
 </pre>
       
 	  <p>You should raise <tt>PacketError</tt> if <tt>pk</tt> is not an integer.</p>
-      <h5>Get Command</h5>
+      <h4>Get Command</h4>
       <pre>get(table_name, pk)</pre>
       <p><em>table_name</em> is the name of the table, and <em>pk</em> is the id of the row to be retrieved.  
 	    <tt>ObjectDoesNotExist</tt> is raised if the object cannot be found. If the response is <tt>OK</tt>, return a list of the values and the version. 
@@ -704,7 +704,7 @@ easydb.exception.ObjectDoesNotExist: User object 2 is not found
       
 	  <p>For string, remember to decode it from the bytes object you receive from network. Raise <tt>PacketError</tt> if <tt>pk</tt> is not an integer.</p> 
 	  
-      <h5>Scan Command</h5>
+      <h4>Scan Command</h4>
       <pre>scan(table_name, op, column_name=None, value=None)</pre>
       <p><em>table_name</em> is the name of the table, <em>op</em> is the operator, <em>column_name</em> is the name of the column and also the left operand,
 	    and <em>value</em> is a constant value and also the right operand. 
@@ -719,7 +719,7 @@ easydb.exception.ObjectDoesNotExist: User object 2 is not found
 </pre>
 
 	  <p>Note: Do not forget about the internal <tt>id</tt> field. Also, when the operator is <tt>OP_AL</tt>, you should ignore the column name.</p>
-      <h4 id="testing">Testing Your Code</h4>
+      <h3 id="testing">Testing Your Code</h3>
       <p>To test your database client, you will need to run the server. 
 		Remember to go through <a href="labs.html#testing">Tester Setup</a> first, otherwise you will not find the executable for the server, which
 		is placed in the folder <tt>/cad2/ece326f/tester/bin</tt>.
@@ -747,7 +747,7 @@ Type "help", "copyright", "credits" or "license" for more information.
     
 	<p>Note that you will need to change the <tt>tb</tt> variable in <tt>main.py</tt> if you load the database server with a different schema!</p>
 	
-      <h4 id="submission">Code Submission</h4>
+      <h3 id="submission">Code Submission</h3>
       <p>To submit your code with the current commit, use the <tt>Asst1-end</tt> tag. Remember to push the new tag to the remote repository.</p>
  
 <pre>
@@ -755,7 +755,7 @@ git tag Asst1-end    // Creates tag for current submission for Assignment 1
 git push --tags
 </pre>
       
-      <h4 id="glossary">Glossary of Terms</h4>
+      <h3 id="glossary">Glossary of Terms</h3>
       <p>Here, you can find the definition of commonly seen terms that are used in the assignment. More will be added as people ask questions about the assignment.</p>
       
       <ul>
