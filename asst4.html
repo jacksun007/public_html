@@ -236,7 +236,13 @@ Pay attention the the <code>front</code> and <code>assign</code> member function
 
 <p>Notice that the <code>DecodeAndExecute()</code> has similar semantic with <code>Protocol&lt;T&gt;::Decode()</code>. This function returns false if the buffer <code>in_len</code> isn't large enough or any fatal error happens during parsing.</p>
 
-<p>On the client side, the networking part is complete. You need to implement the <code>Client::Call()</code> function, which converts the member function and its parameters into network data and then sends over the network. This function takes many parameters. The first parameter is the service pointer, the second is the member function you want to RPC. After these, depending on the type of the member function, <em>this function takes all parameters you need to pass into the member function</em>. The return type also depends on the type of the member function. It needs to inherit the <code>BaseResult</code> class and its <code>data()</code> function should return the result of the corresponding type type on the client-side when ready.</p>
+<p>On the client side, the networking part is complete. You need to implement the <code>Client::Call()</code> function, 
+which converts the member function and its parameters into network data and then sends them over the network. 
+This function takes many parameters. The first parameter is the service pointer, the second is the member function you want to RPC. 
+After these, depending on the type of the member function, <em>this function takes all parameters you need to pass into the member function</em>. 
+The return type also depends on the type of the member function. 
+It needs to inherit the <code>BaseResult</code> class and its <code>data()</code> function should return the result of the corresponding type 
+on the client-side when ready.</p>
 
 <p>The <code>BaseClient::Send()</code> function can help you implement this task. This function takes an instance ID, a function ID, a <code>BaseParams</code> that describes how to encode function parameters and a <code>BaseResult</code> that describes how to decode result. <code>BaseParams::Encode()</code> virtual function describes how to encode parameters into the network buffer and <code>BaseResult::HandleResponse()</code> describes how to decode result from the network buffer.</p>
 
@@ -244,7 +250,7 @@ Pay attention the the <code>front</code> and <code>assign</code> member function
 integer, both the <code>IntResult</code> (<code>BaseResult</code>) and <code>IntParam</code> (<code>BaseParams</code>) only support one 
 integer. Please refer to the starter code, <code>rpcxx.h</code>, for further details.</p>
 
-<p>There are two unit-tests for this task. First, <code>test-simple</code> should compile and pass for the starter code that's given to you. 
+<p>There are three unit-tests for this task. First, <code>test-simple</code> should compile and pass for the starter code that's given to you. 
 You should use this as a regression test. Second, you need to pass <code>test-complex</code>, which is a more complicated test. 
 Lastly, <code>test-exhaustive</code> will create random member functions and a random number of parameters and types.
 The sample solution <strong>cannot</strong> compile with <code>test-complex</code> or <code>test-exhaustive</code> yet.</p>
