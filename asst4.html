@@ -260,25 +260,28 @@ You are suggested to read through <a href="https://isocpp.org/wiki/faq/pointers-
 how member function pointers work. <code>test-complex</code> requires you to support the following types of member functions:</p>
 
 <ol>
-  <li><code>void (Svc::*)()</code>: a function whose return type is <code>void</code> (i.e., nothing) and takes no parameters.</li>
-  <li><code>bool (Svc::*)()</code>: a function whose return type is <code>bool</code> and takes no parameters.</li>
-  <li><code>std::string (Svc::*)(unsigned int)</code>: a function whose return type is <code>std::string</code> and takes one parameter of type 
+  <li><code>void (Svc::*)()</code>: Required for <code>InitializeSomeRandomThing</code>, a function whose return type is <code>void</code> (i.e., nothing) and takes no parameters.</li>
+  <li><code>bool (Svc::*)()</code>: Required for <code>CheckInitialized</code>, a function whose return type is <code>bool</code> and takes no parameters.</li>
+  <li><code>std::string (Svc::*)(unsigned int)</code>: Required for <code>Guess</code>, a function whose return type is <code>std::string</code> and takes one parameter of type 
   <code>unsigned int</code>.</li>
-  <li><code>std::string (Svc::*)(std::string)</code>: a function whose return type is <code>std::string</code> and takes one parameter of type 
-  <code>std::string</code>.</li> 
-  <li><code>std::string (Svc::*)(std::string, int)</code>: a function whose return type is <code>std::string</code> and takes <em>two</em> parameters 
+  <li><code>std::string (Svc::*)(std::string, int)</code>: Required for <code>Repeat</code>, a function whose return type is <code>std::string</code> and takes <em>two</em> parameters 
 	of types <code>std::string</code> and <code>int</code>.</li>
-  <li><code>unsigned (Svc::*)(std::string, int)</code>: a function whose return type is <code>unsigned int</code> and takes two parameters 
-	of types <code>std::string</code> and <code>int</code>.</li>
-  <li><code>void (Svc::*)(std::string, int)</code>: a function whose return type is <code>void</code> and takes two parameters 
-	of types <code>std::string</code> and <code>int</code>.</li> 
+  <li><code>unsigned long(Svc::*)(int, unsigned int)</code>: Required for <code>TestSign</code>, a function whose return type is <code>unsigned long</code> and takes two parameters 
+	of types <code>int</code> and <code>unsigned int</code>.</li>
+  <li><code>void (Svc::*)(std::string, std::string)</code>: Required for <code>Put</code>, a function whose return type is <code>void</code> and takes two parameters 
+	of type <code>std::string</code>.</li> 	
+  <li><code>std::string (Svc::*)(std::string)</code>: Required for <code>Get</code>, a function whose return type is <code>std::string</code> and takes one parameter
+	of type <code>std::string</code>.</li> 
 </ol>
 
 <p>You should be able to get (1) working easily because no parameters or return value are exchanged between the client and the server. 
-(2-4) should be similarly easy because you can follow the example in sample code on how to send a single argument to the server and then
-transmit the return value back to the client. For (5-7) you will need to understand how to chain calls to <code>Protocol::Encode</code> and 
+(2-3, 7) should be similarly easy because you can follow the example in sample code on how to send a single argument to the server and then
+transmit the return value back to the client. For (4-6) you will need to understand how to chain calls to <code>Protocol::Encode</code> and 
 <code>Protocol::Decode</code>. This involves keeping track of the buffer's <em>current position</em> and <em>remaining length</em>, similar
 to what you have done in assignment 1, but this time in C++.</p>
+
+<p>You are highly suggested to work from top to bottom because that's the order in which the tester runs. If the tester crashes on the
+first test case, it won't get to the subsequent test cases, even if they are working.</p>
 
 <p>While working on passing <code>test-complex</code> you should think deeply about how to generalize the code so that you can
 support any number of parameters of any types. You will need to use many variadic templates to do this. However, make sure you are able to
