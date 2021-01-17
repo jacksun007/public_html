@@ -58,26 +58,38 @@
 }
 
 table.packet, .packet td {
-	border: 1px solid black;
+  border: 1px solid black;
 }
 
 table.packet {
-	margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .packet td {
-	font-family: monospace;
-	padding: 6px;
-	font-size: 1.25rem;
-	vertical-align: top;
+  font-family: monospace;
+  padding: 6px;
+  font-size: 1.25rem;
+  vertical-align: top;
 }
 
 div.frame {
-	padding: 8px;
-	border: 1px solid black;
-	margin-bottom: 1rem;
+  padding: 8px;
+  border: 1px solid black;
+  margin-bottom: 1rem;
 }
 
 div.frame pre {
-	margin-bottom: 0px;
+  margin-bottom: 0px;
 }
+
+@media print {
+  [role="main"] {
+    padding: 0px;
+	margin-left: 0px !important;
+	width: 100%;
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
