@@ -113,7 +113,7 @@ if rec.valid():
     name = rec["firstName"]
 </pre>      
 
-      <p>into this:</p>
+      <p>The Python code a web application programmer would write would now look like this:</p>
 
 <pre>
 from schema import User
@@ -131,9 +131,10 @@ except orm.ObjectDoesNotExist:
 <img src="img/webstack.svg" alt="Web Stack" height="300px" style="margin-bottom:1rem;">
 </div>
 </div>
-	  <p>In other words, with ORM, you can treat database tables as classes and database rows as objects, allowing the end user to 
+	  <p>In other words, with ORM, you can treat database tables as classes and database rows as objects, allowing a web backend 
+	    developer to 
 	    write object-oriented code. More importantly, ORM layer abstracts away the underlying database implementation, 
-		allowing the end users possible freedom to switch from one database solution to another (e.g. from EasyDB to MySQL)
+		which simplifies the process of switching from one database solution to another (e.g. from EasyDB to MySQL)
 		without having to rewrite their entire application to use the new database solution.</p>
       
       <p>Another advantage is that an ORM framework can help with converting in-memory types to and from storage types seamlessly. 
